@@ -1,0 +1,45 @@
+{
+  "name": "@delyva/icons",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SVG icon set compiled to typed React and React Native components.",
+  "exports": {
+    "./web": {
+      "types": "./dist/web.d.ts",
+      "default": "./dist/web.js"
+    },
+    "./native": {
+      "types": "./dist/native.d.ts",
+      "default": "./dist/native.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs && tsc -p tsconfig.build.json",
+    "typecheck": "node scripts/build.mjs && tsc --noEmit",
+    "lint": "node scripts/build.mjs && eslint . --max-warnings 0",
+    "test": "node scripts/build.mjs && vitest run --coverage"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "19.3.0",
+    "react-native-svg": "15.16.0"
+  },
+  "devDependencies": {
+    "@delyva/config": "workspace:*",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/coverage-v8": "5.1.1",
+    "eslint": "10.15.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1",
+    "react-native": "0.88.1",
+    "react-native-svg": "15.16.0"
+  }
+}

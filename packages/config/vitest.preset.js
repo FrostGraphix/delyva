@@ -11,7 +11,7 @@ export function vitestPreset(opts = {}) {
       coverage: {
         provider: 'v8',
         include: opts.coverageInclude ?? ['src/**/*.ts'],
-        exclude: ['src/**/*.test.ts', 'src/**/index.ts'],
+        exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/index.ts'],
         thresholds: opts.thresholds ?? { lines: 80, functions: 80, branches: 80, statements: 80 },
       },
     },
