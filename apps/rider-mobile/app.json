@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Delyva Rider",
+    "slug": "delyva-rider",
+    "scheme": "delyva-rider",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": { "bundleIdentifier": "ng.delyva.rider" },
+    "android": { "package": "ng.delyva.rider" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}

@@ -6,9 +6,9 @@ import globals from 'globals';
  * Shared flat config: strict type-aware TS rules, no console, and import boundaries.
  * Boundaries: nobody imports from apps/*; packages never import apps; deep imports
  * into other packages' src are forbidden (use the package entry point).
- * @param {{ tsconfigRootDir: string; extraBoundaries?: import('eslint').Linter.RulesRecord }} opts
+ * @param {{ tsconfigRootDir: string; browser?: boolean }} opts
  */
-export function delyvaConfig({ tsconfigRootDir }) {
+export function delyvaConfig({ tsconfigRootDir, browser = false }) {
   return tseslint.config(
     {
       ignores: [
@@ -28,7 +28,7 @@ export function delyvaConfig({ tsconfigRootDir }) {
     ...tseslint.configs.stylisticTypeChecked,
     {
       languageOptions: {
-        globals: { ...globals.node },
+        globals: browser ? { ...globals.browser, ...globals.node } : { ...globals.node },
         parserOptions: { projectService: true, tsconfigRootDir },
       },
       rules: {

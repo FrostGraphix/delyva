@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Delyva",
+    "slug": "delyva-customer",
+    "scheme": "delyva",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": { "bundleIdentifier": "ng.delyva.customer" },
+    "android": { "package": "ng.delyva.customer" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}

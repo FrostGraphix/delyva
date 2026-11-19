@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@import '@delyva/design-tokens/tailwind.css';
+@source '../../../packages/ui-web/dist';
+
+body {
+  background: var(--dl-bg);
+  color: var(--dl-text);
+}
