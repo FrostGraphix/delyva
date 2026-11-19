@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delyva — Admin Dashboard</title><link rel="stylesheet" href="assets/delyva.css"><link rel="stylesheet" href="assets/liquid.css">
+<style>.screens .desk{flex:none}</style></head>
+<body><div class="canvas">
+<nav class="topnav"><a href="index.html">← Gallery</a><a href="customer.html">Customer</a><a href="merchant.html">Merchant</a><a href="rider.html">Rider</a><a class="on" href="admin.html">Admin</a><a href="design-system.html">Design system</a></nav>
+<h1 class="page-title">Operations dashboard</h1>
+<p class="page-sub">Desktop 1440×900 · 248 px sidebar · 12-col grid. Scroll horizontally on small screens.</p>
+<div style="overflow-x:auto;padding-bottom:20px">
+
+<!-- A02 OVERVIEW -->
+<div class="section-h"><h2>A02 · Overview</h2></div>
+<div class="screens"><div class="desk"><aside class="side" data-side="Overview"></aside>
+ <div class="main"><div class="dtop"><div class="field" style="height:42px;width:360px;box-shadow:none;background:var(--surface)">🔍 <input placeholder="Search order, phone, merchant…"></div><span class="grow"></span><span class="pill ready">● All systems normal</span><select style="height:40px;border-radius:12px;border:1px solid var(--line);padding:0 12px;background:#fff"><option>Lagos</option></select><div class="avatar">NA</div></div>
+ <div class="dbody">
+  <div class="row between"><div><h1 class="h1">Good evening, Nasir</h1><div class="muted">Thursday 19 Nov · Lagos · Live</div></div><div class="row"><button class="btn btn-ghost s">⤓ Export</button><button class="btn btn-primary s">Today ⌄</button></div></div>
+  <div class="grid g4">
+   <div class="stat"><div class="micro">GMV today</div><div class="v">₦4.82M</div><div class="small" style="color:var(--lime-700)">▲ 14% vs last Thu</div></div>
+   <div class="stat"><div class="micro">Orders</div><div class="v">642</div><div class="small" style="color:var(--lime-700)">▲ 9%</div></div>
+   <div class="stat"><div class="micro">On-time</div><div class="v">92.4%</div><div class="bar mt8"><i style="width:92%"></i></div></div>
+   <div class="stat"><div class="micro">Contribution / order</div><div class="v">₦536</div><div class="small muted">target ₦500</div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:2fr 1fr;flex:1;min-height:0">
+   <div class="card"><div class="row between"><h3 class="h3">Orders by hour</h3><div class="seg" style="width:220px"><span class="on">Today</span><span>7d</span><span>30d</span></div></div>
+    <div class="spark" style="height:340px;margin-top:20px"><i style="height:12%"></i><i style="height:18%"></i><i style="height:30%"></i><i style="height:45%"></i><i style="height:55%"></i><i style="height:48%"></i><i style="height:42%"></i><i style="height:60%"></i><i style="height:72%"></i><i class="hi" style="height:100%"></i><i class="hi" style="height:92%"></i><i style="height:70%"></i><i style="height:40%"></i><i style="height:25%"></i></div>
+    <div class="row between small muted mt8"><span>10 AM</span><span>12 PM</span><span>2 PM</span><span>4 PM</span><span>6 PM</span><span>8 PM</span><span>10 PM</span></div></div>
+   <div class="col gap12">
+    <div class="card"><h3 class="h3">Needs attention</h3>
+     <div class="row mt12"><span class="pill bad">3</span><span class="grow">Late orders (&gt;SLA)</span><span class="muted">›</span></div>
+     <div class="row mt12"><span class="pill wait">5</span><span class="grow">Merchants awaiting review</span><span class="muted">›</span></div>
+     <div class="row mt12"><span class="pill wait">4</span><span class="grow">Rider applications</span><span class="muted">›</span></div>
+     <div class="row mt12"><span class="pill bad">1</span><span class="grow">Failed payout</span><span class="muted">›</span></div>
+     <div class="row mt12"><span class="pill wait">2</span><span class="grow">Low-battery riders</span><span class="muted">›</span></div></div>
+    <div class="card"><h3 class="h3">Supply now</h3><div class="row between mt12"><span class="muted">Riders online</span><b>48</b></div><div class="row between mt8"><span class="muted">On delivery</span><b>31</b></div><div class="row between mt8"><span class="muted">Avg dispatch time</span><b>1m 12s</b></div><div class="row between mt8"><span class="muted">Solar share of energy</span><b style="color:var(--lime-700)">78%</b></div></div>
+   </div></div>
+ </div></div></div></div>
+
+<!-- A03 LIVE OPS -->
+<div class="section-h"><h2>A03 · Live operations</h2></div>
+<div class="screens"><div class="desk"><aside class="side" data-side="Live ops"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Live operations</h2><span class="grow"></span><div class="chips"><span class="chip on">All</span><span class="chip">Late</span><span class="chip">Unassigned</span><span class="chip">Food</span><span class="chip">Parcel</span></div></div>
+ <div class="dbody" style="padding:0;flex-direction:row;gap:0">
+  <div style="flex:1;position:relative;overflow:hidden"><div class="map"><div class="road" style="left:0;right:0;top:280px;height:18px"></div><div class="road" style="left:300px;top:0;bottom:0;width:18px"></div><div class="road" style="left:0;right:0;top:560px;height:14px"></div><div class="road" style="left:640px;top:0;bottom:0;width:14px"></div>
+    <div style="position:absolute;left:200px;top:100px;width:260px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,176,32,.5),transparent 70%)"></div>
+    <div class="pin store" style="left:120px;top:200px"><span>🍛</span></div><div class="pin store" style="left:520px;top:420px"><span>🍕</span></div><div class="pin home" style="left:380px;top:120px"><span>🏠</span></div><div class="pin home" style="left:760px;top:300px"><span>🏠</span></div>
+    <div class="pin rider" style="left:260px;top:260px"><span>🛵</span></div><div class="pin rider" style="left:600px;top:340px"><span>🛵</span></div><div class="pin rider" style="left:420px;top:520px"><span>🛵</span></div>
+    <div class="pin" style="left:700px;top:150px;background:var(--sun);border-radius:14px;transform:none"><span style="transform:none">☀️</span></div></div>
+   <div class="glass row" style="position:absolute;left:16px;bottom:16px;padding:10px 14px;gap:16px;border-radius:99px"><span>🛵 48 riders</span><span>📦 87 active</span><span style="color:var(--danger)">⚠ 3 late</span></div></div>
+  <div style="width:400px;background:#fff;border-left:1px solid var(--line);padding:16px;overflow:hidden" class="col gap12">
+   <h3 class="h3">Active orders</h3>
+   <div class="card" style="box-shadow:none;border:1px solid #F7C9CB;background:#FFF7F7"><div class="row between"><b>#48199</b><span class="pill bad">Late +8 min</span></div><div class="small muted mt8">Slice Lagos → Yaba · Rider: Femi O.</div><div class="row mt12"><button class="btn btn-ghost s">📞 Rider</button><button class="btn btn-primary s">Reassign</button></div></div>
+   <div class="card" style="box-shadow:none;border:1px solid var(--line)"><div class="row between"><b>#48213</b><span class="pill way">On the way</span></div><div class="small muted mt8">Mama Nkechi's → Lekki · Tunde A.</div><div class="bar mt8"><i style="width:62%"></i></div></div>
+   <div class="card" style="box-shadow:none;border:1px solid var(--line)"><div class="row between"><b>#48220</b><span class="pill wait">Finding rider · 0:48</span></div><div class="small muted mt8">Burger Hub → Ikoyi · 3 offers sent</div><div class="row mt12"><button class="btn btn-brand s">Assign manually</button></div></div>
+   <div class="card" style="box-shadow:none;border:1px solid var(--line)"><div class="row between"><b>#48221</b><span class="pill prep">Preparing</span></div><div class="small muted mt8">Suya Spot → VI · ready in 9 min</div></div>
+   <div class="card" style="box-shadow:none;border:1px solid var(--line)"><div class="row between"><b>P-1032</b><span class="pill way">On the way</span></div><div class="small muted mt8">Parcel · Lekki → Yaba · Bola K.</div></div>
+  </div>
+ </div></div></div></div>
+
+<!-- A05 MERCHANTS -->
+<div class="section-h"><h2>A05 · Merchants pipeline</h2></div>
+<div class="screens"><div class="desk"><aside class="side" data-side="Merchants"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Merchants</h2><span class="grow"></span><button class="btn btn-ghost s">Import leads</button><button class="btn btn-brand s">＋ Add merchant</button></div>
+ <div class="dbody">
+  <div class="grid" style="grid-template-columns:repeat(5,1fr)">
+   <div class="card soft"><div class="micro">Leads</div><div class="h2">142</div></div><div class="card soft"><div class="micro">Registered</div><div class="h2">64</div></div><div class="card soft" style="background:#FFF8E6"><div class="micro">In review</div><div class="h2">5</div></div><div class="card soft"><div class="micro">Test order</div><div class="h2">3</div></div><div class="card lime"><div class="micro">Live</div><div class="h2">52</div></div></div>
+  <div class="card" style="flex:1;overflow:hidden"><div class="row between"><div class="chips"><span class="chip on">All</span><span class="chip">In review</span><span class="chip">Live</span><span class="chip">Suspended</span></div><div class="field" style="height:40px;width:260px;box-shadow:none;background:var(--surface)">🔍 <input placeholder="Search"></div></div>
+  <table class="t mt12"><thead><tr><th>Merchant</th><th>Category</th><th>Area</th><th>Agent</th><th>Status</th><th>Orders (7d)</th><th>Rating</th><th></th></tr></thead><tbody>
+   <tr><td><div class="row"><div class="ph a round" style="width:36px;height:36px;font-size:18px">🍛</div><b>Mama Nkechi's Kitchen</b></div></td><td>Restaurant</td><td>Lekki</td><td>Bashir</td><td><span class="pill ready">Live</span></td><td class="tnum">186</td><td>⭐ 4.8</td><td><span class="muted">⋯</span></td></tr>
+   <tr><td><div class="row"><div class="ph c round" style="width:36px;height:36px;font-size:18px">🛒</div><b>FreshMart Supermarket</b></div></td><td>Grocery</td><td>Yaba</td><td>Bashir</td><td><span class="pill prep">Test order</span></td><td class="tnum">—</td><td>—</td><td><button class="btn btn-soft s">Review</button></td></tr>
+   <tr><td><div class="row"><div class="ph d round" style="width:36px;height:36px;font-size:18px">💊</div><b>HealthPlus Pharmacy</b></div></td><td>Pharmacy</td><td>VI</td><td>Amina</td><td><span class="pill wait">In review</span></td><td class="tnum">—</td><td>—</td><td><button class="btn btn-brand s">Approve</button></td></tr>
+   <tr><td><div class="row"><div class="ph b round" style="width:36px;height:36px;font-size:18px">🍔</div><b>Burger Hub</b></div></td><td>Restaurant</td><td>Ikoyi</td><td>Bashir</td><td><span class="pill ready">Live</span></td><td class="tnum">121</td><td>⭐ 4.5</td><td><span class="muted">⋯</span></td></tr>
+   <tr><td><div class="row"><div class="ph e round" style="width:36px;height:36px;font-size:18px">🧁</div><b>Sweet Crumbs Bakery</b></div></td><td>Bakery</td><td>Surulere</td><td>Amina</td><td><span class="pill bad">Docs missing</span></td><td class="tnum">—</td><td>—</td><td><button class="btn btn-ghost s">Nudge</button></td></tr>
+  </tbody></table></div>
+ </div></div></div></div>
+
+<!-- A08 PRICING -->
+<div class="section-h"><h2>A08 · Pricing & commissions</h2></div>
+<div class="screens"><div class="desk"><aside class="side" data-side="Pricing"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Pricing & commissions</h2><span class="grow"></span><span class="pill wait">Draft · effective 1 Dec</span><button class="btn btn-primary s">Publish changes</button></div>
+ <div class="dbody"><div class="grid g2" style="flex:1;min-height:0">
+  <div class="card"><h3 class="h3">Delivery fee bands (₦)</h3><table class="t mt12"><thead><tr><th>Distance</th><th>Customer fee</th><th>Rider payout</th><th>Margin</th></tr></thead><tbody>
+   <tr><td>Up to 2 km</td><td class="tnum"><div class="field sq" style="height:36px;box-shadow:none;background:var(--surface);width:100px">300</div></td><td class="tnum">220</td><td class="tnum" style="color:var(--lime-700)">+80</td></tr>
+   <tr><td>2 – 4 km</td><td><div class="field sq" style="height:36px;box-shadow:none;background:var(--surface);width:100px">450</div></td><td class="tnum">320</td><td class="tnum" style="color:var(--lime-700)">+130</td></tr>
+   <tr><td>4 – 6 km</td><td><div class="field sq" style="height:36px;box-shadow:none;background:var(--surface);width:100px">650</div></td><td class="tnum">470</td><td class="tnum" style="color:var(--lime-700)">+180</td></tr>
+   <tr><td>6 km +</td><td class="muted">650 + ₦90 / km</td><td class="tnum">470 + ₦65 / km</td><td class="tnum" style="color:var(--lime-700)">+25 / km</td></tr></tbody></table>
+   <h3 class="h3 mt24">Multipliers</h3><div class="row between mt12"><span>🌧 Rain</span><div class="field sq" style="height:36px;width:90px;box-shadow:none;background:var(--surface)">×1.2</div></div><div class="row between mt8"><span>🌙 Night (10pm–6am)</span><div class="field sq" style="height:36px;width:90px;box-shadow:none;background:var(--surface)">×1.3</div></div><div class="row between mt8"><span>🔥 Peak (auto, by demand)</span><div class="toggle on"></div></div></div>
+  <div class="col gap12"><div class="card"><h3 class="h3">Merchant commission</h3>
+   <div class="row between mt12"><span>Introductory phase (all)</span><b>0%</b></div><div class="row between mt8"><span>Restaurants</span><div class="field sq" style="height:36px;width:90px;box-shadow:none;background:var(--surface)">12%</div></div><div class="row between mt8"><span>Groceries</span><div class="field sq" style="height:36px;width:90px;box-shadow:none;background:var(--surface)">8%</div></div><div class="row between mt8"><span>Pharmacy</span><div class="field sq" style="height:36px;width:90px;box-shadow:none;background:var(--surface)">10%</div></div></div>
+   <div class="card"><h3 class="h3">Fees</h3><div class="row between mt12"><span>Service fee</span><b>₦100</b></div><div class="row between mt8"><span>Free delivery threshold</span><b>₦8,000</b></div><div class="row between mt8"><span>COD cap</span><b>₦15,000</b></div></div>
+   <div class="card lime"><b>Simulation</b><div class="small mt8">Avg order ₦6,000 · 3.1 km → contribution <b>₦536</b> (+₦16 vs current)</div></div></div>
+ </div></div></div></div></div>
+
+<!-- A10 FINANCE -->
+<div class="section-h"><h2>A10 · Finance — settlements & payouts</h2></div>
+<div class="screens"><div class="desk"><aside class="side" data-side="Finance"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Finance</h2><span class="grow"></span><button class="btn btn-ghost s">Reconcile</button><button class="btn btn-brand s">▶ Run weekly payout</button></div>
+ <div class="dbody"><div class="grid g4"><div class="stat"><div class="micro">Merchant payable</div><div class="v">₦18.4M</div></div><div class="stat"><div class="micro">Rider payable</div><div class="v">₦3.1M</div></div><div class="stat"><div class="micro">Revenue (MTD)</div><div class="v">₦7.9M</div></div><div class="stat"><div class="micro">Reconciliation</div><div class="v" style="color:var(--lime-700)">99.8%</div><div class="small muted">3 exceptions</div></div></div>
+  <div class="card" style="flex:1;overflow:hidden"><div class="row between"><h3 class="h3">Payout batch · Week 47</h3><span class="pill prep">Ready to run</span></div>
+  <table class="t mt12"><thead><tr><th>Recipient</th><th>Type</th><th>Orders</th><th>Gross</th><th>Commission</th><th>Adjustments</th><th>Net payout</th><th>Status</th></tr></thead><tbody>
+   <tr><td><b>Mama Nkechi's Kitchen</b></td><td>Merchant</td><td class="tnum">186</td><td class="tnum">₦468,500</td><td class="tnum">₦0</td><td class="tnum">−₦56,200</td><td class="tnum b">₦412,300</td><td><span class="pill ready">Verified</span></td></tr>
+   <tr><td><b>Burger Hub</b></td><td>Merchant</td><td class="tnum">121</td><td class="tnum">₦390,200</td><td class="tnum">₦0</td><td class="tnum">−₦9,000</td><td class="tnum b">₦381,200</td><td><span class="pill ready">Verified</span></td></tr>
+   <tr><td><b>Tunde Adeyemi</b></td><td>Rider</td><td class="tnum">86</td><td class="tnum">₦62,450</td><td class="tnum">—</td><td class="tnum">−₦12,500 COD</td><td class="tnum b">₦49,950</td><td><span class="pill ready">Verified</span></td></tr>
+   <tr><td><b>FreshMart</b></td><td>Merchant</td><td class="tnum">44</td><td class="tnum">₦210,000</td><td class="tnum">₦0</td><td class="tnum">—</td><td class="tnum b">₦210,000</td><td><span class="pill bad">Bank name mismatch</span></td></tr>
+  </tbody></table></div></div></div></div></div>
+
+<!-- A11 FLEET -->
+<div class="section-h"><h2>A11 · Fleet, charging & solar</h2></div>
+<div class="screens"><div class="desk"><aside class="side" data-side="Fleet & solar"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Fleet & solar</h2><span class="grow"></span><div class="chips"><span class="chip on">Lekki Hub</span><span class="chip">Yaba Hub</span></div></div>
+ <div class="dbody"><div class="grid g4"><div class="stat"><div class="micro">Solar generation</div><div class="v">38.4 kWh</div><div class="small" style="color:var(--lime-700)">☀️ 78% of demand</div></div><div class="stat"><div class="micro">Bikes active</div><div class="v">22 / 26</div></div><div class="stat"><div class="micro">Batteries charged</div><div class="v">14</div><div class="small muted">9 charging</div></div><div class="stat"><div class="micro">Energy cost / km</div><div class="v">₦6.2</div><div class="small muted">petrol equiv. ≈ ₦38</div></div></div>
+  <div class="grid" style="grid-template-columns:1.2fr 1fr;flex:1;min-height:0">
+   <div class="card"><h3 class="h3">Solar vs consumption (today)</h3><div class="spark" style="height:220px;margin-top:20px"><i class="hi" style="height:10%"></i><i class="hi" style="height:35%"></i><i class="hi" style="height:70%"></i><i class="hi" style="height:95%"></i><i class="hi" style="height:100%"></i><i class="hi" style="height:90%"></i><i class="hi" style="height:60%"></i><i class="hi" style="height:25%"></i><i style="height:5%"></i><i style="height:0"></i></div><div class="row between small muted mt8"><span>6 AM</span><span>10 AM</span><span>2 PM</span><span>6 PM</span><span>10 PM</span></div><div class="row mt12 small"><span class="row"><i class="dot"></i>Solar</span><span class="row"><i class="dot" style="background:var(--ink-900)"></i>Grid backup (22%)</span></div></div>
+   <div class="card" style="overflow:hidden"><h3 class="h3">Bikes needing attention</h3>
+    <div class="row mt12"><div class="ring" style="--p:12;--s:44px;--c:var(--danger)"><span class="small">12</span></div><div class="grow"><b>LAG-310-EV</b><div class="small muted">Battery 12% · Tade O.</div></div><button class="btn btn-soft s">Message</button></div>
+    <div class="row mt12"><div class="ring" style="--p:21;--s:44px;--c:var(--sun)"><span class="small">21</span></div><div class="grow"><b>LAG-452-EV</b><div class="small muted">Battery 21% · Tunde A.</div></div><button class="btn btn-soft s">Message</button></div>
+    <div class="row mt12"><div class="avatar" style="width:44px;height:44px;background:#FFF3D9">🔧</div><div class="grow"><b>LAG-275-EV</b><div class="small muted">Service due in 40 km</div></div><button class="btn btn-ghost s">Schedule</button></div>
+    <div class="row mt12"><div class="avatar" style="width:44px;height:44px;background:#FDECEC">⚠</div><div class="grow"><b>LAG-198-EV</b><div class="small muted">Battery SoH 71% · replace</div></div><button class="btn btn-ghost s">Ticket</button></div></div>
+  </div></div></div></div></div>
+
+
+<!-- A01 LOGIN -->
+<div class="section-h"><h2>A01 · Login + 2FA</h2></div>
+<div class="screens"><div class="desk"><div class="main bg-hero" style="display:grid;place-items:center;min-height:620px">
+  <div class="card" style="width:400px;padding:32px">
+    <div class="row"><div class="logo-mark">D</div><b class="h3">Delyva Ops</b></div>
+    <h1 class="h1 mt16">Sign in</h1><p class="small muted mt8">Use your work email. We'll ask for a 6-digit code next.</p>
+    <label class="label mt16">Work email</label><div class="field"><input value="nasir@delyva.ng"></div>
+    <label class="label mt12">Password</label><div class="field"><input type="password" value="••••••••••"></div>
+    <label class="label mt16">Authenticator code</label>
+    <div class="otp"><div>4</div><div>8</div><div>2</div><div>1</div><div></div><div></div></div>
+    <button class="btn btn-primary block mt16">Continue</button>
+    <p class="small muted mt12" style="text-align:center">Access is logged and limited to your role.</p>
+  </div></div></div></div>
+
+<!-- A04 ORDER DETAIL -->
+<div class="section-h"><h2>A04 · Order detail &amp; intervention</h2></div>
+<div class="screens"><div class="desk fit"><aside class="side" data-side="Live ops"></aside>
+ <div class="main"><div class="dtop"><button class="icon-btn">←</button><h2 class="h2">Order #48199</h2><span class="pill bad">Late +8 min</span><span class="grow"></span><button class="btn btn-ghost s">Message customer</button><button class="btn btn-ghost s">Refund</button><button class="btn btn-brand s">Reassign rider</button></div>
+ <div class="dbody"><div class="grid" style="grid-template-columns:2fr 1fr;flex:1">
+  <div class="col gap12">
+   <div class="card"><h3 class="h3">Timeline</h3>
+    <div class="row mt12"><span class="dot-s"></span><div class="grow"><b>Rider Femi O. delayed at hub</b><div class="small muted">1:58 PM · SLA breached</div></div></div>
+    <div class="row mt12"><span class="dot-s"></span><div class="grow"><b>Picked up from Slice Lagos</b><div class="small muted">1:44 PM</div></div></div>
+    <div class="row mt12"><span class="dot-s"></span><div class="grow"><b>Merchant marked ready</b><div class="small muted">1:39 PM</div></div></div>
+    <div class="row mt12"><span class="dot-s"></span><div class="grow"><b>Order placed &amp; paid · Card ••4242</b><div class="small muted">1:15 PM</div></div></div></div>
+   <div class="card"><h3 class="h3">Items</h3><div class="price-row mt8"><span>2× Pepperoni medium</span><span class="tnum">₦16,000</span></div><div class="price-row"><span>Delivery + service</span><span class="tnum">₦700</span></div><div class="price-row"><b>Total</b><b class="tnum">₦16,700</b></div></div>
+  </div>
+  <div class="col gap12">
+   <div class="card"><div class="micro">Customer</div><b>Chidi E.</b><div class="small muted">Yaba · 12 orders · no prior issues</div></div>
+   <div class="card"><div class="micro">Rider</div><b>Femi O.</b><div class="small muted">LAG-310-EV · 41% battery · 3.1 km away</div></div>
+   <div class="card" style="background:#FFF1F0"><div class="micro">Suggested action</div><b>Reassign to Tunde A. (0.9 km away)</b><div class="small muted mt8">Offer ₦150 goodwill credit to the customer</div></div>
+  </div>
+ </div></div></div></div></div>
+
+<!-- A06 MERCHANT REVIEW -->
+<div class="section-h"><h2>A06 · Merchant review</h2></div>
+<div class="screens"><div class="desk fit"><aside class="side" data-side="Merchants"></aside>
+ <div class="main"><div class="dtop"><button class="icon-btn">←</button><h2 class="h2">HealthPlus Pharmacy</h2><span class="pill wait">In review</span><span class="grow"></span><button class="btn btn-danger s">Reject</button><button class="btn btn-brand s">Approve &amp; go live</button></div>
+ <div class="dbody"><div class="grid" style="grid-template-columns:1fr 1fr;flex:1">
+  <div class="card"><h3 class="h3">Verification</h3>
+   <div class="price-row mt8"><span>Owner ID (NIN)</span><span class="pill ready">Verified</span></div>
+   <div class="price-row"><span>CAC registration</span><span class="pill ready">Verified</span></div>
+   <div class="price-row"><span>Pharmacy licence (PCN)</span><span class="pill wait">Check expiry</span></div>
+   <div class="price-row"><span>Bank account</span><span class="pill ready">Name matches</span></div>
+   <div class="price-row"><span>Address pin</span><span class="pill ready">Confirmed</span></div></div>
+  <div class="card"><h3 class="h3">Catalogue (24 items)</h3>
+   <div class="price-row mt8"><span>Paracetamol 500mg</span><span class="tnum">₦600</span></div>
+   <div class="price-row"><span>Vitamin C 1000mg</span><span class="tnum">₦2,500</span></div>
+   <div class="price-row"><span>Hand sanitiser 250ml</span><span class="tnum">₦1,800</span></div>
+   <div class="price-row"><span>Bandage roll</span><span class="tnum">₦700</span></div>
+   <button class="btn btn-soft s mt12">Open catalogue editor</button></div>
+ </div></div></div></div></div>
+
+<!-- A07 RIDERS -->
+<div class="section-h"><h2>A07 · Riders &amp; applications</h2></div>
+<div class="screens"><div class="desk fit"><aside class="side" data-side="Riders"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Riders</h2><span class="grow"></span><button class="btn btn-ghost s">Export</button></div>
+ <div class="dbody"><div class="card" style="flex:1"><div class="chips"><span class="chip on">All 214</span><span class="chip">Applications 4</span><span class="chip">Online 48</span><span class="chip">Low battery 2</span></div>
+  <table class="t mt12"><thead><tr><th>Rider</th><th>Hub</th><th>Bike</th><th>Status</th><th>Rating</th><th>Trips (7d)</th><th></th></tr></thead><tbody>
+   <tr><td><b>Tunde Adeyemi</b></td><td>Lekki</td><td>LAG-452-EV</td><td><span class="pill ready">Online</span></td><td>⭐ 4.9</td><td class="tnum">86</td><td>···</td></tr>
+   <tr><td><b>Femi Okafor</b></td><td>Yaba</td><td>LAG-310-EV</td><td><span class="pill prep">On delivery</span></td><td>⭐ 4.6</td><td class="tnum">72</td><td>···</td></tr>
+   <tr><td><b>Sade Bello</b></td><td>—</td><td>—</td><td><span class="pill wait">Reference check</span></td><td>—</td><td>—</td><td><button class="btn btn-brand s">Review</button></td></tr>
+   <tr><td><b>Ibrahim Musa</b></td><td>—</td><td>—</td><td><span class="pill wait">Docs submitted</span></td><td>—</td><td>—</td><td><button class="btn btn-brand s">Review</button></td></tr>
+  </tbody></table></div></div></div></div></div>
+
+<!-- A09 PROMOTIONS -->
+<div class="section-h"><h2>A09 · Promotions builder</h2></div>
+<div class="screens"><div class="desk fit"><aside class="side" data-side="Promotions"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">New promotion</h2><span class="grow"></span><button class="btn btn-ghost s">Save draft</button><button class="btn btn-brand s">Launch</button></div>
+ <div class="dbody"><div class="grid" style="grid-template-columns:1.4fr 1fr;flex:1">
+  <div class="card"><h3 class="h3">Rules</h3>
+   <label class="label mt12">Name</label><div class="field"><input value="Free delivery weekend"></div>
+   <div class="row mt12"><div class="grow"><label class="label">Type</label><div class="seg"><span class="on">Free delivery</span><span>% off</span><span>₦ off</span></div></div></div>
+   <div class="row mt12"><div class="grow"><label class="label">Code</label><div class="field"><input value="WEEKEND"></div></div><div class="grow"><label class="label">Min. order</label><div class="field"><input value="₦3,000"></div></div></div>
+   <label class="label mt12">Audience</label><div class="chips"><span class="chip on">All customers</span><span class="chip">New users</span><span class="chip">Lapsed 30d</span></div>
+   <div class="row mt12"><div class="grow"><label class="label">Starts</label><div class="field"><input value="Sat 22 Nov"></div></div><div class="grow"><label class="label">Ends</label><div class="field"><input value="Sun 23 Nov"></div></div></div></div>
+  <div class="card"><h3 class="h3">Estimated impact</h3>
+   <div class="price-row mt8"><span>Budget cap</span><b class="tnum">₦600,000</b></div>
+   <div class="price-row"><span>Expected redemptions</span><b>~1,900</b></div>
+   <div class="price-row"><span>Added orders</span><b style="color:var(--lime-700)">+14%</b></div>
+   <div class="price-row"><span>Contribution / order</span><b class="tnum">₦412</b></div></div>
+ </div></div></div></div></div>
+
+<!-- A12 SUPPORT -->
+<div class="section-h"><h2>A12 · Support inbox</h2></div>
+<div class="screens"><div class="desk fit"><aside class="side" data-side="Support"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Support</h2><span class="grow"></span><span class="pill wait">7 open</span></div>
+ <div class="dbody"><div class="grid" style="grid-template-columns:1fr 1.5fr;flex:1">
+  <div class="card pad0"><div class="row" style="padding:14px;background:var(--lime-50)"><div class="grow"><b>Chidi E. · #48199</b><div class="small muted">Order is very late</div></div><span class="small muted">2m</span></div><div class="divider"></div>
+   <div class="row" style="padding:14px"><div class="grow"><b>Amaka O. · #48180</b><div class="small muted">Item missing</div></div><span class="small muted">9m</span></div><div class="divider"></div>
+   <div class="row" style="padding:14px"><div class="grow"><b>Bashir (merchant)</b><div class="small muted">Payout not received</div></div><span class="small muted">24m</span></div></div>
+  <div class="card col"><div class="row between"><h3 class="h3">Chidi E. · Order #48199</h3><span class="pill bad">High</span></div>
+   <div class="card soft mt12">My pizza is 30 minutes late and the rider isn't moving.</div>
+   <div class="card mt8" style="background:var(--lime-100);align-self:flex-end">Sorry Chidi, we're sending a new rider now.</div>
+   <div class="row mt12" style="margin-top:auto"><div class="field grow"><input placeholder="Write a reply…"></div><button class="btn btn-primary">Send</button></div></div>
+ </div></div></div></div></div>
+
+<!-- A13 FRAUD -->
+<div class="section-h"><h2>A13 · Fraud &amp; trust</h2></div>
+<div class="screens"><div class="desk fit"><aside class="side" data-side="Fraud & trust"></aside>
+ <div class="main"><div class="dtop"><h2 class="h2">Fraud &amp; trust</h2></div>
+ <div class="dbody"><div class="grid g4"><div class="stat"><div class="micro">Flags today</div><div class="v">11</div></div><div class="stat"><div class="micro">Held payouts</div><div class="v">2</div></div><div class="stat"><div class="micro">Refund rate</div><div class="v">1.8%</div></div><div class="stat"><div class="micro">Blocked devices</div><div class="v">5</div></div></div>
+  <div class="card" style="flex:1"><table class="t"><thead><tr><th>Signal</th><th>Account</th><th>Risk</th><th>Detail</th><th></th></tr></thead><tbody>
+   <tr><td><b>Promo abuse</b></td><td>Customer · 0803…7890</td><td><span class="pill bad">High</span></td><td>6 accounts, one device</td><td><button class="btn btn-ghost s">Block</button></td></tr>
+   <tr><td><b>GPS spoofing</b></td><td>Rider · Femi O.</td><td><span class="pill wait">Medium</span></td><td>Jumps of 2 km in 5s</td><td><button class="btn btn-ghost s">Review</button></td></tr>
+   <tr><td><b>Refund spike</b></td><td>Merchant · Burger Hub</td><td><span class="pill wait">Medium</span></td><td>12 refunds in 24h</td><td><button class="btn btn-ghost s">Review</button></td></tr>
+   <tr><td><b>Payout mismatch</b></td><td>Merchant · Sweet Crumbs</td><td><span class="pill bad">High</span></td><td>Account name differs</td><td><button class="btn btn-brand s">Hold payout</button></td></tr>
+  </tbody></table></div></div></div></div></div>
+</div></div>
+<script src="assets/ui.js"></script>
+<script>
+const items=[['chart','Overview'],['map','Live ops',3],['utensils','Merchants',5],['bike','Riders',4],['users','Customers'],['dollar','Pricing'],['gift','Promotions'],['wallet','Finance'],['sun','Fleet & solar'],['chat','Support',7],['shield','Fraud & trust'],['settings','Settings']];
+document.querySelectorAll('[data-side]').forEach(s=>{
+  s.innerHTML='<div class="logo"><div class="logo-mark">D</div>Delyva <span class="tag">Ops</span></div>'+items.map(i=>`<div class="nav ${i[1]===s.dataset.side?'on':''}"><span class="i">${dIcon(i[0])}</span>${i[1]}${i[2]?`<span class="badge">${i[2]}</span>`:''}</div>`).join('');
+});
+</script></body></html>

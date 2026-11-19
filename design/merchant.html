@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delyva — Merchant App</title><link rel="stylesheet" href="assets/delyva.css"><link rel="stylesheet" href="assets/liquid.css"></head>
+<body><div class="canvas">
+<nav class="topnav"><a href="index.html">← Gallery</a><a href="customer.html">Customer</a><a class="on" href="merchant.html">Merchant</a><a href="rider.html">Rider</a><a href="admin.html">Admin</a><a href="design-system.html">Design system</a></nav>
+<h1 class="page-title">Merchant app</h1>
+<p class="page-sub">Phone + tablet (kitchen counter). Built around the proposal's 5-step onboarding and a loud, one-tap order alert.</p>
+
+<div class="section-h"><h2>1 · Onboarding</h2><span>M01 – M05</span></div>
+<div class="screens">
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="micro">Step 1 of 4 · ~5 min</span></div>
+  <div class="scr-body scroll">
+    <div class="bar"><i style="width:25%"></i></div>
+    <h1 class="h1 mt16">Tell us about<br>your business</h1>
+    <label class="label">Business name</label><div class="field sq"><input value="Mama Nkechi's Kitchen"></div>
+    <label class="label">Category</label><div class="chips" style="flex-wrap:wrap"><span class="chip on">🍛 Restaurant</span><span class="chip">🛒 Grocery</span><span class="chip">💊 Pharmacy</span><span class="chip">🧁 Bakery</span><span class="chip">🏪 Shop</span></div>
+    <label class="label">Contact phone</label><div class="field sq"><input value="0803 456 7890"></div>
+    <label class="label">Business address</label><div class="field sq">📍<input value="22 Admiralty Way, Lekki"></div>
+    <div class="card pad0 mt12" style="height:110px;position:relative"><div class="map"><div class="pin store" style="left:160px;top:34px"><span>🍛</span></div></div></div>
+    <label class="label">Opening hours</label><div class="card row"><b class="grow">Mon – Sun</b><span class="tnum">8:00 AM – 10:00 PM</span></div>
+  </div>
+  <div style="padding:16px 16px 34px"><button class="btn btn-primary block l">Continue</button></div>
+</div></div><div class="screen-label"><i>M01</i>Business details</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="micro">Step 2 of 4</span></div>
+  <div class="scr-body scroll">
+    <div class="bar"><i style="width:50%"></i></div>
+    <h1 class="h1 mt16">Verify & get paid</h1>
+    <div class="card mt16 row"><div class="ph c s56">🪪</div><div class="grow"><div class="b">Owner ID (NIN / Driver's licence)</div><div class="small muted">Photo of ID</div></div><span class="pill ready">Uploaded ✓</span></div>
+    <div class="card mt8 row"><div class="ph d s56">🏢</div><div class="grow"><div class="b">CAC / Business name</div><div class="small muted">Optional for small vendors</div></div><button class="btn btn-soft s">Upload</button></div>
+    <div class="card mt8 row"><div class="ph a s56">🧾</div><div class="grow"><div class="b">Food-safety certificate</div><div class="small muted">If available</div></div><button class="btn btn-soft s">Upload</button></div>
+    <div class="micro mt24">Payout account</div>
+    <label class="label">Bank</label><div class="field sq"><input value="GTBank"><span>⌄</span></div>
+    <label class="label">Account number</label><div class="field sq"><input value="0123456789"></div>
+    <div class="card soft mt12 row"><span>✅</span><div><b>Nkechi Okafor</b><div class="small muted">Name matched with owner ID</div></div></div>
+  </div>
+  <div style="padding:16px 16px 34px"><button class="btn btn-primary block l">Continue</button></div>
+</div></div><div class="screen-label"><i>M03</i>Verification & bank</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="micro">Step 3 of 4</span></div>
+  <div class="scr-body scroll">
+    <div class="bar"><i style="width:75%"></i></div>
+    <h1 class="h1 mt16">Add your menu —<br>we'll do the typing</h1>
+    <p class="muted mt8">Choose the easiest way. Our team builds your listings free.</p>
+    <div class="card mt16 row" style="outline:2px solid var(--lime-500)"><div class="avatar" style="width:48px;height:48px;background:#D5F5DD;font-size:22px">💬</div><div class="grow"><div class="b">Send via WhatsApp</div><div class="small muted">Photos, voice notes or list</div></div><div class="radio on"></div></div>
+    <div class="card mt8 row"><div class="avatar" style="width:48px;height:48px;font-size:22px">📷</div><div class="grow"><div class="b">Snap your printed menu</div><div class="small muted">We digitise it</div></div><div class="radio"></div></div>
+    <div class="card mt8 row"><div class="avatar" style="width:48px;height:48px;font-size:22px">📊</div><div class="grow"><div class="b">Upload spreadsheet</div><div class="small muted">Excel or CSV</div></div><div class="radio"></div></div>
+    <div class="card mt8 row"><div class="avatar" style="width:48px;height:48px;font-size:22px">✍️</div><div class="grow"><div class="b">Add items myself</div><div class="small muted">One by one in the app</div></div><div class="radio"></div></div>
+  </div>
+  <div style="padding:16px 16px 34px" class="col gap12"><button class="btn btn-brand block l">Open WhatsApp</button><button class="b small center" style="color:var(--ink-500);text-align:center">I'll do this later</button></div>
+</div></div><div class="screen-label"><i>M04</i>Menu upload options</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><span class="title">You're almost live</span><button class="icon-btn">?</button></div>
+  <div class="scr-body scroll">
+    <div class="glass center" style="padding:20px;text-align:center"><div class="ring" style="--p:80;--s:92px;margin:0 auto"><span class="h3">4/5</span></div><h2 class="h2 mt12">Final checks</h2><p class="small muted mt8">Test order next, then you're live.</p></div>
+    <div class="card mt16"><div class="timeline">
+      <div class="tl done"><div class="n">✓</div><div><div class="b">Registered</div><div class="small muted">5 min ago</div></div></div>
+      <div class="tl done"><div class="n">✓</div><div><div class="b">Documents verified</div><div class="small muted">Approved by Delyva</div></div></div>
+      <div class="tl done"><div class="n">✓</div><div><div class="b">Menu published</div><div class="small muted">24 items by our team</div></div></div>
+      <div class="tl now"><div class="n">4</div><div><div class="b">Test order</div><div class="small muted">We'll send a practice order now</div></div></div>
+      <div class="tl"><div class="n">5</div><div><div class="b muted">Go live 🎉</div></div></div>
+    </div></div>
+    <div class="card soft mt12 row"><span style="font-size:22px">🤝</span><div class="grow"><b>Your onboarding agent</b><div class="small muted">Bashir · 0801 234 5678</div></div><button class="icon-btn lime">📞</button></div>
+  </div>
+</div></div><div class="screen-label"><i>M05</i>Go-live checklist</div></div>
+</div>
+
+<div class="section-h"><h2>2 · Daily operations</h2><span>M06 – M10</span></div>
+<div class="screens">
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="scr-body scroll" style="padding-bottom:110px">
+    <div class="row between"><div><div class="micro">Mama Nkechi's Kitchen</div><h2 class="h2">Good evening 👋</h2></div><button class="icon-btn">🔔</button></div>
+    <div class="card lime mt16 row" style="background:var(--lime-200)"><div class="grow"><div class="b">Store is OPEN</div><div class="small muted">Receiving orders until 10:00 PM</div></div><div class="toggle on"></div></div>
+    <div class="row mt12"><div class="stat grow"><div class="micro">Today's sales</div><div class="v">₦84,500</div><div class="small" style="color:var(--lime-700)">▲ 12%</div></div><div class="stat grow"><div class="micro">Orders</div><div class="v">23</div><div class="small muted">2 active</div></div></div>
+    <div class="row between mt24"><h3 class="h3">Live orders</h3><span class="badge">2</span></div>
+    <div class="card mt12"><div class="row between"><b>#DLV-48213</b><span class="pill wait">New · 02:41</span></div><div class="small muted mt8">2× Party Jollof, 1× Chapman · ₦9,300</div><div class="row mt12"><button class="btn btn-danger s grow">Reject</button><button class="btn btn-brand s grow">Accept</button></div></div>
+    <div class="card mt8"><div class="row between"><b>#DLV-48207</b><span class="pill prep">Preparing · 6 min</span></div><div class="small muted mt8">1× Fried Rice · ₦3,800</div><button class="btn btn-primary s block mt12">Mark ready</button></div>
+    <div class="card soft mt12 row"><span>⏸</span><div class="grow"><b>Busy right now?</b><div class="small muted">Add +10 min to prep time</div></div><div class="toggle"></div></div>
+  </div>
+  <div data-tabs="merchant:0"></div>
+</div></div><div class="screen-label"><i>M06</i>Dashboard</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr" style="background:linear-gradient(170deg,#0B0F0A,#1d2a14)">
+  <div data-sb="light"></div>
+  <div class="scr-body col" style="color:#fff;justify-content:center;gap:16px;text-align:center;align-items:center">
+    <div class="ring" style="--p:78;--s:120px;--c:var(--lime-500)"><span style="color:var(--ink-900);font-size:26px" class="tnum">2:41</span></div>
+    <div class="micro" style="color:var(--lime-400)">New order · auto-rejects in</div>
+    <h1 class="h1" style="font-size:30px">#DLV-48213</h1>
+    <div class="card" style="width:100%;background:rgba(255,255,255,.08);color:#fff;box-shadow:none;text-align:left;backdrop-filter:blur(10px)">
+      <div class="row between"><span>2× Party Jollof + Chicken</span><b class="tnum">₦7,800</b></div><div class="row between mt8"><span>1× Chapman</span><b class="tnum">₦1,500</b></div>
+      <div class="small mt12" style="opacity:.7">📝 Less pepper please · Extra dodo</div><div class="divider" style="background:rgba(255,255,255,.12)"></div><div class="row between"><span>You receive</span><b class="tnum" style="color:var(--lime-400)">₦8,184</b></div>
+    </div>
+    <div class="small" style="opacity:.7">🔊 Sound on · Customer paid ✓</div>
+  </div>
+  <div style="padding:16px 16px 34px" class="row"><button class="btn grow l" style="background:rgba(255,255,255,.12);color:#fff">Reject</button><button class="btn btn-brand l" style="flex:2">Accept</button></div>
+</div></div><div class="screen-label"><i>M07</i>New order alert</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="scrim" style="top:54px"></div>
+  <div style="flex:1"></div>
+  <div class="sheet" style="position:relative">
+    <div class="grab"></div><h2 class="h2">How long to prepare?</h2><p class="small muted mt8">A rider is dispatched so they arrive as it's ready.</p>
+    <div class="grid g2 mt16" style="gap:10px"><div class="card center" style="text-align:center;box-shadow:none;border:1px solid var(--line)"><b class="h2">10</b><div class="small muted">min</div></div><div class="card center" style="text-align:center;background:var(--ink-900);color:#fff"><b class="h2">15</b><div class="small">min</div></div><div class="card center" style="text-align:center;box-shadow:none;border:1px solid var(--line)"><b class="h2">20</b><div class="small muted">min</div></div><div class="card center" style="text-align:center;box-shadow:none;border:1px solid var(--line)"><b class="h2">30</b><div class="small muted">min</div></div></div>
+    <button class="btn btn-brand block l mt16">Accept order</button>
+  </div>
+</div></div><div class="screen-label"><i>M08</i>Accept · prep time</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="title">#DLV-48207</span><span class="pill prep">Preparing</span></div>
+  <div class="scr-body scroll">
+    <div class="card row"><div class="ph round s56" style="width:52px;height:52px">🧑🏾</div><div class="grow"><b>Tunde A. arriving</b><div class="small muted">⚡ LAG-452-EV · 4 min away</div></div><button class="icon-btn lime">📞</button></div>
+    <div class="glass center mt12" style="padding:18px;text-align:center"><div class="micro">Pickup code</div><div class="h-display tnum" style="letter-spacing:.2em">3 8 1 6</div><div class="small muted">Rider shows this code at handover</div></div>
+    <div class="card mt12"><div class="b">Items</div><div class="divider"></div><div class="row"><div class="check on">✓</div><span class="grow">1× Fried Rice Special</span><b class="tnum">₦3,800</b></div><div class="row mt8"><div class="check"></div><span class="grow">1× Extra plantain</span><b class="tnum">₦500</b></div><div class="divider"></div><div class="row between muted"><span>Commission (12%)</span><span class="tnum">−₦516</span></div><div class="row between b mt8"><span>You earn</span><span class="tnum">₦3,784</span></div></div>
+  </div>
+  <div style="padding:16px 16px 34px"><button class="btn btn-brand block l">Mark ready for pickup</button></div>
+</div></div><div class="screen-label"><i>M10</i>Order detail</div></div>
+</div>
+
+<div class="section-h"><h2>3 · Tablet — orders board</h2><span>M09 · landscape 1024×700</span></div>
+<div class="screens">
+<div class="screen-wrap"><div class="phone tablet"><div class="scr bg-hero" style="flex-direction:row">
+  <div style="width:84px;background:#fff;display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 0;border-right:1px solid var(--line)"><div class="logo-mark">D</div><div class="icon-btn lime">📥</div><div class="icon-btn">🍽️</div><div class="icon-btn">💰</div><div class="icon-btn">⚙️</div></div>
+  <div style="flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+    <div class="row between"><div><div class="micro">Mama Nkechi's Kitchen</div><h2 class="h2">Orders board</h2></div><div class="row"><span class="pill ready">● Store open</span><button class="btn btn-ghost s">🖨 Printer ready</button></div></div>
+    <div class="grid g3" style="align-items:start">
+      <div class="card soft col gap12" style="background:#FFF8E6;border-color:#FFEBB8"><div class="row between"><b>New</b><span class="badge">2</span></div>
+        <div class="card"><div class="row between"><b>#48213</b><span class="pill wait">02:41</span></div><div class="small muted mt8">2× Jollof, 1× Chapman</div><div class="row mt12"><button class="btn btn-danger s grow">✕</button><button class="btn btn-brand s grow" style="flex:2">Accept</button></div></div>
+        <div class="card"><div class="row between"><b>#48214</b><span class="pill wait">00:50</span></div><div class="small muted mt8">3× Suya, 2× Zobo</div><div class="row mt12"><button class="btn btn-danger s grow">✕</button><button class="btn btn-brand s grow" style="flex:2">Accept</button></div></div></div>
+      <div class="card soft col gap12" style="background:#EAF6FD;border-color:#CBE6F7"><div class="row between"><b>Preparing</b><span class="badge" style="background:var(--info)">2</span></div>
+        <div class="card"><div class="row between"><b>#48207</b><span class="pill prep">6 min</span></div><div class="small muted mt8">1× Fried Rice</div><button class="btn btn-primary s block mt12">Mark ready</button></div>
+        <div class="card"><div class="row between"><b>#48209</b><span class="pill prep">11 min</span></div><div class="small muted mt8">4× Pepper soup</div><button class="btn btn-primary s block mt12">Mark ready</button></div></div>
+      <div class="card soft col gap12"><div class="row between"><b>Ready for pickup</b><span class="badge" style="background:var(--lime-600)">1</span></div>
+        <div class="card"><div class="row between"><b>#48201</b><span class="pill ready">Rider 2 min</span></div><div class="small muted mt8">2× Jollof + Chicken</div><div class="row mt12"><span class="tag">Code 3816</span><span class="tag">🧑🏾 Tunde A.</span></div></div></div>
+    </div>
+  </div>
+</div></div><div class="screen-label"><i>M09</i>Orders board (tablet)</div></div>
+</div>
+
+<div class="section-h"><h2>4 · Menu, delivery-only & money</h2><span>M11 – M15</span></div>
+<div class="screens">
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><span class="title" style="font-size:24px">Menu</span><button class="icon-btn dark">＋</button></div>
+  <div class="scr-body scroll" style="padding-bottom:110px">
+    <div class="field" style="height:46px">🔍 <input placeholder="Search items"></div>
+    <div class="chips mt12"><span class="chip on">Rice dishes</span><span class="chip">Soups</span><span class="chip">Grills</span><span class="chip">Drinks</span></div>
+    <div class="card mt12 row"><div class="ph a s56">🍛</div><div class="grow"><b>Party Jollof + Chicken</b><div class="small muted tnum">₦3,500</div></div><div class="toggle on"></div></div>
+    <div class="card mt8 row"><div class="ph c s56">🍚</div><div class="grow"><b>Fried Rice Special</b><div class="small muted tnum">₦3,800</div></div><div class="toggle on"></div></div>
+    <div class="card mt8 row" style="opacity:.7"><div class="ph b s56">🍲</div><div class="grow"><b>Ofada Rice</b><div class="small" style="color:var(--danger);font-weight:700">Out of stock</div></div><div class="toggle"></div></div>
+    <div class="card mt8 row"><div class="ph d s56">🥤</div><div class="grow"><b>Chapman</b><div class="small muted tnum">₦1,500</div></div><div class="toggle on"></div></div>
+  </div>
+  <div data-tabs="merchant:1"></div>
+</div></div><div class="screen-label"><i>M11</i>Menu manager</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="title">Request a rider</span><span style="width:44px"></span></div>
+  <div class="scr-body scroll" style="padding-bottom:110px">
+    <div class="card soft row"><span>📲</span><p class="small muted">For orders taken on WhatsApp, Instagram or by phone. Your customer gets a tracking link by SMS.</p></div>
+    <div class="card mt12"><div class="row"><span class="dot" style="background:var(--ink-900)"></span><div class="grow"><div class="micro">Pickup</div><b>Mama Nkechi's Kitchen</b></div></div><div style="margin-left:3px;height:18px;border-left:2px dashed var(--ink-300)"></div><div class="row"><span class="dot" style="background:var(--danger)"></span><div class="grow"><div class="micro">Drop-off</div><b>7 Akin Adesola St, VI</b></div></div></div>
+    <label class="label">Customer name & phone</label><div class="field sq"><input value="Ngozi · 0805 222 3344"></div>
+    <label class="label">Package</label><div class="chips"><span class="chip on">Food</span><span class="chip">Small box</span><span class="chip">Documents</span></div>
+    <label class="label">Collect cash from customer?</label><div class="card row"><b class="grow">Cash on delivery</b><div class="toggle on"></div></div><div class="field sq mt8"><input value="₦6,500"></div>
+    <div class="card mt12"><div class="price-row"><span>Delivery · 3.4 km</span><span class="tnum">₦450</span></div><div class="price-row"><span>Launch discount</span><span class="tnum" style="color:var(--lime-700)">−₦150</span></div><div class="price-row total"><span>Pay from wallet</span><span class="tnum">₦300</span></div></div>
+  </div>
+  <div class="sticky-cta"><button class="btn btn-primary block l">Request rider</button></div>
+</div></div><div class="screen-label"><i>M13</i>Delivery-only request</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><span class="title" style="font-size:24px">Earnings</span><button class="icon-btn">⤓</button></div>
+  <div class="scr-body scroll" style="padding-bottom:110px">
+    <div class="seg"><span>Today</span><span class="on">This week</span><span>Month</span></div>
+    <div class="card mt16" style="background:var(--ink-900);color:#fff"><div class="small" style="opacity:.7">Net earnings</div><div class="h-display tnum">₦412,300</div><div class="small mt8" style="color:var(--lime-400)">▲ 18% vs last week</div></div>
+    <div class="card mt12"><div class="spark"><i style="height:40%"></i><i style="height:55%"></i><i style="height:48%"></i><i style="height:70%"></i><i style="height:62%"></i><i class="hi" style="height:100%"></i><i style="height:80%"></i></div><div class="row between small muted mt8"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div></div>
+    <div class="card mt12"><div class="price-row"><span>Gross sales</span><span class="tnum">₦468,500</span></div><div class="price-row"><span>Commission (introductory 0%)</span><span class="tnum">₦0</span></div><div class="price-row"><span>Refunds</span><span class="tnum">−₦12,200</span></div><div class="price-row"><span>Delivery-only fees</span><span class="tnum">−₦44,000</span></div><div class="price-row total"><span>Net</span><span class="tnum">₦412,300</span></div></div>
+    <div class="card mt12 row"><span>🏦</span><div class="grow"><b>Next payout</b><div class="small muted">Mon, 24 Nov · GTBank ••6789</div></div><b class="tnum">₦412,300</b></div>
+  </div>
+  <div data-tabs="merchant:3"></div>
+</div></div><div class="screen-label"><i>M14</i>Earnings & payouts</div></div>
+</div>
+
+<div class="section-h"><h2>5 · Setup, items &amp; settings</h2><span>M02 · M12 · M15 · M17</span></div>
+<div class="screens">
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="title" style="font-size:12px">Step 1 of 4</span><span style="width:44px"></span></div>
+  <div class="scr-body scroll">
+    <h1 class="h1">Where &amp; when do you sell?</h1>
+    <label class="label mt16">Opening hours</label>
+    <div class="card"><div class="price-row"><span>Mon – Fri</span><b class="tnum">8:00 AM – 10:00 PM</b></div><div class="price-row"><span>Saturday</span><b class="tnum">9:00 AM – 11:00 PM</b></div><div class="price-row"><span>Sunday</span><b class="tnum">11:00 AM – 9:00 PM</b></div></div>
+    <label class="label mt16">Delivery zones</label>
+    <div class="chips" style="flex-wrap:wrap"><span class="chip on">Lekki</span><span class="chip on">Victoria Island</span><span class="chip">Ikoyi</span><span class="chip">Ajah</span></div>
+    <label class="label mt16">Average prep time</label>
+    <div class="seg"><span>10</span><span class="on">15</span><span>25</span><span>30+</span></div>
+  </div>
+  <div style="padding:0 16px 24px"><button class="btn btn-primary block">Save &amp; continue</button></div>
+</div></div><div class="screen-label"><i>M02</i>Category, location, hours</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="title">Edit item</span><span class="b" style="color:var(--lime-700)">Save</span></div>
+  <div class="scr-body scroll">
+    <div class="ph a" style="height:150px;border-radius:20px;font-size:64px;position:relative">🍛<span class="pill" style="position:absolute;right:10px;bottom:10px;background:#fff">📷 Change photo</span></div>
+    <label class="label mt16">Item name</label><div class="field"><input value="Party Jollof + Chicken"></div>
+    <div class="row mt12"><div class="grow"><label class="label">Price (₦)</label><div class="field"><input value="3,500"></div></div><div class="grow"><label class="label">Category</label><div class="field"><input value="Rice dishes"></div></div></div>
+    <label class="label mt12">Description</label><div class="field" style="height:70px;align-items:flex-start;padding-top:12px"><input value="Smoky party jollof, fried chicken, dodo and coleslaw."></div>
+    <div class="card row mt12"><span>🍗</span><div class="grow"><b>Protein options</b><div class="small muted">Chicken, Beef · pick 1</div></div><span class="muted">›</span></div>
+    <div class="card row mt8"><b class="grow">In stock</b><span class="toggle on"></span></div>
+  </div>
+</div></div><div class="screen-label"><i>M12</i>Item editor</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><button class="icon-btn">←</button><span class="title">Payout statement</span><button class="icon-btn">⤓</button></div>
+  <div class="scr-body scroll">
+    <div class="card" style="background:var(--ink-900);color:#fff"><div class="small" style="opacity:.7">Paid on Mon, 17 Nov</div><div class="h-display tnum">₦386,900</div><div class="small mt8" style="color:var(--lime-400)">Sent to GTBank ••6789</div></div>
+    <div class="card mt12"><div class="price-row"><span>Gross sales (Mon–Sun)</span><span class="tnum">₦432,000</span></div><div class="price-row"><span>Commission</span><span class="tnum">−₦0</span></div><div class="price-row"><span>Refunds</span><span class="tnum">−₦12,600</span></div><div class="price-row"><span>Payment fees</span><span class="tnum">−₦32,500</span></div><div class="divider" style="margin:10px 0"></div><div class="price-row"><b>Net payout</b><b class="tnum">₦386,900</b></div></div>
+    <div class="micro mt16">Previous payouts</div>
+    <div class="card row mt8"><div class="grow"><b>10 Nov</b><div class="small muted">148 orders</div></div><b class="tnum">₦351,200</b></div>
+    <div class="card row mt8"><div class="grow"><b>3 Nov</b><div class="small muted">131 orders</div></div><b class="tnum">₦318,400</b></div>
+  </div>
+  <div data-tabs="merchant:3"></div>
+</div></div><div class="screen-label"><i>M15</i>Payout statement</div></div>
+
+<div class="screen-wrap"><div class="phone"><div class="scr bg-hero">
+  <div data-sb></div>
+  <div class="topbar"><span class="title">Store</span><span style="width:44px"></span></div>
+  <div class="scr-body scroll" style="padding-bottom:110px">
+    <div class="card row"><div class="ph a round" style="width:52px;height:52px;font-size:26px">🍛</div><div class="grow"><b>Mama Nkechi's Kitchen</b><div class="small muted">Lekki · Restaurant · ⭐ 4.8</div></div><span class="muted">›</span></div>
+    <div class="card mt12 pad0">
+      <div class="row" style="padding:14px"><span>⏱</span><div class="grow"><b>Busy mode</b><div class="small muted">Adds +10 min to prep time</div></div><span class="toggle"></span></div><div class="divider"></div>
+      <div class="row" style="padding:14px"><span>🕘</span><div class="grow"><b>Opening hours</b><div class="small muted">8 AM – 10 PM</div></div><span class="muted">›</span></div><div class="divider"></div>
+      <div class="row" style="padding:14px"><span>🔔</span><div class="grow"><b>New order sound</b><div class="small muted">Loud · repeats until accepted</div></div><span class="muted">›</span></div><div class="divider"></div>
+      <div class="row" style="padding:14px"><span>🖨</span><div class="grow"><b>Receipt printer</b><div class="small muted">Epson TM-T20 · Connected</div></div><span class="pill ready">OK</span></div><div class="divider"></div>
+      <div class="row" style="padding:14px"><span>👥</span><div class="grow"><b>Staff &amp; permissions</b><div class="small muted">3 people</div></div><span class="muted">›</span></div>
+    </div>
+    <button class="btn btn-ghost block mt16">Pause store</button>
+  </div>
+  <div data-tabs="merchant:4"></div>
+</div></div><div class="screen-label"><i>M17</i>Store settings</div></div>
+
+</div>
+</div>
+<script src="assets/ui.js"></script></body></html>

@@ -1,0 +1,7 @@
+design/
+docs/
+pnpm-lock.yaml
+dist/
+.next/
+.expo/
+coverage/

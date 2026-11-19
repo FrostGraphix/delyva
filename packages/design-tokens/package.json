@@ -1,0 +1,39 @@
+{
+  "name": "@delyva/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Design tokens (JSON -> TS, Tailwind preset, CSS variables).",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tailwind.css": "./dist/tailwind.css",
+    "./tailwind-preset": {
+      "types": "./dist/tailwind-preset.d.ts",
+      "default": "./dist/tailwind-preset.js"
+    },
+    "./tokens.json": "./tokens/tokens.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs && tsc -p tsconfig.build.json",
+    "typecheck": "node scripts/build.mjs && tsc --noEmit",
+    "lint": "node scripts/build.mjs && eslint . --max-warnings 0",
+    "test": "node scripts/build.mjs && vitest run --coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@delyva/config": "workspace:*",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "eslint": "10.15.0",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1"
+  }
+}

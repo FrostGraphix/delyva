@@ -1,0 +1,271 @@
+/* =====================================================================
+   Delyva — LIQUID GLASS + DELIVERY-APP STANDARD (loaded after delyva.css)
+   Material: translucent fill + backdrop blur/saturate + specular rim + inner highlight.
+   Standard: 8-pt spacing, 16 px gutters, 44–52 px targets, Uber Eats / Chowdeck / Glovo
+   type scale (sentence-case labels, bold-not-black headings), one drawn icon set (24 grid, 1.75 stroke).
+   Radii are concentric: inner radius = outer radius − padding.
+   ===================================================================== */
+:root{
+  --glass-fill:rgba(255,255,255,.38); --glass-fill-2:rgba(255,255,255,.58);
+  --glass-blur:blur(26px) saturate(1.9) brightness(1.04);
+  --rim:linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,255,255,.08) 32%,rgba(255,255,255,.04) 64%,rgba(255,255,255,.85));
+  --hi:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -1px 1px rgba(255,255,255,.35),inset 0 0 22px rgba(255,255,255,.28);
+  --sh-glass:0 1px 2px rgba(25,45,8,.08),0 10px 28px rgba(25,45,8,.12);
+  --sh-float:0 2px 4px rgba(25,45,8,.08),0 22px 48px rgba(25,45,8,.20);
+  --mesh:radial-gradient(420px 360px at 92% 4%,rgba(140,198,63,.62),transparent 66%),
+         radial-gradient(380px 340px at -6% 34%,rgba(46,155,230,.30),transparent 66%),
+         radial-gradient(440px 380px at 104% 70%,rgba(255,176,32,.30),transparent 66%),
+         radial-gradient(420px 320px at 0% 102%,rgba(140,198,63,.48),transparent 66%),#EDF2E3;
+  --ink-btn:linear-gradient(180deg,rgba(52,60,48,.94),rgba(11,15,10,.97));
+  --lime-btn:linear-gradient(180deg,#C4E877,#8CC63F 70%,#7DB635);
+}
+
+/* ---------- Type scale (Uber Eats / Chowdeck feel) ---------- */
+body{font-size:15px;line-height:22px;font-feature-settings:"tnum" 0}
+h1,h2,h3,h4{font-weight:700;letter-spacing:-.025em}
+.h-display{font-size:32px;line-height:40px;font-weight:800}
+.h1{font-size:26px;line-height:32px;font-weight:700}
+.h2{font-size:20px;line-height:28px;font-weight:700}
+.h3{font-size:16px;line-height:24px;font-weight:700}
+.small{font-size:13px;line-height:18px}
+.micro{font-size:12px;line-height:16px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink-500)}
+.b{font-weight:700}.sb{font-weight:600}
+.stat .v{font-size:24px;line-height:32px;font-weight:700}
+.topbar .title{font-weight:700;font-size:17px;letter-spacing:-.01em}
+.btn{font-weight:600;font-size:16px;letter-spacing:-.005em}
+.btn.s{font-size:14px}
+.page-title{font-weight:700}
+.label{font-size:13px;font-weight:600;margin:16px 0 8px}
+
+/* ---------- 8-pt spacing ---------- */
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.card{padding:16px;border-radius:20px}
+.card.pad0{padding:0}
+.row{gap:12px}.row.gap4{gap:4px}
+.topbar{padding:8px 16px 12px}
+.field{height:48px;padding:0 16px;gap:12px}
+.chips{gap:8px}.chip{height:36px;padding:0 16px}
+.price-row{padding:4px 0}
+.tl{padding-bottom:20px}
+.scr-body{padding:0 16px}
+
+/* ---------- Glass surfaces ---------- */
+.phone,.desk{background:var(--mesh)}
+.bg-hero{background:transparent!important}
+.scr.bg-white{background:#fff}
+.main,.dbody{background:transparent}
+
+.card,.glass,.stat,.sheet,.tabbar,.field,.icon-btn,.chip,.stepper,.seg,.btn-glass,.btn-ghost,.otp div,.textarea,.side,.dtop,.toast,.macro,.tag{
+  position:relative;-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.card,.stat,.field,.chip,.stepper,.otp div,.textarea,.macro{background:var(--glass-fill-2);box-shadow:var(--hi),var(--sh-glass);border:0}
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.62),rgba(255,255,255,.26));box-shadow:var(--hi),var(--sh-float);border:0;border-radius:28px}
+.card.soft{background:rgba(234,245,207,.5);box-shadow:var(--hi),0 4px 14px rgba(25,45,8,.06);border:0}
+.card.lime{background:linear-gradient(150deg,rgba(180,221,98,.85),rgba(221,239,181,.6))}
+.divider{background:rgba(25,45,8,.08)}
+
+/* specular rim: 1px gradient hairline, bright top-left & bottom-right */
+.card::after,.glass::after,.stat::after,.sheet::after,.tabbar::after,.field::after,.icon-btn::after,.chip::after,.stepper::after,.seg::after,
+.btn::after,.otp div::after,.textarea::after,.toast::after,.promo::after,.tab.on::after,.tab-fab::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;background:var(--rim);pointer-events:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.btn{position:relative}
+
+/* ---------- Buttons ---------- */
+.btn-primary{background:var(--ink-btn);color:#fff;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 -8px 14px rgba(0,0,0,.35),0 10px 22px rgba(11,15,10,.28)}
+.btn-brand{background:var(--lime-btn);color:var(--ink-900);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.75),inset 0 -6px 12px rgba(76,125,26,.28),0 12px 26px rgba(107,165,42,.38)}
+.btn-soft{background:rgba(234,245,207,.7);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);box-shadow:var(--hi),0 4px 12px rgba(25,45,8,.06)}
+.btn-glass,.btn-ghost{background:var(--glass-fill-2);box-shadow:var(--hi),var(--sh-glass);border:0}
+.btn-danger{background:rgba(253,236,236,.72);box-shadow:var(--hi)}
+.btn[disabled],.btn.disabled{background:rgba(220,224,214,.6);box-shadow:var(--hi);color:var(--ink-300)}
+.btn:active,.icon-btn:active,.chip:active{transform:scale(.97);transition-duration:.08s}
+.icon-btn{border-radius:50%;background:var(--glass-fill-2);box-shadow:var(--hi),var(--sh-glass);width:44px;height:44px}
+.icon-btn.glass{background:var(--glass-fill)}
+.icon-btn.dark{background:var(--ink-btn);color:#fff;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),0 8px 18px rgba(11,15,10,.28)}
+.icon-btn.lime{background:var(--lime-btn);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.8),0 8px 18px rgba(107,165,42,.35)}
+.chip.on{background:var(--ink-btn);color:#fff;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.3),0 6px 14px rgba(11,15,10,.22)}
+.chip.lime{background:rgba(221,239,181,.8)}
+.stepper button{background:rgba(255,255,255,.7);box-shadow:var(--hi)}
+.stepper button.plus{background:var(--ink-btn);color:#fff}
+.seg{background:rgba(255,255,255,.34);box-shadow:var(--hi),inset 0 2px 6px rgba(25,45,8,.08)}
+.seg span{border-radius:calc(var(--r-pill) - 4px)}
+.seg span.on{background:var(--ink-btn);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 4px 10px rgba(11,15,10,.25)}
+.otp div{border-radius:18px}.otp div.on{outline:0;box-shadow:var(--hi),0 0 0 2px var(--lime-500),0 8px 22px rgba(140,198,63,.4)}
+.toggle{background:rgba(25,45,8,.16);box-shadow:inset 0 2px 5px rgba(25,45,8,.18)}
+.toggle::after{width:26px;height:26px;top:2px;left:2px;background:linear-gradient(180deg,#fff,#EEF1E9);box-shadow:inset 0 1px 0 #fff,0 3px 8px rgba(25,45,8,.3)}
+.toggle.on{background:linear-gradient(180deg,#9AD14F,#7DB635)}.toggle.on::after{left:22px}
+.pill{font-weight:600;backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.tag{background:rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.8);font-weight:500}
+.bar{background:rgba(25,45,8,.10);box-shadow:inset 0 1px 3px rgba(25,45,8,.12)}
+.bar i{background:linear-gradient(90deg,#B4DD62,#8CC63F)}
+.ring::before{background:rgba(255,255,255,.85);box-shadow:inset 0 1px 0 #fff}
+
+/* ---------- Sheet = thick glass slab ---------- */
+.sheet{background:linear-gradient(180deg,rgba(255,255,255,.66),rgba(255,255,255,.5));border-radius:36px 36px 0 0;padding:8px 16px 32px;box-shadow:var(--hi),0 -18px 50px rgba(25,45,8,.18);
+  -webkit-backdrop-filter:blur(34px) saturate(2);backdrop-filter:blur(34px) saturate(2)}
+.sheet::after{border-radius:36px 36px 0 0}
+.sheet .grab{background:rgba(25,45,8,.18)}
+.scr.bg-white .sheet{background:rgba(255,255,255,.84)}
+.scrim{background:rgba(11,15,10,.32);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+
+/* ---------- Tab bar: outer 36 = lens 28 + padding 8 ---------- */
+.tabbar{left:16px;right:16px;bottom:16px;height:72px;border-radius:36px;padding:8px;gap:0;background:rgba(255,255,255,.34);box-shadow:var(--hi),var(--sh-float);
+  -webkit-backdrop-filter:blur(30px) saturate(2.1);backdrop-filter:blur(30px) saturate(2.1)}
+.tab{height:56px;width:62px;border-radius:28px;justify-content:center;color:var(--ink-500);position:relative;font-size:11px;font-weight:600}
+.tab .ic{filter:none;opacity:1;display:grid;place-items:center}
+.tab.on{color:var(--ink-900);background:rgba(255,255,255,.62);box-shadow:var(--hi),0 6px 16px rgba(25,45,8,.14)}
+.tab.on .ic{color:var(--lime-700)}
+.tab-fab{width:56px;height:56px;border-radius:50%;transform:none;border:0;background:var(--lime-btn);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.85),0 10px 24px rgba(107,165,42,.45);position:relative;color:var(--ink-900)}
+.tab-fab.dark{background:var(--ink-btn);color:#fff;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),0 10px 24px rgba(11,15,10,.35)}
+.sticky-cta{padding:16px 16px 28px;background:linear-gradient(0deg,rgba(237,242,227,.92) 55%,rgba(237,242,227,0))}
+
+/* ---------- Imagery tiles carry a glass gloss ---------- */
+.ph{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.8),0 6px 16px rgba(25,45,8,.12)}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,255,255,.55),rgba(255,255,255,0) 42%);pointer-events:none}
+.promo{box-shadow:var(--hi),0 16px 34px rgba(107,165,42,.3);position:relative}
+.promo::before{content:"";position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,255,255,.5),rgba(255,255,255,0) 45%);pointer-events:none}
+.promo .em{bottom:-4px;font-size:84px}
+.pin{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.5),0 8px 16px rgba(25,45,8,.3)}
+
+/* ---------- Admin chrome ---------- */
+.side{background:rgba(255,255,255,.46);border-right:0;box-shadow:inset -1px 0 0 rgba(255,255,255,.7)}
+.dtop{background:rgba(255,255,255,.5);border-bottom:0;box-shadow:inset 0 -1px 0 rgba(255,255,255,.7)}
+.nav{border-radius:16px;font-weight:600}
+.nav.on{background:rgba(255,255,255,.7);color:var(--ink-900);box-shadow:var(--hi),0 4px 12px rgba(25,45,8,.1)}
+.nav.on svg.i{color:var(--lime-700)}
+table.t th{border-bottom:1px solid rgba(25,45,8,.1);font-size:12px;text-transform:none;letter-spacing:0;font-weight:600}
+table.t td{border-bottom:1px solid rgba(25,45,8,.06)}
+.spark i{background:rgba(255,255,255,.7);box-shadow:var(--hi)}.spark i.hi{background:var(--lime-btn)}.spark i.dk{background:linear-gradient(180deg,#444,#0B0F0A)}
+.logo-mark{background:var(--lime-btn);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.85),0 8px 18px rgba(107,165,42,.4)}
+
+/* ---------- One drawn icon set: 24 grid, 1.75 stroke ---------- */
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-4px}
+.tab .ic svg.i{width:24px;height:24px}.tab-fab svg.i{width:26px;height:26px}.nav svg.i{width:20px;height:20px}
+.field svg.i{color:var(--ink-500)}
+.btn svg.i{width:18px;height:18px}
+
+@media (prefers-reduced-transparency:reduce){.card,.glass,.stat,.sheet,.tabbar,.field,.icon-btn,.chip,.stepper,.seg,.side,.dtop{background:rgba(255,255,255,.94)!important;-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+.pill{white-space:nowrap}
+
+/* ===== v3 palette: neutral grey stage + glass that fades to a soft GREEN tint (ref: grey→aqua card) ===== */
+:root{
+  --stage:#F1F2F0;
+  --mint:#CFEBD3; --mint-2:#BFE6C0; --mint-3:#DDF3D0;
+  --mesh:radial-gradient(520px 420px at 50% 112%,rgba(150,215,150,.38),transparent 70%),
+         radial-gradient(420px 320px at 100% 0%,rgba(255,255,255,.9),transparent 70%),#F1F2F0;
+  --glass-fill-2:linear-gradient(180deg,rgba(236,238,236,.72) 0%,rgba(222,238,226,.66) 62%,rgba(196,230,200,.78) 100%);
+}
+.phone,.desk{background:var(--mesh)}
+.canvas{background:radial-gradient(900px 500px at 50% 110%,rgba(160,220,160,.28),transparent 70%),#F1F2F0}
+.card,.stat,.macro,.textarea{background:var(--glass-fill-2)}
+.field,.chip,.stepper,.otp div{background:rgba(255,255,255,.7)}
+.card.soft{background:rgba(214,238,214,.55)}
+.glass{background:linear-gradient(180deg,rgba(238,240,238,.7),rgba(205,234,208,.62) 100%)}
+.sheet{background:linear-gradient(180deg,rgba(240,242,240,.8),rgba(214,238,216,.72))}
+.tabbar{background:rgba(244,246,244,.55)}
+.tab.on{background:rgba(255,255,255,.8)}
+/* round white icon buttons, like the reference */
+.icon-btn{background:#fff;box-shadow:0 1px 2px rgba(25,45,8,.06),0 8px 20px rgba(25,45,8,.10);-webkit-backdrop-filter:none;backdrop-filter:none}
+.icon-btn::after{display:none}
+.icon-btn.glass{background:rgba(255,255,255,.78)}
+/* secondary pill = tinted glass with white rim, primary stays ink; lime used as accent */
+.btn-soft,.btn-glass{background:linear-gradient(180deg,rgba(226,244,228,.9),rgba(190,228,196,.85));color:var(--ink-900)}
+.btn-brand{background:linear-gradient(180deg,#B9E48A,#8CC63F 75%,#7DB635)}
+.promo{background:linear-gradient(135deg,#9AD65A,#D9F0C4)}
+.chip.lime,.pill.ready{background:rgba(207,235,211,.9);color:#2F6B22}
+.seg{background:rgba(255,255,255,.5)}
+.side,.dtop{background:rgba(247,248,247,.7)}
+.nav.on{background:rgba(255,255,255,.9)}
+.map{filter:saturate(.75)}
+.spark i{background:rgba(255,255,255,.8)}
+
+/* =====================================================================
+   v4 — WHERE GLASS LIVES (Apple rule: glass = floating control layer above content;
+   content layer stays flat, solid and quiet).
+   GLASS : tab bar · bottom sheets · overlays & buttons on maps/photos · toasts · scrims
+   FLAT  : cards, list rows, stats, inputs, chips, steppers, tables, price breakdowns, OTP boxes
+   ===================================================================== */
+:root{--paper:#fff;--flat-sh:0 1px 2px rgba(20,30,10,.05),0 4px 14px rgba(20,30,10,.06)}
+.phone,.desk{background:linear-gradient(180deg,#F4F5F3 0%,#F1F2F0 62%,#E9F2E4 100%)}
+.canvas{background:#F1F2F0}
+
+/* ---- flat content layer ---- */
+.card,.stat,.macro,.textarea,.field,.chip,.stepper,.otp div,.tag,.glass{
+  -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--paper);box-shadow:var(--flat-sh)}
+.card::after,.stat::after,.field::after,.chip::after,.stepper::after,.otp div::after,.textarea::after,.glass::after{display:none}
+.glass{border-radius:24px}                      /* former "glass" content blocks are now plain panels */
+.card.soft{background:#F0F7EC;box-shadow:none}
+.card.lime{background:linear-gradient(150deg,#C9E99A,#E3F3CC);box-shadow:none}
+.tag{background:#F0F1EE;box-shadow:none}
+.chip{box-shadow:inset 0 0 0 1px rgba(20,30,10,.08)}
+.chip.on{box-shadow:none}
+.field{box-shadow:inset 0 0 0 1px rgba(20,30,10,.07)}
+.textarea{box-shadow:inset 0 0 0 1px rgba(20,30,10,.07)}
+.stepper{box-shadow:inset 0 0 0 1px rgba(20,30,10,.08)}
+.otp div{box-shadow:inset 0 0 0 1px rgba(20,30,10,.08)}
+.otp div.on{box-shadow:0 0 0 2px var(--lime-500)}
+.seg{background:#E8EAE5;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.seg::after{display:none}
+.seg span.on{background:#fff;color:var(--ink-900);box-shadow:var(--flat-sh)}
+.icon-btn{background:#fff;box-shadow:var(--flat-sh)}
+.icon-btn.dark{background:var(--ink-900);box-shadow:none}
+.icon-btn.lime{background:var(--lime-500);box-shadow:none}
+.btn-soft,.btn-glass{background:#E6F2DD;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.btn-ghost{background:#fff;box-shadow:inset 0 0 0 1px rgba(20,30,10,.1);-webkit-backdrop-filter:none;backdrop-filter:none}
+.btn-danger{box-shadow:none}
+.btn::after{display:none}
+.btn-primary{background:var(--ink-900);box-shadow:0 8px 18px rgba(11,15,10,.18)}
+.btn-brand{background:var(--lime-500);box-shadow:0 8px 20px rgba(107,165,42,.28)}
+.pill{backdrop-filter:none;box-shadow:none}
+.side,.dtop{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border:0}
+.side{border-right:1px solid rgba(20,30,10,.06)}.dtop{border-bottom:1px solid rgba(20,30,10,.06)}
+.side::after{display:none}
+.nav.on{background:#EAF5DA;box-shadow:none}
+.spark i{background:#E3EBD8;box-shadow:none}.spark i.hi{background:var(--lime-500)}
+.promo{box-shadow:none}
+.price-row.total{border-top:1px solid rgba(20,30,10,.08)}
+.promo .em{bottom:8px;right:10px;font-size:72px}
+
+/* ---- glass control layer ---- */
+.tabbar,.sheet,.toast,
+.scr:has(.map) .glass,.scr:has(.map) .icon-btn,.scr:has(.map) .chip,
+.scr:has(> .ph.hero) .icon-btn,.scr:has(> .ph.hero) .glass{
+  background:rgba(250,252,249,.52);
+  -webkit-backdrop-filter:blur(26px) saturate(1.9) brightness(1.04);backdrop-filter:blur(26px) saturate(1.9) brightness(1.04);
+  box-shadow:var(--hi),var(--sh-glass)}
+.scr:has(.map) .glass::after,.scr:has(.map) .icon-btn::after,.scr:has(.map) .chip::after,.scr:has(> .ph.hero) .icon-btn::after{
+  display:block;content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;background:var(--rim);pointer-events:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.sheet{background:linear-gradient(180deg,rgba(252,253,251,.78),rgba(236,246,232,.7))}
+.tabbar{background:rgba(250,252,249,.58)}
+.scr:has(.map) .icon-btn.lime{background:var(--lime-500)}
+.scr:has(.map) .icon-btn.dark{background:var(--ink-900)}
+.sticky-cta{background:linear-gradient(0deg,rgba(241,242,240,.95) 55%,rgba(241,242,240,0))}
+/* inside a glass sheet, rows go flat on a faint tint so glass-on-glass never stacks */
+.sheet .card,.sheet .card.soft{background:rgba(255,255,255,.7);box-shadow:none}
+.sheet .field,.sheet .chip{background:rgba(255,255,255,.75)}
+.sheet .chip.on{background:var(--ink-900);color:#fff}
+
+/* polish: selected chips keep ink fill; tablet board columns fit content */
+.chip.on,.tag.on{background:var(--ink-900);color:#fff;box-shadow:none}
+.phone.tablet{height:auto;min-height:0}
+.chips .chip.on,.chip.on{background:var(--ink-900)!important;color:#fff!important}
+.chip.on .i{stroke:#fff}
+.dot-s{width:10px;height:10px;border-radius:50%;background:var(--lime-500);box-shadow:0 0 0 4px var(--lime-100);flex:none}
+.desk.fit{height:auto;min-height:0}
+.desk.fit .main{min-height:0}
+.desk.fit .dbody{min-height:520px}
+.desk.fit .dbody>.card{flex:none}
+
+/* client view */
+.topnav{position:sticky;top:0;z-index:30;padding:10px 0;margin:0 0 8px;background:rgba(241,242,240,.82);backdrop-filter:blur(16px) saturate(1.5)}
+.jump{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0 6px}
+.jump span{font-size:12px;font-weight:700;color:var(--ink-500);margin-right:4px;text-transform:uppercase;letter-spacing:.05em}
+.jump a{padding:7px 13px;border-radius:99px;background:var(--paper);font-size:13px;font-weight:600;box-shadow:var(--flat-sh)}
+.jump a:hover{background:var(--ink-900);color:#fff}
+.section-h{scroll-margin-top:70px}
+.topnav a:first-child{background:transparent;border-color:transparent}
+.embed .topnav,.embed .page-title,.embed .page-sub,.embed .jump,.embed .section-h,.embed .screen-label{display:none!important}
+.embed .canvas{padding:0!important;margin:0!important}
+.embed .screens{margin-top:0}
+.embed body{background:transparent}

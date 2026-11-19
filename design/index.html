@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delyva — Design Presentation</title>
+<link rel="stylesheet" href="assets/delyva.css"><link rel="stylesheet" href="assets/liquid.css">
+<style>
+body{background:var(--stage)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 80px}
+.top{position:sticky;top:0;z-index:20;backdrop-filter:blur(18px) saturate(1.6);background:rgba(241,242,240,.78);border-bottom:1px solid rgba(11,15,10,.06)}
+.top .in{max-width:1180px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.top .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;margin-right:auto}
+.top .brand i{width:30px;height:30px;border-radius:10px;background:var(--ink-900);color:var(--lime-500);display:grid;place-items:center;font-style:normal}
+.top a.l{padding:8px 14px;border-radius:99px;font-weight:600;font-size:13px}
+.top a.l:hover{background:#fff}
+.hero{padding:64px 0 36px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;border-radius:99px;background:var(--lime-100);color:var(--lime-700);font-weight:700;font-size:12px}
+.hero h1{font-size:58px;line-height:1.02;letter-spacing:-.035em;margin:18px 0 14px}
+.hero h1 b{color:var(--lime-600)}
+.hero p{font-size:17px;line-height:1.55;color:var(--ink-500);max-width:520px}
+.cta{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.hero-art{height:380px;border-radius:40px;background:radial-gradient(420px 320px at 90% 0,rgba(140,198,63,.6),transparent 65%),radial-gradient(460px 380px at 20% 110%,rgba(150,215,150,.5),transparent 70%),linear-gradient(160deg,#E7ECE6,#D7EAD9);position:relative;overflow:hidden;box-shadow:var(--flat-sh)}
+.hero-art iframe{position:absolute;border:0;width:390px;height:844px;border-radius:44px;transform:scale(.52);transform-origin:top left;box-shadow:0 24px 50px rgba(11,15,10,.25);pointer-events:none;background:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0 56px}
+.stats div{background:var(--paper);border-radius:24px;padding:20px;box-shadow:var(--flat-sh)}
+.stats b{display:block;font-size:34px;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.03em}
+.stats span{color:var(--ink-500);font-size:13px}
+h2.sec{font-size:30px;letter-spacing:-.03em;margin:0 0 6px}
+.sub{color:var(--ink-500);margin-bottom:22px;max-width:640px}
+.apps{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.app{display:flex;flex-direction:column;background:var(--paper);border-radius:32px;overflow:hidden;box-shadow:var(--flat-sh);transition:transform .2s var(--ease),box-shadow .2s}
+.app:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(11,15,10,.12)}
+.prev{height:250px;position:relative;overflow:hidden;background:linear-gradient(160deg,#E9EEE8,#DCEBDD);border-bottom:1px solid var(--line)}
+.prev iframe{position:absolute;left:18px;top:18px;border:0;width:1500px;height:900px;transform:scale(.4);transform-origin:top left;pointer-events:none}
+.prev.desk iframe{transform:scale(.42);left:14px;top:18px;width:1500px}
+.body{padding:22px 24px 24px;display:flex;flex-direction:column;gap:6px;flex:1}
+.body .k{font-size:12px;font-weight:700;color:var(--lime-700);letter-spacing:.04em;text-transform:uppercase}
+.body h3{font-size:24px;letter-spacing:-.02em}
+.body p{color:var(--ink-500);font-size:14px;line-height:1.5}
+.chips2{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chips2 span{font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;background:var(--stage)}
+.body .go{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;font-weight:700}
+.body .go em{font-style:normal;color:var(--lime-700)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:8px}
+.flow div{background:var(--paper);border-radius:22px;padding:18px;box-shadow:var(--flat-sh);position:relative}
+.flow i{font-style:normal;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink-900);color:var(--lime-400);font-weight:800;font-size:13px}
+.flow b{display:block;margin:12px 0 4px}
+.flow span{font-size:13px;color:var(--ink-500);line-height:1.45}
+.ds{margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--paper);border-radius:32px;padding:26px;box-shadow:var(--flat-sh)}
+.sw{display:flex;gap:8px;margin:14px 0}
+.sw i{flex:1;height:54px;border-radius:16px;box-shadow:inset 0 0 0 1px rgba(11,15,10,.06)}
+.sw-l{display:flex;gap:8px;font-size:11px;color:var(--ink-500)}.sw-l span{flex:1}
+.how li{margin:8px 0 8px 18px;color:var(--ink-700)}
+.foot{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);color:var(--ink-500);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.hero h1{font-size:42px}.stats{grid-template-columns:repeat(2,1fr)}.apps,.ds{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.hero-art{display:none}}
+</style></head>
+<body>
+<header class="top"><div class="in"><div class="brand"><i>D</i>Delyva</div>
+<a class="l" href="#apps">Apps</a><a class="l" href="#flow">Order journey</a><a class="l" href="#system">Design system</a><a class="l" href="customer.html">Customer</a><a class="l" href="merchant.html">Merchant</a><a class="l" href="rider.html">Rider</a><a class="l" href="admin.html">Admin</a></div></header>
+
+<div class="wrap">
+<section class="hero">
+  <div>
+    <span class="eyebrow">Design presentation · v1</span>
+    <h1>Delivered <b>Your Way.</b></h1>
+    <p>Electric, solar-powered delivery and commerce for Nigeria. Every screen across four apps, from first launch to payment and live delivery tracking, designed once on a single system.</p>
+    <div class="cta"><a class="btn btn-primary" href="customer.html">Start with the customer app →</a><a class="btn btn-ghost" href="design-system.html">View design system</a></div>
+  </div>
+  <div class="hero-art"><iframe src="customer.html#embed" style="left:92px;top:40px" tabindex="-1" loading="lazy" title="preview"></iframe></div>
+</section>
+
+<section class="stats">
+  <div><b>73</b><span>screens designed</span></div>
+  <div><b>4</b><span>connected apps</span></div>
+  <div><b>1</b><span>shared design system</span></div>
+  <div><b>3</b><span>breakpoints: phone, tablet, desktop</span></div>
+</section>
+
+<section id="apps">
+  <h2 class="sec">The four apps</h2>
+  <p class="sub">Each app opens as a canvas of screens in flow order. Use the jump bar at the top of each page to move between sections.</p>
+  <div class="apps">
+    <a class="app" href="customer.html"><div class="prev"><iframe src="customer.html#embed" tabindex="-1" loading="lazy" title="Customer preview"></iframe></div>
+      <div class="body"><span class="k">Customer · 29 screens</span><h3>Order anything, track it live</h3><p>Onboarding, discovery, cart and payment, live rider tracking, parcels, wallet and help.</p>
+      <div class="chips2"><span>Phone</span><span>Food</span><span>Groceries</span><span>Parcels</span></div><div class="go"><span>Open customer app</span><em>→</em></div></div></a>
+    <a class="app" href="merchant.html"><div class="prev"><iframe src="merchant.html#embed" tabindex="-1" loading="lazy" title="Merchant preview"></iframe></div>
+      <div class="body"><span class="k">Merchant · 16 screens</span><h3>Run the kitchen counter</h3><p>Five-step onboarding, loud new-order alert, orders board for tablet, menu, payouts and settings.</p>
+      <div class="chips2"><span>Phone</span><span>Tablet</span></div><div class="go"><span>Open merchant app</span><em>→</em></div></div></a>
+    <a class="app" href="rider.html"><div class="prev"><iframe src="rider.html#embed" tabindex="-1" loading="lazy" title="Rider preview"></iframe></div>
+      <div class="body"><span class="k">Rider · 15 screens</span><h3>Glove-friendly deliveries</h3><p>Verification, go online, offers, navigation, proof of delivery, battery hubs and earnings.</p>
+      <div class="chips2"><span>Phone</span><span>One action per step</span></div><div class="go"><span>Open rider app</span><em>→</em></div></div></a>
+    <a class="app" href="admin.html"><div class="prev desk"><iframe src="admin.html#embed" tabindex="-1" loading="lazy" title="Admin preview"></iframe></div>
+      <div class="body"><span class="k">Admin · 13 screens</span><h3>Operations dashboard</h3><p>Live ops map, order intervention, merchants and riders, pricing, finance, fleet and solar, support, fraud.</p>
+      <div class="chips2"><span>Desktop 1440</span></div><div class="go"><span>Open admin dashboard</span><em>→</em></div></div></a>
+  </div>
+</section>
+
+<section id="flow" style="margin-top:64px">
+  <h2 class="sec">One order, end to end</h2>
+  <p class="sub">How a single order moves across the apps.</p>
+  <div class="flow">
+    <div><i>1</i><b>Customer orders</b><span>Browses, builds a cart, pays by card, transfer or wallet.</span></div>
+    <div><i>2</i><b>Merchant accepts</b><span>Loud alert, one tap, picks a prep time.</span></div>
+    <div><i>3</i><b>Rider is matched</b><span>Offer with earnings, navigates to the store, confirms pickup code.</span></div>
+    <div><i>4</i><b>Live tracking</b><span>Customer sees the electric bike move on the map.</span></div>
+    <div><i>5</i><b>Delivered &amp; paid</b><span>Code at the door, rider earns, merchant paid out weekly.</span></div>
+  </div>
+</section>
+
+<section id="system" class="ds">
+  <div class="panel"><h2 class="sec" style="font-size:24px">Design system</h2>
+    <p class="sub" style="margin-bottom:0">Lime and ink, flat content, glass only on floating controls.</p>
+    <div class="sw"><i style="background:#0B0F0A"></i><i style="background:#8CC63F"></i><i style="background:#EAF5CF"></i><i style="background:#CFEBD3"></i><i style="background:#F1F2F0"></i><i style="background:#FFB020"></i></div>
+    <div class="sw-l"><span>Ink</span><span>Lime</span><span>Lime 100</span><span>Mint</span><span>Stage</span><span>Sun</span></div>
+    <p class="mt16"><b>Type</b> Plus Jakarta Sans for headings, Inter for interface text.</p>
+    <a class="btn btn-soft s mt16" href="design-system.html">Open design system →</a></div>
+  <div class="panel"><h2 class="sec" style="font-size:24px">How to view</h2>
+    <ul class="how"><li>Each app page reads left to right, row by row, in flow order.</li><li>Use the <b>jump bar</b> under the title to skip to a section.</li><li>Phone frames are 390×844, tablet 1024×700, admin 1440×900.</li><li>Food photos and avatars are placeholders until real photography is supplied.</li></ul></div>
+</section>
+
+<div class="foot"><span>Delyva · Delivered Your Way.</span><span>Design presentation · all screens are static prototypes</span></div>
+</div>
+</body></html>

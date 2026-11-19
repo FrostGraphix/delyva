@@ -1,0 +1,21 @@
+{
+  "name": "@delyva/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared tsconfig, ESLint flat config, Prettier and Vitest presets.",
+  "exports": {
+    "./eslint": "./eslint.config.js",
+    "./prettier": "./prettier.config.js",
+    "./vitest": "./vitest.preset.js",
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.react-library.json": "./tsconfig.react-library.json",
+    "./tsconfig.bundler.json": "./tsconfig.bundler.json"
+  },
+  "dependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.15.0",
+    "globals": "17.14.0",
+    "typescript-eslint": "8.73.0"
+  }
+}

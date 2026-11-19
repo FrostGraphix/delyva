@@ -1,0 +1,33 @@
+{
+  "name": "@delyva/utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure money, time and geo helpers.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@delyva/config": "workspace:*",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "eslint": "10.15.0",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1"
+  }
+}
