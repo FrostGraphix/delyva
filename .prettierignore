@@ -5,3 +5,7 @@ dist/
 .next/
 .expo/
 coverage/
+*.md
+.claude/
+apps/api/openapi.json
+apps/api/drizzle/meta/

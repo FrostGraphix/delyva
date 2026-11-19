@@ -380,3 +380,59 @@ End every task with: a summary of what changed, the commands to run (migrate, te
 ---
 
 **CURRENT TASK:** set per session.
+
+---
+
+## Phase 0 implementation record (2026-11-19)
+
+### Pinned versions
+
+All versions are pinned exactly in `package.json` (`.npmrc` has `save-exact=true`) and were checked with `npm view <pkg> version` before install.
+
+| Area | Package | Version |
+| --- | --- | --- |
+| Runtime | Node.js | 24.13.1 (engines `>=24`) |
+| Monorepo | pnpm / turbo | 11.1.2 / 2.11.13 |
+| Language | typescript | 6.0.3 (TS 7.0.2 is `latest`, but typescript-eslint supports `<6.1`; see ADR 0002) |
+| Lint/format | eslint / @eslint/js / typescript-eslint / globals / prettier | 10.15.0 / 10.0.1 / 8.73.0 / 17.14.0 / 3.10.1 |
+| Test | vitest / @vitest/coverage-v8 / supertest / unplugin-swc / @swc/core | 5.1.1 / 5.1.1 / 7.3.2 / 2.0.0 / 1.16.22 |
+| Validation | zod | 4.6.7 |
+| Backend | @nestjs/common, core, platform-express, testing | 12.5.1 |
+| Backend | reflect-metadata / rxjs | 0.2.2 / 7.8.2 |
+| Data | drizzle-orm / drizzle-kit / pg | 0.45.4 / 0.31.11 / 8.23.1 |
+| Cache, jobs | ioredis / bullmq | 6.0.0 / 6.7.8 |
+| Auth | jose | 6.2.18 |
+| Logging | pino | 10.4.0 |
+| Web | next / tailwindcss / @tailwindcss/postcss / postcss | 16.4.6 / 4.3.5 / 4.3.5 / 8.5.33 |
+| React | react / react-dom / @types/react | 19.3.0 / 19.3.0 / 19.3.0 (matches Expo SDK 58 bundledNativeModules) |
+| Mobile | expo / expo-router / expo-status-bar / expo-constants / expo-linking | 58.0.26 / 58.0.32 / 58.0.5 / 58.0.16 / 58.0.17 |
+| Mobile | react-native / react-native-svg / safe-area-context / screens | 0.88.1 / 15.16.0 / 5.11.1 / 4.30.1 |
+| SDK | @tanstack/react-query | 5.108.1 |
+| Infra images | postgis/postgis / redis | 16-3.5 / 7.4-alpine |
+| CI | actions/checkout / actions/setup-node / pnpm/action-setup / gitleaks | v7.0.1 / v7.1.0 / v6.1.1 / v8.30.1 |
+
+### Decisions
+
+- ADR 0001 — Drizzle ORM for data access (SQL migrations in `apps/api/drizzle`).
+- ADR 0002 — ESM everywhere, TypeScript 6.0, `tsc`-built packages, token/icon code generation, isolated docker-compose project (`delyva`, ports 55432/56379).
+- ADR 0003 — Phone OTP + EdDSA access JWT + rotating refresh tokens with reuse detection.
+
+### What exists
+
+- `apps/api`: `src/shared` (Zod-validated env, pino JSON logger with redaction + trace-id mixin, request tracing via `traceparent`/`x-request-id`, RFC 9457 problem+json filter, Zod body pipe, Redis Idempotency-Key interceptor (24 h), Redis sliding-window rate limiter, transactional outbox table + `appendToOutbox` + `SKIP LOCKED` polling publisher, `/healthz`, `/readyz`). `src/modules/identity` with `api/application/domain/infrastructure` layers. OpenAPI 3.1 spec generated from contracts to `apps/api/openapi.json` on build.
+- `packages/contracts` is the single source of truth for DTOs, enums, problem and event envelope schemas, and the route registry used to build the OpenAPI document and the SDK.
+- Events emitted: `identity.user.registered` (payload `{ userId }`).
+
+### Known technical debt (Phase 0)
+
+- DEBT(identity): single JWT signing key; JWKS rotation with previous keys not implemented.
+- DEBT(platform): helmet/CORS/`trust proxy` not configured; per-IP limits need the real client IP behind the LB.
+- DEBT(observability): OpenTelemetry traces/metrics not wired (trace ids are propagated and logged only); Sentry not added.
+- DEBT(outbox): logging event bus; NATS JetStream adapter and LISTEN/NOTIFY wake-ups pending.
+- DEBT(notifications): Termii adapter has a timeout but no retry/circuit breaker or WhatsApp fallback.
+- DEBT(data): Drizzle has no down migrations; reversibility relies on expand/contract.
+- DEBT(security): no bot check (captcha/attestation) on OTP send yet; no RBAC guard yet (no protected routes exist).
+- DEBT(mobile): customer bundle is ~2.6 MB Hermes bytecode before any feature work (NFR target < 2 MB initial JS); tokens not yet stored via expo-secure-store (no auth screen yet).
+- DEBT(web): CSP/HSTS headers not configured; i18n not set up (hard-coded English in scaffolds).
+- DEBT(test): SDK hooks and RN `Button` lack render tests (need React/RN testing libraries); no Testcontainers yet (integration tests use the docker-compose services and skip with a message when unreachable).
+- DEBT(icons): icons are hand-optimised SVG; SVGO pipeline and Phosphor import not added.

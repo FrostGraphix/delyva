@@ -39,3 +39,35 @@ Shared styling lives in `design/assets/delyva.css` (all tokens as CSS variables)
 - **Tagline:** Delivered Your Way.
 - **Promise:** Fast. Affordable. Reliable.
 - **Look:** soft lime-green + near-black ink, off-white surfaces, glassmorphism cards, big rounded corners, food/product photography first.
+
+## Running locally
+
+Prerequisites: Node.js 24, pnpm 11, Docker Desktop.
+
+```bash
+pnpm install
+
+# Postgres 16 + PostGIS and Redis 7 (compose project "delyva", ports 55432 / 56379 on 127.0.0.1).
+# Override ports in infra/.env (see infra/.env.example).
+docker compose -f infra/docker-compose.yml up -d
+
+# API environment (local development values only; never commit .env)
+cp apps/api/.env.example apps/api/.env      # set HASH_PEPPER to a random 64-hex string
+
+pnpm build                                  # builds packages, apps and writes apps/api/openapi.json
+pnpm --filter @delyva/api db:migrate        # applies SQL migrations
+pnpm --filter @delyva/api start             # http://localhost:3300 (/healthz, /readyz)
+```
+
+With `SMS_PROVIDER=dev`, the latest OTP for a phone is stored in Redis (never logged):
+
+```bash
+docker exec delyva-redis-1 redis-cli GET "dev:otp:+2348031234567"
+```
+
+Other apps: `pnpm --filter @delyva/vendor-web dev` (port 3301), `pnpm --filter @delyva/admin-web dev` (3302),
+`pnpm --filter @delyva/customer-mobile dev` / `@delyva/rider-mobile dev` (Expo), `pnpm --filter @delyva/workers dev`.
+
+Quality gates (same as CI): `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format`.
+API integration tests use the docker-compose services (database `delyva_test`, Redis db 15) and are skipped
+with a message if those services are not reachable.
