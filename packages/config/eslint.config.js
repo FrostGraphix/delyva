@@ -37,6 +37,14 @@ export function delyvaConfig({ tsconfigRootDir }) {
         '@typescript-eslint/no-non-null-assertion': 'error',
         '@typescript-eslint/ban-ts-comment': 'error',
         '@typescript-eslint/consistent-type-imports': 'error',
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            argsIgnorePattern: '^_',
+            varsIgnorePattern: '^_',
+            destructuredArrayIgnorePattern: '^_',
+          },
+        ],
         '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
         'no-restricted-imports': [
           'error',

@@ -1,0 +1,34 @@
+# Local development dependencies for Delyva. Isolated project name and non-default host ports
+# so it never collides with other stacks on the machine. Override ports via infra/.env.
+name: delyva
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+    environment:
+      POSTGRES_USER: delyva
+      POSTGRES_PASSWORD: ${DELYVA_PG_PASSWORD:-delyva_local_only}
+      POSTGRES_DB: delyva
+    ports:
+      - '127.0.0.1:${DELYVA_PG_PORT:-55432}:5432'
+    volumes:
+      - delyva-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U delyva -d delyva']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7.4-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '127.0.0.1:${DELYVA_REDIS_PORT:-56379}:6379'
+    volumes:
+      - delyva-redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  delyva-pg:
+  delyva-redis:
