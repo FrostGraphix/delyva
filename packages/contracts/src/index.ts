@@ -11,3 +11,4 @@ export * from './catalog/routes.js';
 export * from './pricing/index.js';
 export * from './notifications/index.js';
 export * from './realtime/index.js';
+export * from './payments/index.js';

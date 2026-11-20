@@ -26,6 +26,23 @@ export const EnvSchema = z
       .enum(['true', 'false'])
       .default('true')
       .transform((v) => v === 'true'),
+    // payments (ADR 0300)
+    PAYMENTS_PROVIDER: z.enum(['paystack', 'fake']).default('fake'),
+    PAYSTACK_SECRET_KEY: z.string().optional().default(''),
+    PAYSTACK_BASE_URL: z.url().default('https://api.paystack.co'),
+    PAYSTACK_WEBHOOK_IPS: z
+      .string()
+      .default('')
+      .transform((s) =>
+        s
+          .split(',')
+          .map((x) => x.trim())
+          .filter((x) => x !== ''),
+      ),
+    PAYMENTS_FAKE_WEBHOOK_SECRET: z.string().optional().default(''),
+    PAYMENTS_CUSTOMER_EMAIL_DOMAIN: z.string().min(3).default('customers.delyva.invalid'),
+    PAYOUT_MIN_MINOR: z.coerce.number().int().min(1).default(100_000),
+    INTERNAL_JOBS_TOKEN: z.string().optional().default(''),
   })
   .superRefine((env, ctx) => {
     if (env.ETA_PROVIDER === 'google' && env.GOOGLE_MAPS_API_KEY === '') {
@@ -40,6 +57,21 @@ export const EnvSchema = z
     }
     if (env.JWT_PRIVATE_KEY_PEM_B64 === '') {
       ctx.addIssue({ code: 'custom', message: 'production requires JWT_PRIVATE_KEY_PEM_B64' });
+    }
+    if (env.PAYMENTS_PROVIDER !== 'paystack' || env.PAYSTACK_SECRET_KEY === '') {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'production requires PAYMENTS_PROVIDER=paystack and PAYSTACK_SECRET_KEY',
+      });
+    }
+    if (env.PAYSTACK_WEBHOOK_IPS.length === 0) {
+      ctx.addIssue({ code: 'custom', message: 'production requires PAYSTACK_WEBHOOK_IPS' });
+    }
+    if (env.INTERNAL_JOBS_TOKEN.length < 32) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'production requires INTERNAL_JOBS_TOKEN (>= 32 chars)',
+      });
     }
   });
 

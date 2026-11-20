@@ -4,3 +4,4 @@ export * from './catalog-hooks.js';
 export * from './pricing-hooks.js';
 export * from './notification-hooks.js';
 export * from './realtime.js';
+export * from './payments.js';

@@ -61,6 +61,13 @@ import {
   NotificationPreferencesSchema,
   type RegisterDevice,
   type RiderLocationBatch,
+  type CreateTopUpRequest,
+  type PaymentIntent,
+  PaymentIntentSchema,
+  type Wallet,
+  WalletSchema,
+  type WalletTransactionsPage,
+  WalletTransactionsPageSchema,
 } from '@delyva/contracts';
 import type { z } from 'zod';
 
@@ -199,6 +206,53 @@ export class DelyvaClient {
   /** POST /v1/riders/me/locations — HTTP fallback when the socket is down. */
   postRiderLocations(body: RiderLocationBatch): Promise<LocationBatchResult> {
     return this.send('POST', ROUTES.postRiderLocations.path, body, LocationBatchResultSchema);
+  }
+
+  /** GET /v1/wallet (bearer) */
+  getWallet(): Promise<Wallet> {
+    return this.send('GET', ROUTES.getWallet.path, undefined, WalletSchema);
+  }
+
+  /** GET /v1/wallet/transactions (bearer) */
+  listWalletTransactions(
+    q: { limit?: number; cursor?: string } = {},
+  ): Promise<WalletTransactionsPage> {
+    const qs = new URLSearchParams();
+    if (q.limit !== undefined) qs.set('limit', String(q.limit));
+    if (q.cursor !== undefined) qs.set('cursor', q.cursor);
+    const suffix = qs.size > 0 ? `?${qs.toString()}` : '';
+    const path = `${ROUTES.listWalletTransactions.path}${suffix}`;
+    return this.send('GET', path, undefined, WalletTransactionsPageSchema);
+  }
+
+  /** POST /v1/wallet/top-ups (bearer; stable idempotency key per user intent) */
+  createWalletTopUp(body: CreateTopUpRequest, idempotencyKey?: string): Promise<PaymentIntent> {
+    return this.post(
+      ROUTES.createWalletTopUp.path,
+      body,
+      PaymentIntentSchema,
+      this.idem(idempotencyKey),
+    );
+  }
+
+  /** GET /v1/payment-intents/{id} (bearer) */
+  getPaymentIntent(id: string): Promise<PaymentIntent> {
+    return this.send(
+      'GET',
+      withId(ROUTES.getPaymentIntent.path, id),
+      undefined,
+      PaymentIntentSchema,
+    );
+  }
+
+  /** POST /v1/payment-intents/{id}/verify (bearer) — server-side verify after checkout redirect */
+  verifyPaymentIntent(id: string, idempotencyKey?: string): Promise<PaymentIntent> {
+    return this.post(
+      withId(ROUTES.verifyPaymentIntent.path, id),
+      undefined,
+      PaymentIntentSchema,
+      this.idem(idempotencyKey),
+    );
   }
 
   private idem(key?: string): Record<string, string> {

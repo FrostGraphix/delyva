@@ -11,6 +11,7 @@ import type { OrderRoomAuthorizer } from './modules/realtime/application/ports.j
 import { RedisIoAdapter } from './modules/realtime/infrastructure/socket-io.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { PricingModule } from './modules/pricing/pricing.module.js';
+import { PaymentsModule } from './modules/payments/payments.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';
@@ -59,6 +60,7 @@ export async function createApp(
       CatalogModule,
       NotificationsModule,
       realtime,
+      PaymentsModule,
     ],
   })
   class AppModule {}
@@ -66,6 +68,8 @@ export async function createApp(
   const app = await NestFactory.create(AppModule, {
     logger: new PinoNestLogger(logger),
     bodyParser: true,
+    // Keeps req.rawBody (Buffer) next to the parsed JSON for webhook HMAC checks; other routes unaffected.
+    rawBody: true,
   });
   app.use(requestContext(logger));
   app.useWebSocketAdapter(new RedisIoAdapter(app, env.REDIS_URL));

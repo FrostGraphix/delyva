@@ -532,3 +532,25 @@ All writes require `Idempotency-Key`. Contracts: `packages/contracts/src/{geo,ca
 - DEBT(geo): ETA heuristic constants uncalibrated; Google adapter untested, no breaker/cache, one call per branch.
 - DEBT(data): zone polygons are rough rectangles; drizzle snapshot for 0100 records SRID-less point type (SQL hand-corrected to 4326).
 - DEBT(sdk): catalog hooks have no render tests (same as Phase 0 hooks).
+
+## Payments & ledger (Phase 1, 2026-11-20)
+
+See ADR 0300. Module `apps/api/src/modules/payments` (api / application / domain / infrastructure), migration `0300_payments.sql`, contracts `packages/contracts/src/payments/`, SDK methods on `DelyvaClient` + hooks in `packages/sdk/src/payments.ts`, jobs in `apps/workers/src/jobs/payments.jobs.ts`.
+
+- **Ledger:** append-only double entry (`ledger_accounts`, `ledger_transactions`, `ledger_entries`), signed integer kobo, invariants in the domain and in Postgres (deferred balance trigger, append-only triggers, revoked privileges). Corrections are compensating transactions.
+- **Intents:** `requires_action → processing → succeeded | failed`, `succeeded → refunded`; transitions only via `settleIntent` after a provider `verify` (verify endpoint, or a webhook that is re-verified server-side).
+- **Wallet:** balance derived from the ledger; holds with 15-minute expiry; per-wallet advisory locks.
+- **Endpoints** (bearer, shared `AuthGuard`): `GET /v1/wallet`, `GET /v1/wallet/transactions`, `POST /v1/wallet/top-ups`, `GET /v1/payment-intents/{id}`, `POST /v1/payment-intents/{id}/verify`. Signed, unauthenticated: `POST /v1/webhooks/paystack`. Internal (shared token, not in public OpenAPI): `POST /internal/payments/payouts/run`, `POST /internal/payments/reconciliations/run`.
+- **Service interface for ordering:** `PaymentsService.createIntentForOrder`, `captureOrderSplit(orderId, breakdown)`, `releaseOrderHold`, `refundOrder` (full/partial, to wallet or source).
+- **Events:** `payments.intent.succeeded`, `payments.intent.failed`, `payments.refund.completed`, `payments.payout.sent`, `payments.reconciliation.mismatched` (outbox).
+- **Env:** `PAYMENTS_PROVIDER` (paystack|fake), `PAYSTACK_SECRET_KEY`, `PAYSTACK_BASE_URL`, `PAYSTACK_WEBHOOK_IPS`, `PAYMENTS_FAKE_WEBHOOK_SECRET`, `PAYMENTS_CUSTOMER_EMAIL_DOMAIN`, `PAYOUT_MIN_MINOR`, `INTERNAL_JOBS_TOKEN`; workers `API_INTERNAL_URL`, `INTERNAL_JOBS_TOKEN`. Production refuses to boot without a Paystack key, webhook IPs and a 32+ char jobs token.
+- **Raw body:** `NestFactory.create(..., { rawBody: true })` keeps `req.rawBody` next to the parsed JSON; other routes are unchanged.
+
+### Known technical debt (payments)
+
+- DEBT(payments): live Paystack calls unverified; the adapter is tested against mocked HTTP shaped by the official PaystackOSS OpenAPI spec. Refund id field placement and transfer OTP flow need a sandbox check.
+- DEBT(payments): Paystack needs a customer email; a synthetic `<userId>@PAYMENTS_CUSTOMER_EMAIL_DOMAIN` is sent until real emails exist.
+- DEBT(payments): failed provider refunds stay `pending_provider` with no retry job; vendor payouts only (no rider payouts); no recipient-onboarding endpoint (adapter has bank resolve + create recipient).
+- DEBT(payments): webhook IP check uses `req.ip`; needs `trust proxy` behind the LB.
+- DEBT(payments): reconciliation compares charges only (not refunds, transfers or settlement reports); alerting is log + outbox, no pager.
+- DEBT(payments): no admin refund endpoint with reason, audit log and second approver yet (service method only).

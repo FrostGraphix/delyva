@@ -18,6 +18,7 @@ import {
   RegisterDeviceSchema,
 } from './notifications/index.js';
 import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
+import { PAYMENT_ROUTES } from './payments/payment-routes.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 import {
   CreateFeeRuleSchema,
@@ -267,6 +268,7 @@ export const ROUTES = {
     errors: [400, 401, 403, 429],
     auth: true,
   },
+  ...PAYMENT_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
 
 const json = (schema: z.ZodType): object => z.toJSONSchema(schema, { target: 'draft-2020-12' });
