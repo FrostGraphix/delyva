@@ -82,7 +82,8 @@ export const ORDERING_ROUTES = {
     method: 'post',
     path: '/v1/orders',
     operationId: 'checkout',
-    summary: 'Checkout a cart: re-price, redeem promo, reserve wallet or start payment, create order',
+    summary:
+      'Checkout a cart: re-price, redeem promo, reserve wallet or start payment, create order',
     body: CheckoutRequestSchema,
     success: { status: 201, schema: OrderSchema },
     errors: [400, 401, 404, 409, 422],

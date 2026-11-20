@@ -12,10 +12,7 @@ import { RedisIoAdapter } from './modules/realtime/infrastructure/socket-io.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { PricingModule } from './modules/pricing/pricing.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
-import {
-  OrderingModule,
-  orderRoomAuthorizerProvider,
-} from './modules/ordering/ordering.module.js';
+import { OrderingModule, orderRoomAuthorizerProvider } from './modules/ordering/ordering.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';

@@ -60,7 +60,11 @@ export class OrderFulfilmentService implements OrderFulfilmentPort {
   }
 
   /** @inheritdoc */
-  markRiderAtVendor(orderId: string, riderId: string, pickupCode: string): Promise<OrderFulfilmentResult> {
+  markRiderAtVendor(
+    orderId: string,
+    riderId: string,
+    pickupCode: string,
+  ): Promise<OrderFulfilmentResult> {
     return this.step(orderId, riderId, 'RIDER_AT_VENDOR', (o) => {
       if (!this.deps.codes.verify(o.id, 'pickup', pickupCode, o.pickupCodeHash)) {
         throw new OrderingError('validation_failed', 'Pickup code is incorrect.');
@@ -79,7 +83,11 @@ export class OrderFulfilmentService implements OrderFulfilmentPort {
   }
 
   /** @inheritdoc Captures the payment split before the DELIVERED transition (idempotent). */
-  async markDelivered(orderId: string, riderId: string, deliveryOtp: string): Promise<OrderFulfilmentResult> {
+  async markDelivered(
+    orderId: string,
+    riderId: string,
+    deliveryOtp: string,
+  ): Promise<OrderFulfilmentResult> {
     const order = await this.owned(orderId, riderId);
     if (order.status === 'DELIVERED') return result(order);
     if (order.status !== 'RIDER_AT_CUSTOMER') {
@@ -99,12 +107,18 @@ export class OrderFulfilmentService implements OrderFulfilmentPort {
   }
 
   /** @inheritdoc */
-  async markUndeliverable(orderId: string, riderId: string, reason: string): Promise<OrderFulfilmentResult> {
+  async markUndeliverable(
+    orderId: string,
+    riderId: string,
+    reason: string,
+  ): Promise<OrderFulfilmentResult> {
     await this.owned(orderId, riderId);
     const o = await this.deps.lifecycle.run(orderId, (order) => {
       assertRider(order, riderId);
       if (['UNDELIVERABLE', 'REFUND_PENDING', 'REFUNDED'].includes(order.status)) return [];
-      return withRefund(order, [{ to: 'UNDELIVERABLE', actorType: 'rider', actorId: riderId, reason }]);
+      return withRefund(order, [
+        { to: 'UNDELIVERABLE', actorType: 'rider', actorId: riderId, reason },
+      ]);
     });
     return result(o);
   }

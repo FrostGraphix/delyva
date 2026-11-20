@@ -6,11 +6,7 @@ import {
   type OrderVendorAcceptedPayload,
 } from '@delyva/contracts';
 import { orderRef } from '../domain/order-money.js';
-import {
-  assertActor,
-  assertTransition,
-  REFUNDABLE_EXITS,
-} from '../domain/order-state-machine.js';
+import { assertActor, assertTransition, REFUNDABLE_EXITS } from '../domain/order-state-machine.js';
 import { OrderingError } from '../domain/ordering-errors.js';
 import type {
   AutoRejectScheduler,
@@ -112,7 +108,10 @@ export function withRefund(order: OrderRecord, steps: TransitionStep[]): Transit
   if (!exit || !REFUNDABLE_EXITS.includes(exit.to) || order.status === 'PENDING_PAYMENT') {
     return steps;
   }
-  return [...steps, { to: 'REFUND_PENDING', actorType: 'system', actorId: null, reason: exit.reason ?? null }];
+  return [
+    ...steps,
+    { to: 'REFUND_PENDING', actorType: 'system', actorId: null, reason: exit.reason ?? null },
+  ];
 }
 
 /**
@@ -154,7 +153,8 @@ export class OrderLifecycle {
     for (const s of steps) this.publish(order.id, s.to, at);
     const entered = new Set(steps.map((s) => s.to));
     await this.safely(order.id, 'auto-reject scheduling', async () => {
-      if (entered.has('PLACED')) await this.deps.scheduler.schedule(order.id, this.deps.config.autoRejectMs);
+      if (entered.has('PLACED'))
+        await this.deps.scheduler.schedule(order.id, this.deps.config.autoRejectMs);
       else if (before.status === 'PLACED') await this.deps.scheduler.cancel(order.id);
     });
     await this.safely(order.id, 'trip binding', () => this.bindTrip(order, entered));

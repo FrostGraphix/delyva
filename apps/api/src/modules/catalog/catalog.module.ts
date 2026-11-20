@@ -119,5 +119,9 @@ export class CatalogModule {}
  */
 export function buildCatalogService(db: Db): CatalogService {
   const writes = new DrizzleCatalogWriteRepository(db);
-  return new CatalogService({ reads: new DrizzleCatalogReadRepository(db), members: writes, clock });
+  return new CatalogService({
+    reads: new DrizzleCatalogReadRepository(db),
+    members: writes,
+    clock,
+  });
 }

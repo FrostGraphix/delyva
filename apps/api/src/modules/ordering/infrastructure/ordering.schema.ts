@@ -118,7 +118,9 @@ export const orderItems = pgTable(
     name: text('name').notNull(),
     quantity: smallint('quantity').notNull(),
     unitPriceMinor: money('unit_price_minor'),
-    options: jsonb('options').$type<{ id: string; name: string; priceDeltaMinor: number }[]>().notNull(),
+    options: jsonb('options')
+      .$type<{ id: string; name: string; priceDeltaMinor: number }[]>()
+      .notNull(),
     position: smallint('position').notNull(),
   },
   (t) => [index('order_items_order_idx').on(t.orderId, t.position)],

@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { OrderStatusSchema } from '../order-status.js';
-import { MoneyDtoSchema, PaymentIntentStatusSchema, PaymentMethodSchema } from '../payments/payments.js';
+import {
+  MoneyDtoSchema,
+  PaymentIntentStatusSchema,
+  PaymentMethodSchema,
+} from '../payments/payments.js';
 
 /** Most units of one item per cart line. */
 export const MAX_LINE_QUANTITY = 50;
@@ -148,8 +152,16 @@ export const OrderSchema = z.strictObject({
   readyAt: z.iso.datetime().nullable(),
   etaMinutes: z.number().int().nonnegative(),
   rider: z.strictObject({ id: z.uuid() }).nullable(),
-  deliveryOtp: z.string().regex(/^\d{4}$/).nullable().describe('customer only'),
-  pickupCode: z.string().regex(/^\d{4}$/).nullable().describe('vendor and ops only'),
+  deliveryOtp: z
+    .string()
+    .regex(/^\d{4}$/)
+    .nullable()
+    .describe('customer only'),
+  pickupCode: z
+    .string()
+    .regex(/^\d{4}$/)
+    .nullable()
+    .describe('vendor and ops only'),
   timeline: z.array(OrderTimelineEntrySchema),
   createdAt: z.iso.datetime(),
 });

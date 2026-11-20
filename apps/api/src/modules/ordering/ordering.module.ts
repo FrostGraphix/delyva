@@ -28,7 +28,10 @@ import { PaymentsModule } from '../payments/payments.module.js';
 import { PricingService } from '../pricing/application/pricing.service.js';
 import { TransactionalRedeemPromo } from '../pricing/infrastructure/transactional-redeem-promo.js';
 import { PricingModule } from '../pricing/pricing.module.js';
-import { LIVE_TRACKING, type LiveTrackingService } from '../realtime/application/live-tracking.service.js';
+import {
+  LIVE_TRACKING,
+  type LiveTrackingService,
+} from '../realtime/application/live-tracking.service.js';
 import { ORDER_ROOM_AUTHORIZER } from '../realtime/application/ports.js';
 import {
   AdminOrdersController,
@@ -115,7 +118,7 @@ function pricingPort(p: PricingService): PricingPort {
 
 function trackingPort(t: LiveTrackingService): TrackingPort {
   return {
-    publishOrderStatus: (id, s, at) => t.publishOrderStatus(id, s, at),
+    publishOrderStatus: (id, s, at) => { t.publishOrderStatus(id, s, at); },
     startTrip: (r, o) => t.startTrip(r, o),
     endTrip: (r) => t.endTrip(r),
   };
@@ -132,7 +135,10 @@ export const orderRoomAuthorizerProvider: Provider = {
   provide: ORDER_ROOM_AUTHORIZER,
   inject: [DB],
   useFactory: (db: Db) =>
-    new OrderRoomAccess({ orders: new DrizzleOrderStore(db, noRedeem), catalog: buildCatalogService(db) }),
+    new OrderRoomAccess({
+      orders: new DrizzleOrderStore(db, noRedeem),
+      catalog: buildCatalogService(db),
+    }),
 };
 
 const providers: Provider[] = [
@@ -140,7 +146,11 @@ const providers: Provider[] = [
     provide: ACCESS_TOKEN_VERIFIER,
     inject: [JoseAccessTokenSigner, ENV],
     useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
-      new JoseAccessTokenVerifier({ key: signer.verificationKey, issuer: env.JWT_ISSUER, audience: env.JWT_AUDIENCE }),
+      new JoseAccessTokenVerifier({
+        key: signer.verificationKey,
+        issuer: env.JWT_ISSUER,
+        audience: env.JWT_AUDIENCE,
+      }),
   },
   AuthGuard,
   { provide: T.clock, useValue: clock },
@@ -155,11 +165,23 @@ const providers: Provider[] = [
       },
     }),
   },
-  { provide: T.codes, inject: [ENV], useFactory: (env: Env) => new HmacOrderCodes(env.HASH_PEPPER) },
-  { provide: T.catalog, inject: [CatalogService], useFactory: (c: CatalogService): CatalogPort => c },
+  {
+    provide: T.codes,
+    inject: [ENV],
+    useFactory: (env: Env) => new HmacOrderCodes(env.HASH_PEPPER),
+  },
+  {
+    provide: T.catalog,
+    inject: [CatalogService],
+    useFactory: (c: CatalogService): CatalogPort => c,
+  },
   { provide: T.geo, inject: [GeoService], useFactory: (g: GeoService): GeoPort => g },
   { provide: T.pricing, inject: [PricingService], useFactory: pricingPort },
-  { provide: T.payments, inject: [PaymentsService], useFactory: (p: PaymentsService): PaymentsPort => p },
+  {
+    provide: T.payments,
+    inject: [PaymentsService],
+    useFactory: (p: PaymentsService): PaymentsPort => p,
+  },
   { provide: T.tracking, inject: [LIVE_TRACKING], useFactory: trackingPort },
   {
     provide: OWNERSHIP_CHECKER,
@@ -172,7 +194,8 @@ const providers: Provider[] = [
   {
     provide: DrizzleOrderStore,
     inject: [DB, TransactionalRedeemPromo],
-    useFactory: (db: Db, r: TransactionalRedeemPromo) => new DrizzleOrderStore(db, (tx, cmd) => r.execute(tx, cmd)),
+    useFactory: (db: Db, r: TransactionalRedeemPromo) =>
+      new DrizzleOrderStore(db, (tx, cmd) => r.execute(tx, cmd)),
   },
   { provide: DrizzleCartStore, inject: [DB], useFactory: (db: Db) => new DrizzleCartStore(db) },
   {
@@ -182,7 +205,14 @@ const providers: Provider[] = [
   },
   {
     provide: OrderLifecycle,
-    inject: [DrizzleOrderStore, T.payments, T.tracking, BullMqAutoRejectScheduler, LOGGER, T.config],
+    inject: [
+      DrizzleOrderStore,
+      T.payments,
+      T.tracking,
+      BullMqAutoRejectScheduler,
+      LOGGER,
+      T.config,
+    ],
     useFactory: (
       store: DrizzleOrderStore,
       payments: PaymentsPort,
@@ -195,12 +225,21 @@ const providers: Provider[] = [
   {
     provide: T.cartDeps,
     inject: [DrizzleCartStore, T.catalog],
-    useFactory: (carts: DrizzleCartStore, catalog: CatalogPort): CartDeps => ({ carts, catalog, clock }),
+    useFactory: (carts: DrizzleCartStore, catalog: CatalogPort): CartDeps => ({
+      carts,
+      catalog,
+      clock,
+    }),
   },
   {
     provide: T.commandDeps,
     inject: [DrizzleOrderStore, OrderLifecycle, T.catalog, T.codes],
-    useFactory: (orders: DrizzleOrderStore, lifecycle: OrderLifecycle, catalog: CatalogPort, codes: OrderCodes): OrderCommandDeps => ({
+    useFactory: (
+      orders: DrizzleOrderStore,
+      lifecycle: OrderLifecycle,
+      catalog: CatalogPort,
+      codes: OrderCodes,
+    ): OrderCommandDeps => ({
       orders,
       lifecycle,
       catalog,
@@ -210,13 +249,38 @@ const providers: Provider[] = [
   },
   { provide: ListCarts, inject: [T.cartDeps], useFactory: (d: CartDeps) => new ListCarts(d) },
   { provide: GetCart, inject: [T.cartDeps], useFactory: (d: CartDeps) => new GetCart(d) },
-  { provide: AddCartLineUseCase, inject: [T.cartDeps], useFactory: (d: CartDeps) => new AddCartLineUseCase(d) },
-  { provide: UpdateCartLineUseCase, inject: [T.cartDeps], useFactory: (d: CartDeps) => new UpdateCartLineUseCase(d) },
-  { provide: RemoveCartLineUseCase, inject: [T.cartDeps], useFactory: (d: CartDeps) => new RemoveCartLineUseCase(d) },
-  { provide: DeleteCartUseCase, inject: [DrizzleCartStore], useFactory: (c: DrizzleCartStore) => new DeleteCartUseCase(c) },
+  {
+    provide: AddCartLineUseCase,
+    inject: [T.cartDeps],
+    useFactory: (d: CartDeps) => new AddCartLineUseCase(d),
+  },
+  {
+    provide: UpdateCartLineUseCase,
+    inject: [T.cartDeps],
+    useFactory: (d: CartDeps) => new UpdateCartLineUseCase(d),
+  },
+  {
+    provide: RemoveCartLineUseCase,
+    inject: [T.cartDeps],
+    useFactory: (d: CartDeps) => new RemoveCartLineUseCase(d),
+  },
+  {
+    provide: DeleteCartUseCase,
+    inject: [DrizzleCartStore],
+    useFactory: (c: DrizzleCartStore) => new DeleteCartUseCase(c),
+  },
   {
     provide: Checkout,
-    inject: [DrizzleOrderStore, DrizzleCartStore, T.catalog, T.geo, T.pricing, T.payments, OrderLifecycle, T.codes],
+    inject: [
+      DrizzleOrderStore,
+      DrizzleCartStore,
+      T.catalog,
+      T.geo,
+      T.pricing,
+      T.payments,
+      OrderLifecycle,
+      T.codes,
+    ],
     useFactory: (
       orders: DrizzleOrderStore,
       carts: DrizzleCartStore,
@@ -231,29 +295,59 @@ const providers: Provider[] = [
   {
     provide: OrderQueries,
     inject: [DrizzleOrderStore, DrizzleCartStore, T.catalog, T.codes],
-    useFactory: (orders: DrizzleOrderStore, carts: DrizzleCartStore, catalog: CatalogPort, codes: OrderCodes) =>
-      new OrderQueries({ orders, carts, catalog, codes, clock }),
+    useFactory: (
+      orders: DrizzleOrderStore,
+      carts: DrizzleCartStore,
+      catalog: CatalogPort,
+      codes: OrderCodes,
+    ) => new OrderQueries({ orders, carts, catalog, codes, clock }),
   },
-  { provide: VendorOrderActions, inject: [T.commandDeps], useFactory: (d: OrderCommandDeps) => new VendorOrderActions(d) },
-  { provide: CancelOrderByCustomer, inject: [T.commandDeps], useFactory: (d: OrderCommandDeps) => new CancelOrderByCustomer(d) },
-  { provide: CancelOrderByOps, inject: [T.commandDeps], useFactory: (d: OrderCommandDeps) => new CancelOrderByOps(d) },
-  { provide: AutoRejectOrder, inject: [OrderLifecycle], useFactory: (l: OrderLifecycle) => new AutoRejectOrder(l) },
+  {
+    provide: VendorOrderActions,
+    inject: [T.commandDeps],
+    useFactory: (d: OrderCommandDeps) => new VendorOrderActions(d),
+  },
+  {
+    provide: CancelOrderByCustomer,
+    inject: [T.commandDeps],
+    useFactory: (d: OrderCommandDeps) => new CancelOrderByCustomer(d),
+  },
+  {
+    provide: CancelOrderByOps,
+    inject: [T.commandDeps],
+    useFactory: (d: OrderCommandDeps) => new CancelOrderByOps(d),
+  },
+  {
+    provide: AutoRejectOrder,
+    inject: [OrderLifecycle],
+    useFactory: (l: OrderLifecycle) => new AutoRejectOrder(l),
+  },
   {
     provide: HandlePaymentEvent,
     inject: [DrizzleOrderStore, OrderLifecycle, T.payments, LOGGER],
-    useFactory: (orders: DrizzleOrderStore, lifecycle: OrderLifecycle, payments: PaymentsPort, logger: Logger) =>
-      new HandlePaymentEvent({ orders, lifecycle, payments, logger }),
+    useFactory: (
+      orders: DrizzleOrderStore,
+      lifecycle: OrderLifecycle,
+      payments: PaymentsPort,
+      logger: Logger,
+    ) => new HandlePaymentEvent({ orders, lifecycle, payments, logger }),
   },
   {
     provide: OutboxPaymentEventsConsumer,
     inject: [PG_POOL, HandlePaymentEvent, LOGGER],
-    useFactory: (pool: pg.Pool, h: HandlePaymentEvent, logger: Logger) => new OutboxPaymentEventsConsumer(pool, h, logger),
+    useFactory: (pool: pg.Pool, h: HandlePaymentEvent, logger: Logger) =>
+      new OutboxPaymentEventsConsumer(pool, h, logger),
   },
   {
     provide: ORDER_FULFILMENT_PORT,
     inject: [DrizzleOrderStore, OrderLifecycle, T.payments, T.codes, T.config],
-    useFactory: (orders: DrizzleOrderStore, lifecycle: OrderLifecycle, payments: PaymentsPort, codes: OrderCodes, config: OrderingConfig) =>
-      new OrderFulfilmentService({ orders, lifecycle, payments, codes, config }),
+    useFactory: (
+      orders: DrizzleOrderStore,
+      lifecycle: OrderLifecycle,
+      payments: PaymentsPort,
+      codes: OrderCodes,
+      config: OrderingConfig,
+    ) => new OrderFulfilmentService({ orders, lifecycle, payments, codes, config }),
   },
 ];
 
@@ -279,7 +373,14 @@ export class OrderingModule implements OnApplicationBootstrap, OnApplicationShut
   static register(realtime: DynamicModule | typeof Module | object): DynamicModule {
     return {
       module: OrderingModule,
-      imports: [IdentityModule, PricingModule, GeoModule, CatalogModule, PaymentsModule, realtime as DynamicModule],
+      imports: [
+        IdentityModule,
+        PricingModule,
+        GeoModule,
+        CatalogModule,
+        PaymentsModule,
+        realtime as DynamicModule,
+      ],
       controllers: [
         CartsController,
         OrdersController,
@@ -288,7 +389,12 @@ export class OrderingModule implements OnApplicationBootstrap, OnApplicationShut
         AdminOrdersController,
       ],
       providers,
-      exports: [ORDER_FULFILMENT_PORT, AutoRejectOrder, HandlePaymentEvent, OutboxPaymentEventsConsumer],
+      exports: [
+        ORDER_FULFILMENT_PORT,
+        AutoRejectOrder,
+        HandlePaymentEvent,
+        OutboxPaymentEventsConsumer,
+      ],
     };
   }
 
@@ -296,7 +402,12 @@ export class OrderingModule implements OnApplicationBootstrap, OnApplicationShut
   onApplicationBootstrap(): void {
     if (!this.env.ORDERING_JOBS_ENABLED) return;
     this.consumer.start();
-    this.worker = startAutoRejectWorker(this.env.REDIS_URL, this.env.BULLMQ_PREFIX, this.autoReject, this.logger);
+    this.worker = startAutoRejectWorker(
+      this.env.REDIS_URL,
+      this.env.BULLMQ_PREFIX,
+      this.autoReject,
+      this.logger,
+    );
   }
 
   /** Stops background work. */

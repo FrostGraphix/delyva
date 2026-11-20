@@ -38,7 +38,12 @@ import {
   type UpdateCartLine,
   UpdateCartLineSchema,
 } from '@delyva/contracts';
-import { AuthGuard, type AuthPrincipal, Principal, Roles } from '../../../shared/auth/auth.guard.js';
+import {
+  AuthGuard,
+  type AuthPrincipal,
+  Principal,
+  Roles,
+} from '../../../shared/auth/auth.guard.js';
 import { OwnershipGuard, OwnsResource } from '../../../shared/auth/ownership.guard.js';
 import { AppError } from '../../../shared/errors/app-error.js';
 import { Idempotent } from '../../../shared/idempotency/idempotency.interceptor.js';
@@ -126,7 +131,10 @@ export class CartsController {
   @Delete(':cartId')
   @HttpCode(204)
   @Idempotent()
-  async deleteCart(@Principal() p: AuthPrincipal, @Param('cartId', uuid) cartId: string): Promise<void> {
+  async deleteCart(
+    @Principal() p: AuthPrincipal,
+    @Param('cartId', uuid) cartId: string,
+  ): Promise<void> {
     await this.del.execute(p.userId, cartId);
   }
 }
@@ -276,7 +284,9 @@ export class AdminOrdersController {
   /** GET /v1/admin/orders */
   @Get()
   @Roles('ops', 'support', 'super_admin')
-  list(@Query(new ZodQueryPipe(ListAdminOrdersQuerySchema)) q: ListAdminOrdersQuery): Promise<OrderPage> {
+  list(
+    @Query(new ZodQueryPipe(ListAdminOrdersQuerySchema)) q: ListAdminOrdersQuery,
+  ): Promise<OrderPage> {
     return this.queries.admin(q);
   }
 

@@ -86,9 +86,9 @@ describe('order state machine', () => {
   });
 
   it('restricts actors per target state', () => {
-    expect(() => assertActor('VENDOR_ACCEPTED', 'customer')).toThrow(/cannot move/);
-    expect(() => assertActor('DELIVERED', 'vendor')).toThrow();
-    expect(() => assertActor('CANCELLED_BY_OPS', 'ops')).not.toThrow();
+    expect(() => { assertActor('VENDOR_ACCEPTED', 'customer'); }).toThrow(/cannot move/);
+    expect(() => { assertActor('DELIVERED', 'vendor'); }).toThrow();
+    expect(() => { assertActor('CANCELLED_BY_OPS', 'ops'); }).not.toThrow();
   });
 });
 
@@ -114,7 +114,7 @@ describe('order money', () => {
   });
 
   it('rejects unbalanced totals and uses integer bps', () => {
-    expect(() => assertTotalsBalance({ ...totals, total: 1 })).toThrow(/balance/);
+    expect(() => { assertTotalsBalance({ ...totals, total: 1 }); }).toThrow(/balance/);
     expect(bpsFloor(999, 3_333)).toBe(332);
   });
 
@@ -137,7 +137,8 @@ describe('cart lines', () => {
     const full = addLine([], { id: 'l1', itemId: 'i', quantity: 50, optionIds: [] });
     expect(() => addLine(full, { id: 'x', itemId: 'i', quantity: 1, optionIds: [] })).toThrow();
     let lines = full;
-    for (let n = 0; n < 29; n++) lines = addLine(lines, { id: `n${n}`, itemId: `i${n}`, quantity: 1, optionIds: [] });
+    for (let n = 0; n < 29; n++)
+      lines = addLine(lines, { id: `n${n}`, itemId: `i${n}`, quantity: 1, optionIds: [] });
     expect(() => addLine(lines, { id: 'y', itemId: 'zz', quantity: 1, optionIds: [] })).toThrow();
   });
 });

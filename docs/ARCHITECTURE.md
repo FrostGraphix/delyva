@@ -554,3 +554,25 @@ See ADR 0300. Module `apps/api/src/modules/payments` (api / application / domain
 - DEBT(payments): webhook IP check uses `req.ip`; needs `trust proxy` behind the LB.
 - DEBT(payments): reconciliation compares charges only (not refunds, transfers or settlement reports); alerting is log + outbox, no pager.
 - DEBT(payments): no admin refund endpoint with reason, audit log and second approver yet (service method only).
+
+## Ordering (Phase 1, 2026-11-20)
+
+See ADR 0500. Module `apps/api/src/modules/ordering` (api / application / domain / infrastructure), migration `0500_ordering.sql` (`carts`, `cart_lines`, `orders`, `order_items`, `order_status_history`, `ordering_event_receipts`), contracts `packages/contracts/src/ordering/`, SDK `OrderingClient` (`client.ordering`) + hooks in `packages/sdk/src/ordering.ts`.
+
+- **State machine:** explicit table in `ordering/domain/order-state-machine.ts` (+ actor table). Each transition: history row (actor, time, reason) + `ordering.order.<state>` outbox event in the same transaction, then `LIVE_TRACKING.publishOrderStatus`. Payload `{ orderId, orderRef, customerId, vendorId, branchId, riderId, status, previousStatus, actor, reason, at }`; `vendor_accepted` adds `pickup`, `dropoff`, `prepMinutes`, `readyAt` (dispatch input).
+- **Carts:** one per user per branch, prices never stored; every read re-prices via `CatalogService.priceSelections`; equal selections merge; `version` increments (optimistic concurrency).
+- **Checkout:** see ADR 0500 §3. Pricing zone code = lower-cased city of the geo zone (fixes the catalog/pricing zone DEBT).
+- **Money:** capture split at DELIVERED (vendor = items − commission, rider = delivery share, platform = commission + service + small-order + rest of delivery, tax = VAT, promo = discount); refunds before capture = hold release to the wallet.
+- **Ports for other contexts:** `OrderFulfilmentPort` under `ORDER_FULFILMENT_PORT` (dispatch); `OrderRoomAccess` registered as realtime's `ORDER_ROOM_AUTHORIZER`. New public services consumed: `CatalogService` (catalog), `GeoService.zonesAt/addressOf` (geo), `TransactionalRedeemPromo` (pricing).
+- **Endpoints:** `GET /v1/carts`, `GET /v1/carts/{cartId}`, `POST /v1/carts/lines`, `PATCH|DELETE /v1/carts/{cartId}/lines/{lineId}`, `DELETE /v1/carts/{cartId}`, `POST /v1/orders`, `GET /v1/orders`, `GET /v1/orders/{id}`, `POST /v1/orders/{id}/cancel`, `POST /v1/orders/{id}/reorder`, `GET /v1/vendors/{vendorId}/orders?status=`, `POST /v1/vendor-orders/{id}/accept|reject|preparing|ready`, `GET /v1/admin/orders`, `POST /v1/admin/orders/{id}/cancel`. All writes take `Idempotency-Key`.
+- **Jobs:** BullMQ queue `ordering-auto-reject` (delayed, `jobId = orderId`) and the payments-event outbox consumer run in the API process when `ORDERING_JOBS_ENABLED=true`.
+- **Env:** `ORDERING_AUTO_REJECT_SECONDS` (300), `ORDERING_VENDOR_COMMISSION_BPS` (0), `ORDERING_RIDER_DELIVERY_SHARE_BPS` (8000), `ORDERING_JOBS_ENABLED` (true).
+
+### Known technical debt (ordering)
+
+- DEBT(ordering): refunds before capture release the hold to the wallet; card/transfer orders are not refunded to the source.
+- DEBT(ordering): failed hold releases stay REFUND_PENDING (no retry job); PENDING_PAYMENT orders never expire; promo redemptions are not reversed on cancel/payment failure (pricing has no reversal).
+- DEBT(ordering): wallet holds expire after 15 min (payments TTL); capture re-checks funds at DELIVERED.
+- DEBT(ordering): auto-reject worker and payment-event consumer run in the API process; rider unassignment/reassignment and vendor compensation on UNDELIVERABLE not modelled; `markRiderAtVendor` before READY is rejected.
+- DEBT(ordering): DTO intent status is derived from the order lifecycle; rider profile not available (id only).
+- DEBT(sdk): ordering hooks have no render tests.

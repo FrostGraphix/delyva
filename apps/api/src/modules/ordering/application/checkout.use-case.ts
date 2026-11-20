@@ -76,7 +76,8 @@ export class Checkout {
     const zoneCode = await this.zoneCode(branch, dropoff);
     const lines = await this.deps.catalog.priceSelections(branch.vendorId, cart.lines);
     const problem = lines.find((l) => l.problem !== null);
-    if (problem) throw new OrderingError('conflict', `Cart needs attention: ${problem.problem ?? ''}`);
+    if (problem)
+      throw new OrderingError('conflict', `Cart needs attention: ${problem.problem ?? ''}`);
     const quote = await this.deps.pricing.quote({
       userId,
       zoneCode,
@@ -106,7 +107,10 @@ export class Checkout {
     const zones = await this.deps.geo.zonesAt(dropoff);
     const zone = zones.find((z) => z.id === branch.zoneId);
     if (!zone) {
-      throw new OrderingError('zone_not_serviceable', 'This vendor does not deliver to that address.');
+      throw new OrderingError(
+        'zone_not_serviceable',
+        'This vendor does not deliver to that address.',
+      );
     }
     return pricingZoneCode(zone.city);
   }
@@ -159,7 +163,13 @@ export class Checkout {
     const created = { to: order.status, actorType: 'customer', actorId: order.customerId } as const;
     const result = await this.deps.orders.transaction(async (tx) => {
       await tx.insertOrder(order, items);
-      await tx.appendHistory(order.id, { status: order.status, at, actorType: 'customer', actorId: order.customerId, reason: null });
+      await tx.appendHistory(order.id, {
+        status: order.status,
+        at,
+        actorType: 'customer',
+        actorId: order.customerId,
+        reason: null,
+      });
       await tx.appendEvent(statusEvent(order, null, created, at));
       if (order.promoCode) {
         await tx.redeemPromo({
@@ -178,10 +188,26 @@ export class Checkout {
         amount: Money.ofMinor(order.totals.total, 'NGN'),
         method: 'wallet',
       });
-      return applyStep(tx, order, { to: 'PLACED', actorType: 'customer', actorId: order.customerId, reason: 'wallet_hold', patch: { paymentIntentId: intent.id } }, at);
+      return applyStep(
+        tx,
+        order,
+        {
+          to: 'PLACED',
+          actorType: 'customer',
+          actorId: order.customerId,
+          reason: 'wallet_hold',
+          patch: { paymentIntentId: intent.id },
+        },
+        at,
+      );
     });
     if (result.status === 'PLACED') {
-      return this.deps.lifecycle.afterCommit(order, result, [{ to: 'PLACED', actorType: 'customer', actorId: order.customerId }], at);
+      return this.deps.lifecycle.afterCommit(
+        order,
+        result,
+        [{ to: 'PLACED', actorType: 'customer', actorId: order.customerId }],
+        at,
+      );
     }
     return result;
   }
@@ -196,14 +222,24 @@ export class Checkout {
         method: order.paymentMethod,
       });
       return await this.deps.orders.transaction(async (tx) => {
-        const patch = { paymentIntentId: intent.id, paymentAuthorizationUrl: intent.authorizationUrl };
+        const patch = {
+          paymentIntentId: intent.id,
+          paymentAuthorizationUrl: intent.authorizationUrl,
+        };
         await tx.updateOrder(order.id, patch, this.deps.clock.now());
         return { ...order, ...patch };
       });
     } catch (err) {
       await this.deps.lifecycle.run(order.id, (o) =>
         o.status === 'PENDING_PAYMENT'
-          ? [{ to: 'PAYMENT_FAILED', actorType: 'system', actorId: null, reason: 'payment_start_failed' }]
+          ? [
+              {
+                to: 'PAYMENT_FAILED',
+                actorType: 'system',
+                actorId: null,
+                reason: 'payment_start_failed',
+              },
+            ]
           : [],
       );
       throw err;

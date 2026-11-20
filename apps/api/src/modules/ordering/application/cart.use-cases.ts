@@ -14,7 +14,10 @@ export interface CartDeps {
 const MAX_SAVE_ATTEMPTS = 3;
 
 function lineDto(line: CartLineState, priced: PricedLine | undefined): Cart['lines'][number] {
-  const unit = (priced?.options ?? []).reduce((s, o) => s + o.priceDeltaMinor, priced?.unitPriceMinor ?? 0);
+  const unit = (priced?.options ?? []).reduce(
+    (s, o) => s + o.priceDeltaMinor,
+    priced?.unitPriceMinor ?? 0,
+  );
   return {
     id: line.id,
     itemId: line.itemId,

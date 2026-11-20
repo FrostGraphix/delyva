@@ -70,6 +70,8 @@ import {
   WalletTransactionsPageSchema,
 } from '@delyva/contracts';
 import type { z } from 'zod';
+// Cycle-safe: OrderingClient is only constructed lazily (getter), pathOf only called at runtime.
+import { OrderingClient } from './ordering.js';
 
 const withId = (path: string, id: string): string => path.replace('{id}', encodeURIComponent(id));
 
@@ -253,6 +255,26 @@ export class DelyvaClient {
       PaymentIntentSchema,
       this.idem(idempotencyKey),
     );
+  }
+
+  /**
+   * Generic validated request (used by sub-clients such as {@link OrderingClient}). A non-undefined
+   * `idempotencyKey` argument (string, or null to auto-generate) adds the Idempotency-Key header.
+   */
+  request<S extends z.ZodType>(
+    method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+    path: string,
+    body: unknown,
+    schema: S | null,
+    idempotencyKey?: string | null,
+  ): Promise<z.infer<S>> {
+    const headers = idempotencyKey === undefined ? {} : this.idem(idempotencyKey ?? undefined);
+    return this.send(method, path, body, schema, headers);
+  }
+
+  /** Carts, checkout, orders, vendor and ops order actions. */
+  get ordering(): OrderingClient {
+    return new OrderingClient(this);
   }
 
   private idem(key?: string): Record<string, string> {

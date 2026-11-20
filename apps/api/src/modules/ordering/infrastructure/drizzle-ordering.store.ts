@@ -119,7 +119,10 @@ function txOps(tx: DbTx, redeem: TxPromoRedeemer): OrderTx {
       return r ? toRecord(r) : null;
     },
     async updateOrder(orderId, patch: OrderPatch, at) {
-      await tx.update(orders).set({ ...patch, updatedAt: at }).where(eq(orders.id, orderId));
+      await tx
+        .update(orders)
+        .set({ ...patch, updatedAt: at })
+        .where(eq(orders.id, orderId));
     },
     async appendHistory(orderId, e: StatusHistoryRecord) {
       await tx.insert(orderStatusHistory).values({ orderId, ...e });
@@ -213,7 +216,11 @@ export class DrizzleOrderStore implements OrderStore {
   }
 
   /** @inheritdoc */
-  async list(filter: OrderFilter, limit: number, after: PageCursor | null): Promise<OrderListRow[]> {
+  async list(
+    filter: OrderFilter,
+    limit: number,
+    after: PageCursor | null,
+  ): Promise<OrderListRow[]> {
     const rows = await this.db
       .select()
       .from(orders)
@@ -224,7 +231,12 @@ export class DrizzleOrderStore implements OrderStore {
     const counts = await this.db
       .select({ orderId: orderItems.orderId, n: count() })
       .from(orderItems)
-      .where(inArray(orderItems.orderId, rows.map((r) => r.id)))
+      .where(
+        inArray(
+          orderItems.orderId,
+          rows.map((r) => r.id),
+        ),
+      )
       .groupBy(orderItems.orderId);
     const byId = new Map(counts.map((c) => [c.orderId, c.n]));
     return rows.map((r) => ({ order: toRecord(r), itemCount: byId.get(r.id) ?? 0 }));
@@ -237,7 +249,12 @@ async function loadCart(db: Q, where: SQL | undefined): Promise<CartState[]> {
   const lines = await db
     .select()
     .from(cartLines)
-    .where(inArray(cartLines.cartId, rows.map((r) => r.id)))
+    .where(
+      inArray(
+        cartLines.cartId,
+        rows.map((r) => r.id),
+      ),
+    )
     .orderBy(asc(cartLines.position));
   return rows.map((c) => ({
     id: c.id,
@@ -265,7 +282,10 @@ export class DrizzleCartStore implements CartStore {
 
   /** @inheritdoc */
   async findByBranch(userId: string, branchId: string): Promise<CartState | null> {
-    const [c] = await loadCart(this.db, and(eq(carts.branchId, branchId), eq(carts.userId, userId)));
+    const [c] = await loadCart(
+      this.db,
+      and(eq(carts.branchId, branchId), eq(carts.userId, userId)),
+    );
     return c ?? null;
   }
 
@@ -280,7 +300,14 @@ export class DrizzleCartStore implements CartStore {
       if (expectedVersion === null) {
         const inserted = await tx
           .insert(carts)
-          .values({ id: cart.id, userId: cart.userId, vendorId: cart.vendorId, branchId: cart.branchId, version: cart.version, updatedAt: cart.updatedAt })
+          .values({
+            id: cart.id,
+            userId: cart.userId,
+            vendorId: cart.vendorId,
+            branchId: cart.branchId,
+            version: cart.version,
+            updatedAt: cart.updatedAt,
+          })
           .onConflictDoNothing()
           .returning({ id: carts.id });
         if (inserted.length === 0) return false;
@@ -288,7 +315,13 @@ export class DrizzleCartStore implements CartStore {
         const updated = await tx
           .update(carts)
           .set({ version: cart.version, updatedAt: cart.updatedAt })
-          .where(and(eq(carts.id, cart.id), eq(carts.userId, cart.userId), eq(carts.version, expectedVersion)))
+          .where(
+            and(
+              eq(carts.id, cart.id),
+              eq(carts.userId, cart.userId),
+              eq(carts.version, expectedVersion),
+            ),
+          )
           .returning({ id: carts.id });
         if (updated.length === 0) return false;
         await tx.delete(cartLines).where(eq(cartLines.cartId, cart.id));

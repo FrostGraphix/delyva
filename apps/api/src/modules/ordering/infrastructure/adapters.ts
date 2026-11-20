@@ -22,7 +22,10 @@ export class HmacOrderCodes implements OrderCodes {
   constructor(private readonly secret: string) {}
 
   private code(orderId: string, purpose: string): string {
-    const n = createHmac('sha256', this.secret).update(`order-code:${purpose}:${orderId}`).digest().readUInt32BE(0);
+    const n = createHmac('sha256', this.secret)
+      .update(`order-code:${purpose}:${orderId}`)
+      .digest()
+      .readUInt32BE(0);
     return String(n % 10_000).padStart(4, '0');
   }
 
@@ -38,7 +41,9 @@ export class HmacOrderCodes implements OrderCodes {
 
   /** @inheritdoc */
   hash(orderId: string, purpose: 'delivery' | 'pickup', code: string): string {
-    return createHmac('sha256', this.secret).update(`order-code-hash:${purpose}:${orderId}:${code}`).digest('hex');
+    return createHmac('sha256', this.secret)
+      .update(`order-code-hash:${purpose}:${orderId}:${code}`)
+      .digest('hex');
   }
 
   /** @inheritdoc */
@@ -55,19 +60,26 @@ export class BullMqAutoRejectScheduler implements AutoRejectScheduler {
 
   /** @param redisUrl redis url @param prefix BullMQ key prefix */
   constructor(redisUrl: string, prefix: string) {
-    this.queue = new Queue<AutoRejectJob>(ORDERING_QUEUES.autoReject, { connection: { url: redisUrl }, prefix });
+    this.queue = new Queue<AutoRejectJob>(ORDERING_QUEUES.autoReject, {
+      connection: { url: redisUrl },
+      prefix,
+    });
   }
 
   /** @inheritdoc */
   async schedule(orderId: string, delayMs: number): Promise<void> {
-    await this.queue.add('auto-reject', { orderId }, {
-      jobId: orderId,
-      delay: delayMs,
-      attempts: 5,
-      backoff: { type: 'exponential', delay: 2_000 },
-      removeOnComplete: { age: 86_400 },
-      removeOnFail: { age: 7 * 86_400 },
-    });
+    await this.queue.add(
+      'auto-reject',
+      { orderId },
+      {
+        jobId: orderId,
+        delay: delayMs,
+        attempts: 5,
+        backoff: { type: 'exponential', delay: 2_000 },
+        removeOnComplete: { age: 86_400 },
+        removeOnFail: { age: 7 * 86_400 },
+      },
+    );
   }
 
   /** @inheritdoc */
@@ -100,7 +112,8 @@ export function startAutoRejectWorker(
     },
     { connection: { url: redisUrl }, prefix },
   );
-  worker.on('failed', (job, err) => logger.warn({ err, orderId: job?.data.orderId }, 'auto-reject job failed'));
+  worker.on('failed', (job, err) => { logger.warn({ err, orderId: job?.data.orderId }, 'auto-reject job failed'); },
+  );
   return worker;
 }
 
@@ -156,18 +169,27 @@ export class OutboxPaymentEventsConsumer {
   }
 
   private async consumeOne(row: Row): Promise<boolean> {
-    const schema = row.type === PAYMENTS_EVENTS.intentFailed ? IntentFailedPayloadSchema : IntentSucceededPayloadSchema;
+    const schema =
+      row.type === PAYMENTS_EVENTS.intentFailed
+        ? IntentFailedPayloadSchema
+        : IntentSucceededPayloadSchema;
     const parsed = schema.safeParse(row.payload);
     try {
-      const outcome = parsed.success ? await this.handler.execute(row.type, parsed.data) : 'ignored';
-      if (outcome === 'retry' && Date.now() - row.occurred_at.getTime() < UNKNOWN_ORDER_GRACE_MS) return false;
+      const outcome = parsed.success
+        ? await this.handler.execute(row.type, parsed.data)
+        : 'ignored';
+      if (outcome === 'retry' && Date.now() - row.occurred_at.getTime() < UNKNOWN_ORDER_GRACE_MS)
+        return false;
       const res = await this.pool.query(
         `INSERT INTO ordering_event_receipts (event_id, event_type, outcome) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING`,
         [row.id, row.type, outcome === 'retry' ? 'ignored:unknown_order' : outcome],
       );
       return (res.rowCount ?? 0) > 0;
     } catch (err) {
-      this.logger.warn({ err, eventId: row.id, type: row.type }, 'payment event failed; will retry');
+      this.logger.warn(
+        { err, eventId: row.id, type: row.type },
+        'payment event failed; will retry',
+      );
       return false;
     }
   }

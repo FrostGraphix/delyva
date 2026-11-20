@@ -1,9 +1,4 @@
-import type {
-  OrderActorType,
-  OrderStatus,
-  PaymentIntent,
-  PaymentMethod,
-} from '@delyva/contracts';
+import type { OrderActorType, OrderStatus, PaymentIntent, PaymentMethod } from '@delyva/contracts';
 import type { LatLng, Money } from '@delyva/utils';
 import type { CartLineState } from '../domain/cart.js';
 import type { OrderTotalsMinor, SplitTerms } from '../domain/order-money.js';
@@ -37,7 +32,10 @@ export interface OrderRecord {
 
 /** Mutable order fields. */
 export type OrderPatch = Partial<
-  Pick<OrderRecord, 'status' | 'paymentIntentId' | 'paymentAuthorizationUrl' | 'prepMinutes' | 'readyAt' | 'riderId'>
+  Pick<
+    OrderRecord,
+    'status' | 'paymentIntentId' | 'paymentAuthorizationUrl' | 'prepMinutes' | 'readyAt' | 'riderId'
+  >
 >;
 
 /** A modifier option frozen on an order line. */
@@ -254,7 +252,10 @@ export interface PaymentsPort {
     method: PaymentMethod;
   }): Promise<PaymentIntent>;
   /** Captures the hold and posts the split. Idempotent per order. */
-  captureOrderSplit(orderId: string, breakdown: CaptureBreakdown): Promise<{ transactionId: string }>;
+  captureOrderSplit(
+    orderId: string,
+    breakdown: CaptureBreakdown,
+  ): Promise<{ transactionId: string }>;
   /** Releases an uncaptured hold. Idempotent. */
   releaseOrderHold(orderId: string): Promise<{ released: boolean }>;
 }

@@ -49,7 +49,12 @@ export class VendorOrderActions {
     await vendorOrder(this.deps, userId, orderId);
     const readyAt = new Date(this.deps.clock.now().getTime() + input.prepMinutes * 60_000);
     return this.move(orderId, () => [
-      { to: 'VENDOR_ACCEPTED', actorType: 'vendor', actorId: userId, patch: { prepMinutes: input.prepMinutes, readyAt } },
+      {
+        to: 'VENDOR_ACCEPTED',
+        actorType: 'vendor',
+        actorId: userId,
+        patch: { prepMinutes: input.prepMinutes, readyAt },
+      },
     ]);
   }
 
@@ -75,10 +80,16 @@ export class VendorOrderActions {
     await vendorOrder(this.deps, userId, orderId);
     return this.move(orderId, (o) => {
       const steps: TransitionStep[] = [];
-      if (o.status === 'VENDOR_ACCEPTED') steps.push({ to: 'PREPARING', actorType: 'vendor', actorId: userId });
+      if (o.status === 'VENDOR_ACCEPTED')
+        steps.push({ to: 'PREPARING', actorType: 'vendor', actorId: userId });
       steps.push({ to: 'READY_FOR_PICKUP', actorType: 'vendor', actorId: userId });
       if (o.riderId) {
-        steps.push({ to: 'RIDER_ASSIGNED', actorType: 'system', actorId: null, reason: 'rider_assigned_during_prep' });
+        steps.push({
+          to: 'RIDER_ASSIGNED',
+          actorType: 'system',
+          actorId: null,
+          reason: 'rider_assigned_during_prep',
+        });
       }
       return steps;
     });
@@ -100,7 +111,14 @@ export class CancelOrderByCustomer {
     const order = await this.deps.orders.findById(orderId);
     if (order?.customerId !== userId) throw new OrderingError('not_found', 'Order not found.');
     const after = await this.deps.lifecycle.run(orderId, (o) =>
-      withRefund(o, [{ to: 'CANCELLED_BY_CUSTOMER', actorType: 'customer', actorId: userId, reason: reason ?? null }]),
+      withRefund(o, [
+        {
+          to: 'CANCELLED_BY_CUSTOMER',
+          actorType: 'customer',
+          actorId: userId,
+          reason: reason ?? null,
+        },
+      ]),
     );
     return renderOrder(this.deps, after, 'customer');
   }
@@ -129,7 +147,9 @@ export class AutoRejectOrder {
   async execute(orderId: string): Promise<string> {
     const after = await this.lifecycle.run(orderId, (o) =>
       o.status === 'PLACED'
-        ? withRefund(o, [{ to: 'VENDOR_REJECTED', actorType: 'system', actorId: null, reason: 'vendor_timeout' }])
+        ? withRefund(o, [
+            { to: 'VENDOR_REJECTED', actorType: 'system', actorId: null, reason: 'vendor_timeout' },
+          ])
         : [],
     );
     return after.status;

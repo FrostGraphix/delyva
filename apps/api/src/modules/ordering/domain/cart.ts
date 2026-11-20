@@ -34,5 +34,8 @@ export function addLine(
   if (lines.length >= MAX_CART_LINES) {
     throw new OrderingError('validation_failed', `At most ${MAX_CART_LINES} lines per cart.`);
   }
-  return [...lines, { id: add.id, itemId: add.itemId, quantity: add.quantity, optionIds: [...add.optionIds] }];
+  return [
+    ...lines,
+    { id: add.id, itemId: add.itemId, quantity: add.quantity, optionIds: [...add.optionIds] },
+  ];
 }
