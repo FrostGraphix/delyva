@@ -3145,128 +3145,50 @@
         }
       }
     },
-    "/v1/wallet": {
+    "/v1/notifications": {
       "get": {
-        "operationId": "getWallet",
-        "summary": "Wallet balance derived from the ledger (bearer auth)",
+        "operationId": "listNotifications",
+        "summary": "List the in-app notification inbox (newest first, cursor paginated)",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "https://json-schema.org/draft/2020-12/schema",
-                  "type": "object",
-                  "properties": {
-                    "balance": {
-                      "type": "object",
-                      "properties": {
-                        "amountMinor": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "NGN"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "amountMinor",
-                        "currency"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "held": {
-                      "type": "object",
-                      "properties": {
-                        "amountMinor": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "NGN"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "amountMinor",
-                        "currency"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "available": {
-                      "type": "object",
-                      "properties": {
-                        "amountMinor": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "NGN"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "amountMinor",
-                        "currency"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "balance",
-                    "held",
-                    "available"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/wallet/transactions": {
-      "get": {
-        "operationId": "listWalletTransactions",
-        "summary": "Wallet ledger movements, newest first (bearer auth; query limit, cursor)",
-        "security": [
+        "parameters": [
           {
-            "bearerAuth": []
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "unreadOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
           }
         ],
         "responses": {
@@ -3284,36 +3206,47 @@
                         "type": "object",
                         "properties": {
                           "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "template": {
+                            "type": "string",
+                            "enum": [
+                              "account.welcome",
+                              "order.placed",
+                              "order.vendor_accepted",
+                              "order.rider_assigned",
+                              "order.picked_up",
+                              "order.delivered",
+                              "order.cancelled"
+                            ]
+                          },
+                          "title": {
                             "type": "string"
                           },
-                          "kind": {
+                          "body": {
                             "type": "string"
                           },
-                          "amount": {
+                          "data": {
                             "type": "object",
-                            "properties": {
-                              "amountMinor": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "currency": {
-                                "type": "string",
-                                "enum": [
-                                  "NGN"
-                                ]
-                              }
+                            "propertyNames": {
+                              "type": "string"
                             },
-                            "required": [
-                              "amountMinor",
-                              "currency"
-                            ],
-                            "additionalProperties": false
+                            "additionalProperties": {
+                              "type": "string"
+                            }
                           },
-                          "reference": {
-                            "type": [
-                              "string",
-                              "null"
+                          "readAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              {
+                                "type": "null"
+                              }
                             ]
                           },
                           "createdAt": {
@@ -3324,9 +3257,11 @@
                         },
                         "required": [
                           "id",
-                          "kind",
-                          "amount",
-                          "reference",
+                          "template",
+                          "title",
+                          "body",
+                          "data",
+                          "readAt",
                           "createdAt"
                         ],
                         "additionalProperties": false
@@ -3337,11 +3272,17 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "unreadCount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
                     }
                   },
                   "required": [
                     "items",
-                    "nextCursor"
+                    "nextCursor",
+                    "unreadCount"
                   ],
                   "additionalProperties": false
                 }
@@ -3381,10 +3322,10 @@
         }
       }
     },
-    "/v1/wallet/top-ups": {
+    "/v1/notifications/{id}/read": {
       "post": {
-        "operationId": "createWalletTopUp",
-        "summary": "Start a wallet top-up payment intent (bearer auth)",
+        "operationId": "markNotificationRead",
+        "summary": "Mark one inbox notification as read (naturally idempotent)",
         "security": [
           {
             "bearerAuth": []
@@ -3392,14 +3333,152 @@
         ],
         "parameters": [
           {
-            "name": "Idempotency-Key",
-            "in": "header",
+            "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 8,
-              "maxLength": 128
+              "format": "uuid"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/notifications/preferences": {
+      "get": {
+        "operationId": "getNotificationPreferences",
+        "summary": "Effective notification preferences per category and channel",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "preferences": {
+                      "maxItems": 40,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "account",
+                              "order_updates",
+                              "promotions"
+                            ]
+                          },
+                          "channel": {
+                            "type": "string",
+                            "enum": [
+                              "push",
+                              "sms",
+                              "whatsapp",
+                              "in_app"
+                            ]
+                          },
+                          "enabled": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "category",
+                          "channel",
+                          "enabled"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateNotificationPreferences",
+        "summary": "Upsert notification preferences (full or partial list; naturally idempotent)",
+        "security": [
+          {
+            "bearerAuth": []
           }
         ],
         "requestBody": {
@@ -3410,22 +3489,44 @@
                 "$schema": "https://json-schema.org/draft/2020-12/schema",
                 "type": "object",
                 "properties": {
-                  "amountMinor": {
-                    "type": "integer",
-                    "minimum": 10000,
-                    "maximum": 50000000
-                  },
-                  "method": {
-                    "type": "string",
-                    "enum": [
-                      "card",
-                      "transfer"
-                    ]
+                  "preferences": {
+                    "maxItems": 40,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "account",
+                            "order_updates",
+                            "promotions"
+                          ]
+                        },
+                        "channel": {
+                          "type": "string",
+                          "enum": [
+                            "push",
+                            "sms",
+                            "whatsapp",
+                            "in_app"
+                          ]
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "category",
+                        "channel",
+                        "enabled"
+                      ],
+                      "additionalProperties": false
+                    }
                   }
                 },
                 "required": [
-                  "amountMinor",
-                  "method"
+                  "preferences"
                 ],
                 "additionalProperties": false
               }
@@ -3433,7 +3534,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -3441,88 +3542,44 @@
                   "$schema": "https://json-schema.org/draft/2020-12/schema",
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "purpose": {
-                      "type": "string",
-                      "enum": [
-                        "wallet_top_up",
-                        "order"
-                      ]
-                    },
-                    "orderId": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "amount": {
-                      "type": "object",
-                      "properties": {
-                        "amountMinor": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
+                    "preferences": {
+                      "maxItems": 40,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "account",
+                              "order_updates",
+                              "promotions"
+                            ]
+                          },
+                          "channel": {
+                            "type": "string",
+                            "enum": [
+                              "push",
+                              "sms",
+                              "whatsapp",
+                              "in_app"
+                            ]
+                          },
+                          "enabled": {
+                            "type": "boolean"
+                          }
                         },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "NGN"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "amountMinor",
-                        "currency"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "method": {
-                      "type": "string",
-                      "enum": [
-                        "card",
-                        "transfer",
-                        "wallet"
-                      ]
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "requires_action",
-                        "processing",
-                        "succeeded",
-                        "failed",
-                        "refunded"
-                      ]
-                    },
-                    "reference": {
-                      "type": "string"
-                    },
-                    "authorizationUrl": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        "required": [
+                          "category",
+                          "channel",
+                          "enabled"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [
-                    "id",
-                    "purpose",
-                    "orderId",
-                    "amount",
-                    "method",
-                    "status",
-                    "reference",
-                    "authorizationUrl",
-                    "createdAt"
+                    "preferences"
                   ],
                   "additionalProperties": false
                 }
@@ -3549,16 +3606,6 @@
               }
             }
           },
-          "409": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Problem",
             "content": {
@@ -3572,26 +3619,56 @@
         }
       }
     },
-    "/v1/payment-intents/{id}": {
-      "get": {
-        "operationId": "getPaymentIntent",
-        "summary": "Read one of your payment intents (bearer auth)",
+    "/v1/devices": {
+      "post": {
+        "operationId": "registerDevice",
+        "summary": "Register the Expo push token of the device bound to the access token (upsert)",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "pushToken": {
+                    "type": "string",
+                    "pattern": "^Expo(nent)?PushToken\\[[A-Za-z0-9_-]{10,100}\\]$"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android"
+                    ]
+                  },
+                  "locale": {
+                    "default": "en",
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "pcm",
+                      "yo",
+                      "ha",
+                      "ig"
+                    ]
+                  }
+                },
+                "required": [
+                  "pushToken",
+                  "platform",
+                  "locale"
+                ],
+                "additionalProperties": false
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -3601,90 +3678,49 @@
                   "$schema": "https://json-schema.org/draft/2020-12/schema",
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "purpose": {
-                      "type": "string",
-                      "enum": [
-                        "wallet_top_up",
-                        "order"
-                      ]
-                    },
-                    "orderId": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "amount": {
-                      "type": "object",
-                      "properties": {
-                        "amountMinor": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "NGN"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "amountMinor",
-                        "currency"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "method": {
-                      "type": "string",
-                      "enum": [
-                        "card",
-                        "transfer",
-                        "wallet"
-                      ]
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "requires_action",
-                        "processing",
-                        "succeeded",
-                        "failed",
-                        "refunded"
-                      ]
-                    },
-                    "reference": {
+                    "deviceId": {
                       "type": "string"
                     },
-                    "authorizationUrl": {
-                      "type": [
-                        "string",
-                        "null"
+                    "platform": {
+                      "type": "string",
+                      "enum": [
+                        "ios",
+                        "android"
                       ]
                     },
-                    "createdAt": {
+                    "locale": {
+                      "type": "string",
+                      "enum": [
+                        "en",
+                        "pcm",
+                        "yo",
+                        "ha",
+                        "ig"
+                      ]
+                    },
+                    "registeredAt": {
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
-                    "id",
-                    "purpose",
-                    "orderId",
-                    "amount",
-                    "method",
-                    "status",
-                    "reference",
-                    "authorizationUrl",
-                    "createdAt"
+                    "deviceId",
+                    "platform",
+                    "locale",
+                    "registeredAt"
                   ],
                   "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -3699,16 +3735,6 @@
               }
             }
           },
-          "404": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Problem",
             "content": {
@@ -3722,182 +3748,79 @@
         }
       }
     },
-    "/v1/payment-intents/{id}/verify": {
+    "/v1/riders/me/locations": {
       "post": {
-        "operationId": "verifyPaymentIntent",
-        "summary": "Ask the server to verify the intent with the provider (bearer auth)",
+        "operationId": "postRiderLocations",
+        "summary": "HTTP fallback for rider location updates (batched points)",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 8,
-              "maxLength": 128
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "https://json-schema.org/draft/2020-12/schema",
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "purpose": {
-                      "type": "string",
-                      "enum": [
-                        "wallet_top_up",
-                        "order"
-                      ]
-                    },
-                    "orderId": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "amount": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "points": {
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
                       "type": "object",
                       "properties": {
-                        "amountMinor": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
+                        "lat": {
+                          "type": "number",
+                          "minimum": -90,
+                          "maximum": 90
                         },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "NGN"
+                        "lng": {
+                          "type": "number",
+                          "minimum": -180,
+                          "maximum": 180
+                        },
+                        "heading": {
+                          "default": null,
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "exclusiveMaximum": 360
+                            },
+                            {
+                              "type": "null"
+                            }
                           ]
+                        },
+                        "ts": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "amountMinor",
-                        "currency"
+                        "lat",
+                        "lng",
+                        "heading",
+                        "ts"
                       ],
                       "additionalProperties": false
-                    },
-                    "method": {
-                      "type": "string",
-                      "enum": [
-                        "card",
-                        "transfer",
-                        "wallet"
-                      ]
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "requires_action",
-                        "processing",
-                        "succeeded",
-                        "failed",
-                        "refunded"
-                      ]
-                    },
-                    "reference": {
-                      "type": "string"
-                    },
-                    "authorizationUrl": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
-                  },
-                  "required": [
-                    "id",
-                    "purpose",
-                    "orderId",
-                    "amount",
-                    "method",
-                    "status",
-                    "reference",
-                    "authorizationUrl",
-                    "createdAt"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Problem",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
+                  }
+                },
+                "required": [
+                  "points"
+                ],
+                "additionalProperties": false
               }
             }
           }
-        }
-      }
-    },
-    "/v1/webhooks/paystack": {
-      "post": {
-        "operationId": "paystackWebhook",
-        "summary": "Paystack webhook (HMAC-SHA512 x-paystack-signature, allowlisted IPs)",
+        },
         "responses": {
-          "200": {
+          "202": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -3905,17 +3828,20 @@
                   "$schema": "https://json-schema.org/draft/2020-12/schema",
                   "type": "object",
                   "properties": {
-                    "received": {
-                      "type": "boolean",
-                      "const": true
+                    "accepted": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
                     },
-                    "duplicate": {
-                      "type": "boolean"
+                    "rejected": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "received",
-                    "duplicate"
+                    "accepted",
+                    "rejected"
                   ],
                   "additionalProperties": false
                 }
@@ -3943,6 +3869,16 @@
             }
           },
           "403": {
+            "description": "Problem",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
             "description": "Problem",
             "content": {
               "application/problem+json": {

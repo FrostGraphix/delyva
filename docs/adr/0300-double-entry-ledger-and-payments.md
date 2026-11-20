@@ -21,6 +21,8 @@ Delyva moves customer money to vendors, riders, the platform and the tax authori
 9. **Provider port** `PaymentProvider` with `PaystackProvider` (fields taken from the official PaystackOSS OpenAPI spec) and a deterministic `FakePaymentProvider` for tests/dev (forbidden in production by env validation).
 10. **Jobs.** Payout and reconciliation logic lives in the API (sole ledger owner). `apps/workers` schedules BullMQ job schedulers that call token-guarded `/internal/payments/*` endpoints. Payout idempotency = deterministic transfer reference per (ISO week, payee), also unique in `payouts`.
 
+11. **Migration ordering.** `0300_payments` sits between `0200_pricing` and `0400_notifications` in the journal, but its `when` is newer than 0400's, so databases that already applied 0400 still apply 0300 (the drizzle migrator applies any entry newer than the last applied one). The snapshot chain was rebuilt 0200 → 0300 → 0400; `drizzle-kit generate` reports no drift.
+
 ## Consequences
 
 - Ledger rows can never be edited; mistakes need compensating entries and audit.

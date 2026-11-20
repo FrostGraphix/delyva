@@ -19,6 +19,11 @@ export const EnvSchema = z
     TERMII_API_KEY: z.string().optional().default(''),
     TERMII_SENDER_ID: z.string().default('Delyva'),
     TERMII_BASE_URL: z.url().default('https://api.ng.termii.com'),
+    BULLMQ_PREFIX: z.string().min(1).default('bull'),
+    NOTIFICATIONS_CONSUMER_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
     // payments (ADR 0300)
     PAYMENTS_PROVIDER: z.enum(['paystack', 'fake']).default('fake'),
     PAYSTACK_SECRET_KEY: z.string().optional().default(''),

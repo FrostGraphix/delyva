@@ -8,6 +8,14 @@ import {
   TokenPairSchema,
 } from './auth.js';
 import { HealthSchema } from './health.js';
+import {
+  DeviceRegistrationSchema,
+  ListNotificationsQuerySchema,
+  NotificationPageSchema,
+  NotificationPreferencesSchema,
+  RegisterDeviceSchema,
+} from './notifications/index.js';
+import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PAYMENT_ROUTES } from './payments/payment-routes.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 import {
@@ -29,7 +37,7 @@ import {
 
 /** One HTTP operation described from Zod schemas. */
 export interface RouteSpec {
-  readonly method: 'get' | 'post' | 'patch';
+  readonly method: 'get' | 'post' | 'put' | 'patch';
   readonly path: string;
   readonly operationId: string;
   readonly summary: string;
@@ -37,8 +45,10 @@ export interface RouteSpec {
   readonly success: { readonly status: number; readonly schema?: z.ZodType };
   readonly errors: readonly number[];
   readonly idempotent?: boolean;
-  /** Requires a Bearer access token. */
+  /** Requires `Authorization: Bearer <access JWT>`. */
   readonly auth?: boolean;
+  /** Query-string schema (object of scalars). */
+  readonly query?: z.ZodObject;
 }
 
 /** Registry of public routes; the API and SDK are both typed against these schemas. */
@@ -196,6 +206,64 @@ export const ROUTES = {
     errors: [400, 401, 403, 404],
     auth: true,
   },
+  listNotifications: {
+    method: 'get',
+    path: '/v1/notifications',
+    operationId: 'listNotifications',
+    summary: 'List the in-app notification inbox (newest first, cursor paginated)',
+    query: ListNotificationsQuerySchema,
+    success: { status: 200, schema: NotificationPageSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  markNotificationRead: {
+    method: 'post',
+    path: '/v1/notifications/{id}/read',
+    operationId: 'markNotificationRead',
+    summary: 'Mark one inbox notification as read (naturally idempotent)',
+    success: { status: 204 },
+    errors: [400, 401, 404],
+    auth: true,
+  },
+  getNotificationPreferences: {
+    method: 'get',
+    path: '/v1/notifications/preferences',
+    operationId: 'getNotificationPreferences',
+    summary: 'Effective notification preferences per category and channel',
+    success: { status: 200, schema: NotificationPreferencesSchema },
+    errors: [401],
+    auth: true,
+  },
+  updateNotificationPreferences: {
+    method: 'put',
+    path: '/v1/notifications/preferences',
+    operationId: 'updateNotificationPreferences',
+    summary: 'Upsert notification preferences (full or partial list; naturally idempotent)',
+    body: NotificationPreferencesSchema,
+    success: { status: 200, schema: NotificationPreferencesSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  registerDevice: {
+    method: 'post',
+    path: '/v1/devices',
+    operationId: 'registerDevice',
+    summary: 'Register the Expo push token of the device bound to the access token (upsert)',
+    body: RegisterDeviceSchema,
+    success: { status: 200, schema: DeviceRegistrationSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  postRiderLocations: {
+    method: 'post',
+    path: '/v1/riders/me/locations',
+    operationId: 'postRiderLocations',
+    summary: 'HTTP fallback for rider location updates (batched points)',
+    body: RiderLocationBatchSchema,
+    success: { status: 202, schema: LocationBatchResultSchema },
+    errors: [400, 401, 403, 429],
+    auth: true,
+  },
   ...PAYMENT_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
 
@@ -220,6 +288,17 @@ function pathParameters(path: string): object[] {
   }));
 }
 
+function queryParameters(query: z.ZodObject | undefined): object[] {
+  if (!query) return [];
+  const shape: Record<string, z.ZodType> = query.shape;
+  return Object.entries(shape).map(([name, schema]) => ({
+    name,
+    in: 'query',
+    required: !schema.safeParse(undefined).success,
+    schema: z.toJSONSchema(schema, { target: 'draft-2020-12', io: 'input' }),
+  }));
+}
+
 function operation(route: RouteSpec): object {
   const ok = route.success.schema
     ? {
@@ -237,7 +316,7 @@ function operation(route: RouteSpec): object {
         },
       ]
     : [];
-  const parameters = [...pathParameters(route.path), ...headers];
+  const parameters = [...pathParameters(route.path), ...headers, ...queryParameters(route.query)];
   return {
     operationId: route.operationId,
     summary: route.summary,
