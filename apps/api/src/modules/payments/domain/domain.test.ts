@@ -262,9 +262,15 @@ describe('wallet holds', () => {
   it('computes available and guards overspend', () => {
     const v = walletView(ngn(1_000), ngn(400));
     expect(v.available.minor).toBe(600);
-    expect(() => assertCanHold(v, ngn(600))).not.toThrow();
-    expect(() => assertCanHold(v, ngn(601))).toThrow(/Insufficient/);
-    expect(() => assertCanHold(v, ngn(0))).toThrow(/positive/);
+    expect(() => {
+      assertCanHold(v, ngn(600));
+    }).not.toThrow();
+    expect(() => {
+      assertCanHold(v, ngn(601));
+    }).toThrow(/Insufficient/);
+    expect(() => {
+      assertCanHold(v, ngn(0));
+    }).toThrow(/positive/);
   });
 });
 

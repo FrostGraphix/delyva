@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError } from './client.js';
-import { PaymentsClient, paymentsKeys } from './payments.js';
+import { ApiError, DelyvaClient } from './client.js';
+import { paymentsKeys } from './payments.js';
 
 const intent = {
   id: '0b9d1b8e-3c55-4f5e-9d2a-0a6a1c1f0e11',
@@ -15,7 +15,7 @@ const intent = {
 };
 
 function client(status: number, body: unknown, seen: { url: string; init?: RequestInit }[]) {
-  return new PaymentsClient({
+  return new DelyvaClient({
     baseUrl: 'https://api.test',
     accessToken: () => 'tok',
     idempotencyKey: () => 'idem-key-1',
@@ -26,7 +26,7 @@ function client(status: number, body: unknown, seen: { url: string; init?: Reque
   });
 }
 
-describe('PaymentsClient', () => {
+describe('DelyvaClient payments', () => {
   it('sends bearer + idempotency headers and validates responses', async () => {
     const seen: { url: string; init?: RequestInit }[] = [];
     const out = await client(201, intent, seen).createWalletTopUp({

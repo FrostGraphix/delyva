@@ -107,6 +107,87 @@ describe('DelyvaClient', () => {
     expect(err2.problem.status).toBe(400);
   });
 
+  it('sends Bearer tokens, GET without body, PATCH with id and idempotent admin creates', async () => {
+    const captured: Captured[] = [];
+    const promo = {
+      id: '0b9d1b8e-3c55-4f5e-9d2a-0a6a1c1f0e11',
+      code: 'WEEKEND',
+      type: 'free_delivery',
+      valueMinor: null,
+      percentBps: null,
+      maxDiscountMinor: null,
+      minOrderMinor: 300000,
+      audience: 'all',
+      startsAt: '2026-01-01T00:00:00.000Z',
+      endsAt: '2028-01-01T00:00:00.000Z',
+      activeDaysOfWeek: [0, 6],
+      perUserLimit: 8,
+      globalLimit: null,
+      budgetMinor: null,
+      active: true,
+      redemptionCount: 0,
+      spentMinor: 0,
+      updatedAt: '2026-11-19T00:00:00.000Z',
+    };
+    const client = new DelyvaClient({
+      baseUrl: 'https://api.test',
+      fetch: fakeFetch(200, promo, captured),
+      accessToken: () => 'tok',
+      idempotencyKey: () => 'idem-key-1',
+    });
+    await client.updatePromo(promo.id, { active: false });
+    expect(captured[0]?.url).toBe(`https://api.test/v1/admin/promos/${promo.id}`);
+    expect(captured[0]?.init?.method).toBe('PATCH');
+    const headers = captured[0]?.init?.headers as Record<string, string>;
+    expect(headers.authorization).toBe('Bearer tok');
+    await client.createPromo({ ...promo, code: 'WEEKEND', type: 'free_delivery' } as never);
+    expect((captured[1]?.init?.headers as Record<string, string>)['Idempotency-Key']).toBe(
+      'idem-key-1',
+    );
+    const list = new DelyvaClient({
+      baseUrl: 'https://api.test',
+      fetch: fakeFetch(200, { items: [promo] }, captured),
+    });
+    await expect(list.listPromos()).resolves.toEqual({ items: [promo] });
+    expect(captured[2]?.init?.body).toBeUndefined();
+    expect((captured[2]?.init?.headers as Record<string, string>).authorization).toBeUndefined();
+  });
+
+  it('calls quote and fee-rule endpoints on their registry paths', async () => {
+    const captured: Captured[] = [];
+    const reject = new DelyvaClient({
+      baseUrl: 'https://api.test',
+      fetch: fakeFetch(
+        403,
+        {
+          type: 'about:blank',
+          title: 'Forbidden',
+          status: 403,
+          code: 'forbidden',
+        },
+        captured,
+      ),
+    });
+    const calls = [
+      reject.createQuote({
+        zoneCode: 'lagos',
+        pickup: { lat: 6.4, lng: 3.4 },
+        dropoff: { lat: 6.5, lng: 3.5 },
+        lines: [{ unitPriceMinor: 1, quantity: 1, modifierDeltasMinor: [] }],
+      }),
+      reject.listFeeRules(),
+      reject.createFeeRule({} as never, 'k-12345678'),
+      reject.updateFeeRule('abc', {}),
+    ];
+    for (const call of calls) await expect(call).rejects.toBeInstanceOf(ApiError);
+    expect(captured.map((c) => `${String(c.init?.method)} ${c.url}`)).toEqual([
+      'POST https://api.test/v1/quotes',
+      'GET https://api.test/v1/admin/fee-rules',
+      'POST https://api.test/v1/admin/fee-rules',
+      'PATCH https://api.test/v1/admin/fee-rules/abc',
+    ]);
+  });
+
   it('exposes stable mutation keys', () => {
     expect(authKeys.verifyOtp()).toEqual(['auth', 'otp', 'verify']);
   });

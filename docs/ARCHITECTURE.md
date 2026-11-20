@@ -436,3 +436,53 @@ All versions are pinned exactly in `package.json` (`.npmrc` has `save-exact=true
 - DEBT(web): CSP/HSTS headers not configured; i18n not set up (hard-coded English in scaffolds).
 - DEBT(test): SDK hooks and RN `Button` lack render tests (need React/RN testing libraries); no Testcontainers yet (integration tests use the docker-compose services and skip with a message when unreachable).
 - DEBT(icons): icons are hand-optimised SVG; SVGO pipeline and Phosphor import not added.
+
+## Pricing (Phase 1, 2026-11-19)
+
+Bounded context `apps/api/src/modules/pricing` (`api/application/domain/infrastructure`). See ADR 0200.
+
+- **Public interface:** `PricingService.quote({ userId, zoneCode, pickup, dropoff, lines, promoCode? })` returns an itemised `PriceQuote` in `Money` (kobo). `RedeemPromo.execute({ code, userId, orderId, itemsSubtotalMinor, discountMinor })` records a redemption once per (promo, order). Both are exported by `PricingModule` for ordering.
+- **Endpoints:** `POST /v1/quotes` (any authenticated user), `GET/POST/PATCH /v1/admin/fee-rules`, `/v1/admin/surge-rules`, `/v1/admin/promos` (roles `ops`, `super_admin`; POSTs need `Idempotency-Key`). New problem codes: `zone_not_serviceable` (422), `promo_ineligible` (422).
+- **Calculation order (pure domain, integer kobo, basis points):**
+  1. Items subtotal = Σ quantity × (unit + Σ modifier deltas); a negative unit price is rejected.
+  2. Delivery fee = base fee (covers `baseDistanceMeters`) + per **started** km beyond it, each km priced by the tier it starts in; clamped to `[minFee, maxFee]`. Distance = straight-line haversine rounded **up** to the metre; beyond `maxDistanceMeters` → `zone_not_serviceable`.
+  3. Surge = highest matching rule for the zone and Lagos-local (UTC+1) weekday/minute window `[start, end)`, never compounding, capped at `maxSurgeBps`; a separate `surgeFee` line on the delivery fee.
+  4. Small-order fee when subtotal < threshold. Service fee = subtotal × bps, capped.
+  5. Promo discount: `free_delivery` = delivery + surge; `percent_off` = floor(subtotal × bps), capped; `fixed_off` = value; item discounts never exceed the subtotal; then clamped to the promo's remaining budget.
+  6. VAT (`vatBps`, 750 for Lagos; 0 disables) on platform fees only (delivery + surge + small-order + service − free-delivery discount); menu prices are VAT-inclusive.
+  7. `total = subtotal + fees + VAT − discount` (never negative).
+- **Rounding:** charges (fees, surge, VAT) round half-up to the kobo; percentage discounts round down. `amount × bps` uses BigInt.
+- **Promo eligibility** (fixed order, server-side only): active → window → weekday → audience (`new_users`) → min order → per-user limit → global limit → budget. A quote returns `promo.applied=false` with a `reason` instead of failing.
+- **Redemption concurrency:** `SELECT … FOR UPDATE` on the promo row, eligibility re-checked under the lock, `UNIQUE(promo_id, order_id)` for idempotency, `CHECK`s `spent_minor <= budget_minor` and `redemption_count <= global_limit`. Emits `pricing.promo.redeemed` (`{ redemptionId, promoId, code, userId, orderId, discountMinor }`) via the outbox in the same transaction.
+- **Storage:** migration `0200_pricing` (`fee_rules` one per zone with JSONB tiers, `surge_rules`, `promos`, `promo_redemptions`). Idempotent seed that never overwrites admin edits: `pnpm --filter @delyva/api db:seed:pricing`. Lagos: ₦300 within 3 km, then ₦100/₦150/₦200 per km (to 8 km / 15 km / beyond), ₦300–₦3,500, max 25 km, small-order ₦200 under ₦2,000, service 5 % cap ₦500, VAT 7.5 %, surge cap 1.5x (weekday 12–14h 1.2x, 18–21h 1.3x). Promos `TUNDE50` (₦500 off, new users, once) and `WEEKEND` (free delivery Sat/Sun, min ₦3,000).
+- **Auth:** generic `src/shared/auth` (`AuthGuard`, `@Roles`, `@Principal`, `JoseAccessTokenVerifier`); a module provides `ACCESS_TOKEN_VERIFIER` (pricing builds it from identity's exported signer key).
+
+### Known technical debt (pricing)
+
+- DEBT(pricing): `/v1/quotes` trusts client unit prices until the catalog context exists; ordering must re-quote with catalog prices before charging.
+- DEBT(pricing): zone is a client-supplied `zoneCode`; resolve from coordinates with PostGIS when geo lands. Distance is straight-line, not road distance.
+- DEBT(pricing): "new customer" = no prior promo redemption; switch to ordering's delivered-order count.
+- DEBT(pricing): quotes are not persisted/signed; checkout should reference a short-lived server-side quote id.
+- DEBT(pricing): no admin audit log for config changes; no weather/demand surge; no SDK methods for surge-rule admin.
+
+## Payments & ledger (Phase 1, 2026-11-20)
+
+See ADR 0300. Module `apps/api/src/modules/payments` (api / application / domain / infrastructure), migration `0300_payments.sql`, contracts `packages/contracts/src/payments/`, SDK methods on `DelyvaClient` + hooks in `packages/sdk/src/payments.ts`, jobs in `apps/workers/src/jobs/payments.jobs.ts`.
+
+- **Ledger:** append-only double entry (`ledger_accounts`, `ledger_transactions`, `ledger_entries`), signed integer kobo, invariants in the domain and in Postgres (deferred balance trigger, append-only triggers, revoked privileges). Corrections are compensating transactions.
+- **Intents:** `requires_action → processing → succeeded | failed`, `succeeded → refunded`; transitions only via `settleIntent` after a provider `verify` (verify endpoint, or a webhook that is re-verified server-side).
+- **Wallet:** balance derived from the ledger; holds with 15-minute expiry; per-wallet advisory locks.
+- **Endpoints** (bearer, shared `AuthGuard`): `GET /v1/wallet`, `GET /v1/wallet/transactions`, `POST /v1/wallet/top-ups`, `GET /v1/payment-intents/{id}`, `POST /v1/payment-intents/{id}/verify`. Signed, unauthenticated: `POST /v1/webhooks/paystack`. Internal (shared token, not in public OpenAPI): `POST /internal/payments/payouts/run`, `POST /internal/payments/reconciliations/run`.
+- **Service interface for ordering:** `PaymentsService.createIntentForOrder`, `captureOrderSplit(orderId, breakdown)`, `releaseOrderHold`, `refundOrder` (full/partial, to wallet or source).
+- **Events:** `payments.intent.succeeded`, `payments.intent.failed`, `payments.refund.completed`, `payments.payout.sent`, `payments.reconciliation.mismatched` (outbox).
+- **Env:** `PAYMENTS_PROVIDER` (paystack|fake), `PAYSTACK_SECRET_KEY`, `PAYSTACK_BASE_URL`, `PAYSTACK_WEBHOOK_IPS`, `PAYMENTS_FAKE_WEBHOOK_SECRET`, `PAYMENTS_CUSTOMER_EMAIL_DOMAIN`, `PAYOUT_MIN_MINOR`, `INTERNAL_JOBS_TOKEN`; workers `API_INTERNAL_URL`, `INTERNAL_JOBS_TOKEN`. Production refuses to boot without a Paystack key, webhook IPs and a 32+ char jobs token.
+- **Raw body:** `NestFactory.create(..., { rawBody: true })` keeps `req.rawBody` next to the parsed JSON; other routes are unchanged.
+
+### Known technical debt (payments)
+
+- DEBT(payments): live Paystack calls unverified; the adapter is tested against mocked HTTP shaped by the official PaystackOSS OpenAPI spec. Refund id field placement and transfer OTP flow need a sandbox check.
+- DEBT(payments): Paystack needs a customer email; a synthetic `<userId>@PAYMENTS_CUSTOMER_EMAIL_DOMAIN` is sent until real emails exist.
+- DEBT(payments): failed provider refunds stay `pending_provider` with no retry job; vendor payouts only (no rider payouts); no recipient-onboarding endpoint (adapter has bank resolve + create recipient).
+- DEBT(payments): webhook IP check uses `req.ip`; needs `trust proxy` behind the LB.
+- DEBT(payments): reconciliation compares charges only (not refunds, transfers or settlement reports); alerting is log + outbox, no pager.
+- DEBT(payments): no admin refund endpoint with reason, audit log and second approver yet (service method only).

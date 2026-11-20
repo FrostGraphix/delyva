@@ -34,12 +34,8 @@ import { CreateTopUp, GetIntent, VerifyIntent } from '../application/payment-int
 import { type PayoutBatchReport, RunPayoutBatch } from '../application/payouts.use-cases.js';
 import { RunReconciliation } from '../application/reconciliation.use-case.js';
 import { GetWallet, ListWalletTransactions } from '../application/wallet.queries.js';
-import {
-  BearerAuthGuard,
-  CurrentPrincipal,
-  InternalJobGuard,
-  type Principal,
-} from './auth.guards.js';
+import { AuthGuard, type AuthPrincipal, Principal } from '../../../shared/auth/auth.guard.js';
+import { InternalJobGuard } from './internal-job.guard.js';
 
 const uuid = new ParseUUIDPipe({
   version: '4',
@@ -48,7 +44,7 @@ const uuid = new ParseUUIDPipe({
 
 /** Wallet and payment intent endpoints (v1, bearer auth, owner-scoped). */
 @Controller()
-@UseGuards(BearerAuthGuard)
+@UseGuards(AuthGuard)
 export class WalletController {
   /** Injected use cases. */
   constructor(
@@ -61,14 +57,14 @@ export class WalletController {
 
   /** GET /v1/wallet */
   @Get('v1/wallet')
-  wallet(@CurrentPrincipal() p: Principal): Promise<Wallet> {
+  wallet(@Principal() p: AuthPrincipal): Promise<Wallet> {
     return this.getWallet.execute(p.userId);
   }
 
   /** GET /v1/wallet/transactions */
   @Get('v1/wallet/transactions')
   transactions(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Query(new ZodBodyPipe(WalletTransactionsQuerySchema)) q: WalletTransactionsQuery,
   ): Promise<WalletTransactionsPage> {
     return this.listTransactions.execute({ userId: p.userId, limit: q.limit, cursor: q.cursor });
@@ -79,7 +75,7 @@ export class WalletController {
   @HttpCode(201)
   @Idempotent()
   topUp(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Body(new ZodBodyPipe(CreateTopUpRequestSchema)) body: CreateTopUpRequest,
   ): Promise<PaymentIntent> {
     return this.createTopUp.execute({ userId: p.userId, ...body });
@@ -87,7 +83,7 @@ export class WalletController {
 
   /** GET /v1/payment-intents/{id} */
   @Get('v1/payment-intents/:id')
-  intent(@CurrentPrincipal() p: Principal, @Param('id', uuid) id: string): Promise<PaymentIntent> {
+  intent(@Principal() p: AuthPrincipal, @Param('id', uuid) id: string): Promise<PaymentIntent> {
     return this.getIntent.execute({ userId: p.userId, intentId: id });
   }
 
@@ -95,7 +91,7 @@ export class WalletController {
   @Post('v1/payment-intents/:id/verify')
   @HttpCode(200)
   @Idempotent()
-  verify(@CurrentPrincipal() p: Principal, @Param('id', uuid) id: string): Promise<PaymentIntent> {
+  verify(@Principal() p: AuthPrincipal, @Param('id', uuid) id: string): Promise<PaymentIntent> {
     return this.verifyIntent.execute({ userId: p.userId, intentId: id });
   }
 }

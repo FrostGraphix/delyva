@@ -69,7 +69,7 @@ describe('PaystackProvider (HTTP mocked; live Paystack is NOT exercised)', () =>
     expect((calls[0]?.init.headers as Record<string, string>).authorization).toBe(
       'Bearer sk_test_x',
     );
-    expect(JSON.parse(String(calls[0]?.init.body))).toMatchObject({
+    expect(JSON.parse(calls[0]?.init.body as string)).toMatchObject({
       amount: 10_000,
       currency: 'NGN',
       channels: ['card'],

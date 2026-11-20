@@ -16,6 +16,8 @@ export const STATUS_BY_CODE: Record<ErrorCode, number> = {
   idempotency_key_required: 400,
   idempotency_key_conflict: 409,
   internal_error: 500,
+  promo_ineligible: 422,
+  zone_not_serviceable: 422,
 };
 
 /** Error with a stable code, mapped to RFC 9457 problem+json by the exception filter. */

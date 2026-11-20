@@ -16,6 +16,7 @@ export const PAYMENT_ROUTES = {
     summary: 'Wallet balance derived from the ledger (bearer auth)',
     success: { status: 200, schema: WalletSchema },
     errors: [401],
+    auth: true,
   },
   listWalletTransactions: {
     method: 'get',
@@ -24,6 +25,7 @@ export const PAYMENT_ROUTES = {
     summary: 'Wallet ledger movements, newest first (bearer auth; query limit, cursor)',
     success: { status: 200, schema: WalletTransactionsPageSchema },
     errors: [400, 401],
+    auth: true,
   },
   createWalletTopUp: {
     method: 'post',
@@ -33,6 +35,7 @@ export const PAYMENT_ROUTES = {
     body: CreateTopUpRequestSchema,
     success: { status: 201, schema: PaymentIntentSchema },
     errors: [400, 401, 409],
+    auth: true,
     idempotent: true,
   },
   getPaymentIntent: {
@@ -42,6 +45,7 @@ export const PAYMENT_ROUTES = {
     summary: 'Read one of your payment intents (bearer auth)',
     success: { status: 200, schema: PaymentIntentSchema },
     errors: [401, 404],
+    auth: true,
   },
   verifyPaymentIntent: {
     method: 'post',
@@ -50,6 +54,7 @@ export const PAYMENT_ROUTES = {
     summary: 'Ask the server to verify the intent with the provider (bearer auth)',
     success: { status: 200, schema: PaymentIntentSchema },
     errors: [401, 404, 409],
+    auth: true,
     idempotent: true,
   },
   paystackWebhook: {

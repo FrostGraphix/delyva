@@ -6,7 +6,10 @@ import { ENV, type Env } from '../../shared/config/env.js';
 import { DB, type Db } from '../../shared/database/database.js';
 import { LOGGER } from '../../shared/logging/logger.js';
 import { IdentityModule } from '../identity/identity.module.js';
-import { BearerAuthGuard, InternalJobGuard } from './api/auth.guards.js';
+import { ACCESS_TOKEN_VERIFIER, AuthGuard } from '../../shared/auth/auth.guard.js';
+import { JoseAccessTokenVerifier } from '../../shared/auth/jose-access-token.verifier.js';
+import { JoseAccessTokenSigner } from '../identity/infrastructure/jose-access-token.signer.js';
+import { InternalJobGuard } from './api/internal-job.guard.js';
 import {
   InternalPaymentsController,
   WalletController,
@@ -65,7 +68,17 @@ function webhookSecret(env: Env): string {
   imports: [IdentityModule],
   controllers: [WalletController, WebhooksController, InternalPaymentsController],
   providers: [
-    BearerAuthGuard,
+    {
+      provide: ACCESS_TOKEN_VERIFIER,
+      inject: [JoseAccessTokenSigner, ENV],
+      useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
+        new JoseAccessTokenVerifier({
+          key: signer.verificationKey,
+          issuer: env.JWT_ISSUER,
+          audience: env.JWT_AUDIENCE,
+        }),
+    },
+    AuthGuard,
     InternalJobGuard,
     { provide: CLOCK, useValue: systemClock },
     { provide: PAYMENT_PROVIDER, inject: [ENV], useFactory: providerFor },

@@ -10,7 +10,7 @@ import { runMigrations } from '../scripts/migrate.js';
 import { createApp } from '../src/create-app.js';
 import { JoseAccessTokenSigner } from '../src/modules/identity/infrastructure/jose-access-token.signer.js';
 import { PaymentsService } from '../src/modules/payments/application/payments.service.js';
-import { FakePaymentProvider } from '../src/modules/payments/infrastructure/fake.provider.js';
+import type { FakePaymentProvider } from '../src/modules/payments/infrastructure/fake.provider.js';
 import { signWebhook } from '../src/modules/payments/infrastructure/hmac-webhook.verifier.js';
 import { PAYMENT_PROVIDER } from '../src/modules/payments/payments.module.js';
 import { loadEnv } from '../src/shared/config/env.js';
@@ -289,8 +289,8 @@ describe.skipIf(!available)('payments (integration: Postgres + Redis)', () => {
       }),
     ]);
     expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
-    const rejected = results.find((r) => r.status === 'rejected');
-    expect(String((rejected as PromiseRejectedResult).reason)).toMatch(/Insufficient/);
+    const reasons = results.flatMap((r) => (r.status === 'rejected' ? [String(r.reason)] : []));
+    expect(reasons).toEqual([expect.stringMatching(/Insufficient/)]);
     expect(await walletOf(user)).toMatchObject({
       held: { amountMinor: 7_000 },
       available: { amountMinor: 3_000 },
@@ -400,7 +400,7 @@ describe.skipIf(!available)('payments (integration: Postgres + Redis)', () => {
     expect(
       fake.calls.filter((c) => c.op === 'refund' && c.reference === intent.reference),
     ).toHaveLength(1);
-    expect((await walletOf(user)).balance.amountMinor).toBe(0);
+    expect((await walletOf(user)).balance).toMatchObject({ amountMinor: 0 });
     const row = await pool.query('SELECT status FROM payment_intents WHERE id = $1', [intent.id]);
     expect((row.rows[0] as { status: string }).status).toBe('refunded');
     await expect(payments.releaseOrderHold(orderId)).resolves.toEqual({ released: false });
