@@ -5,3 +5,5 @@ export * from './events.js';
 export * from './health.js';
 export * from './openapi.js';
 export * from './pricing/index.js';
+export * from './notifications/index.js';
+export * from './realtime/index.js';

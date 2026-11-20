@@ -464,3 +464,25 @@ Bounded context `apps/api/src/modules/pricing` (`api/application/domain/infrastr
 - DEBT(pricing): "new customer" = no prior promo redemption; switch to ordering's delivered-order count.
 - DEBT(pricing): quotes are not persisted/signed; checkout should reference a short-lived server-side quote id.
 - DEBT(pricing): no admin audit log for config changes; no weather/demand surge; no SDK methods for surge-rule admin.
+
+## Notifications & realtime (Phase 1, 2026-11-20)
+
+Bounded contexts `apps/api/src/modules/notifications` and `apps/api/src/modules/realtime` (`api/application/domain/infrastructure`), delivery workers in `apps/workers/src/jobs`. See ADR 0400.
+
+- **Contracts:** `packages/contracts/src/notifications` (templates, channels, locales, devices, inbox, preferences, BullMQ job + dead-letter schemas, queue names) and `packages/contracts/src/realtime` (location schemas, socket event names, typed `ServerToClientEvents` / `ClientToServerEvents`, room helpers).
+- **Endpoints (Bearer auth, caller-scoped):** `GET /v1/notifications` (cursor, `unreadOnly`), `POST /v1/notifications/{id}/read` (404 for other users' items), `GET/PUT /v1/notifications/preferences`, `POST /v1/devices` (Expo token bound to the token's `did`), `POST /v1/riders/me/locations` (riders only, batched fallback). Writes are naturally idempotent (upserts / set-once), so they do not require `Idempotency-Key`.
+- **Event → notification mapping:** `identity.user.registered` → `account.welcome`; placeholders `ordering.order.{placed,vendor_accepted,rider_assigned,picked_up,delivered,cancelled_by_customer,cancelled_by_ops,vendor_rejected}` (payload `{ orderId, customerId, orderRef? }`) → `order.*` templates for the customer.
+- **Pipeline:** outbox consumer (receipt-table claim) → `NotifyUser` (preferences → render in device locale → inbox row → BullMQ jobs) → workers (`notifications` queue; Expo push / Termii SMS / WhatsApp stub; 5 attempts, full-jitter backoff; terminal failures → `notifications-dlq`).
+- **Realtime:** Socket.IO on the API HTTP server via `@nestjs/websockets` + `RedisIoAdapter` (`@socket.io/redis-adapter`). JWT handshake auth with the shared `ACCESS_TOKEN_VERIFIER`, rooms `order:<id>` / `rider:<id>`, `OrderRoomAuthorizer` port (deny-by-default; ops/support/super_admin always allowed), `rider:location` → validate → rate limit → `GEOADD riders:locations` → emit to the rider's active order room only. `LiveTrackingService` (`LIVE_TRACKING`) exported for dispatch.
+- **SDK:** `DelyvaClient` methods `listNotifications`, `markNotificationRead`, `getNotificationPreferences`, `updateNotificationPreferences`, `registerDevice`, `postRiderLocations`; hooks in `notification-hooks.ts`; `RealtimeClient` (typed socket helper with ack timeouts).
+- **Storage:** migration `0400_notifications` (`notifications`, `push_devices`, `notification_preferences`, `notification_event_receipts`). Redis: `riders:locations` (GEO), `rider:<id>:last`, `rider:<id>:active_order`, `rl:loc:*`, BullMQ keys under `BULLMQ_PREFIX`.
+- **Config:** API `BULLMQ_PREFIX`, `NOTIFICATIONS_CONSUMER_ENABLED`; workers `PUSH_PROVIDER`, `EXPO_PUSH_URL`, `EXPO_ACCESS_TOKEN`, `SMS_PROVIDER`, `TERMII_*`, `BULLMQ_PREFIX`.
+- **Pinned versions added:** socket.io 4.8.4, socket.io-client 4.8.4, @socket.io/redis-adapter 8.3.0, @nestjs/websockets 12.5.1, @nestjs/platform-socket.io 12.5.1, bullmq 6.7.8 (api), ioredis 6.0.0 (workers dev).
+
+### Known technical debt (notifications & realtime)
+
+- DEBT(notifications): Expo push receipts not polled; `DeviceNotRegistered` tokens not disabled in `push_devices` (workers have no DB access).
+- DEBT(notifications): SMS phone (PII) stored in Redis job data; resolve in the worker or encrypt.
+- DEBT(notifications): phone lookup reads identity's `users` table directly (`SqlRecipientDirectory`) until identity exposes a directory service.
+- DEBT(notifications): outbox consumer polls with `NOT EXISTS`; move to a JetStream durable consumer. No DLQ replay admin tool. WhatsApp provider not chosen. Ordering event payload schema is a local placeholder. English copy only.
+- DEBT(realtime): no downsampled location trail (disputes, 90-day retention); stale GEO members not pruned; in-app notifications not pushed over the socket; no per-IP connection limit.
