@@ -54,14 +54,14 @@ function client(body: unknown, captured: Captured[], status = 200) {
 const headers = (c: Captured | undefined) => c?.init?.headers as Record<string, string>;
 
 describe('DelyvaClient catalog + geo', () => {
-  it('builds discovery query strings without auth', async () => {
+  it('builds discovery query strings (shared send attaches the token when present)', async () => {
     const captured: Captured[] = [];
     const c = client({ items: [] }, captured);
     await c.discoverVendors({ lat: 6.43, lng: 3.42, category: 'grocery' });
     await c.discoverVendors({ lat: 6.43, lng: 3.42 });
     expect(captured[0]?.url).toBe('https://api.test/v1/vendors?lat=6.43&lng=3.42&category=grocery');
     expect(captured[1]?.url).toBe('https://api.test/v1/vendors?lat=6.43&lng=3.42');
-    expect(headers(captured[0]).authorization).toBeUndefined();
+    expect(headers(captured[0]).authorization).toBe('Bearer token-abc');
     expect(captured[0]?.init?.method).toBe('GET');
   });
 

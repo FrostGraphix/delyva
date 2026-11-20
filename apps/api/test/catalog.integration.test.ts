@@ -13,13 +13,13 @@ import { loadEnv } from '../src/shared/config/env.js';
 
 /**
  * Catalog + geo integration tests against real Postgres/PostGIS and Redis (docker-compose).
- * Own database `delyva_catalog_test` and Redis db 13 so sibling suites don't collide.
+ * Own database `delyva_catalog_test` and Redis db 9 so sibling suites don't collide.
  * SKIPS with a message when the services are unreachable; never fake-passes.
  */
 const ADMIN_URL =
   process.env.TEST_PG_ADMIN_URL ?? 'postgres://delyva:delyva_local_only@127.0.0.1:55432/delyva';
 const DB_URL = ADMIN_URL.replace(/\/[^/]+$/, '/delyva_catalog_test');
-const REDIS_URL = process.env.TEST_CATALOG_REDIS_URL ?? 'redis://127.0.0.1:56379/13';
+const REDIS_URL = process.env.TEST_CATALOG_REDIS_URL ?? 'redis://127.0.0.1:56379/9';
 const PEPPER = 'integration-test-pepper-0123456789abcdef';
 
 async function servicesAvailable(): Promise<boolean> {
