@@ -12,6 +12,8 @@ import { RedisIoAdapter } from './modules/realtime/infrastructure/socket-io.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { PricingModule } from './modules/pricing/pricing.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
+import { OnboardingModule } from './modules/onboarding/onboarding.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';
@@ -61,6 +63,8 @@ export async function createApp(
       NotificationsModule,
       realtime,
       PaymentsModule,
+      AdminModule,
+      OnboardingModule,
     ],
   })
   class AppModule {}
