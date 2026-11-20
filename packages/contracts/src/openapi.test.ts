@@ -31,6 +31,14 @@ describe('buildOpenApiDocument', () => {
     expect(op?.responses['429']).toBeDefined();
   });
 
+  it('declares pricing routes with bearer auth and uuid path params', () => {
+    const quote = doc.paths['/v1/quotes']?.post as Op & { security?: unknown[] };
+    expect(quote.security).toEqual([{ bearerAuth: [] }]);
+    const patch = doc.paths['/v1/admin/promos/{id}']?.patch;
+    expect(patch?.parameters?.[0]?.name).toBe('id');
+    expect(doc.paths['/v1/admin/fee-rules']?.post?.parameters?.[0]?.name).toBe('Idempotency-Key');
+  });
+
   it('describes body-less and no-content operations', () => {
     expect(doc.paths['/healthz']?.get?.requestBody).toBeUndefined();
     expect(doc.paths['/v1/auth/logout']?.post?.responses['204']).toEqual({
