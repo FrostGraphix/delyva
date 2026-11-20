@@ -96,7 +96,8 @@ export class DelyvaClient {
   }
 }
 
-async function parseProblem(response: Response): Promise<Problem> {
+/** Parses an RFC 9457 problem body, falling back to a generic problem. */
+export async function parseProblem(response: Response): Promise<Problem> {
   try {
     const parsed = ProblemSchema.safeParse(await response.json());
     return parsed.success ? parsed.data : fallbackProblem(response.status);

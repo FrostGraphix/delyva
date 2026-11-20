@@ -49,8 +49,7 @@ describe('notification contracts', () => {
     });
     expect(job.kind).toBe('sms');
     expect(
-      NotificationJobSchema.safeParse({ kind: 'push', notificationId: uuid, userId: uuid })
-        .success,
+      NotificationJobSchema.safeParse({ kind: 'push', notificationId: uuid, userId: uuid }).success,
     ).toBe(false);
   });
 });

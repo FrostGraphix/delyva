@@ -48,8 +48,11 @@ export class NotifyUser {
     const userDevices = await devices.activeFor(cmd.userId);
     const rendered = renderTemplate(cmd.template, userDevices[0]?.locale ?? 'en', cmd.params);
     const notificationId = this.deps.clock.uuid();
+    let duplicate = false;
     if (channels.includes('in_app')) {
-      const inserted = await this.deps.inbox.insert({
+      // On a duplicate we still (re-)enqueue: deterministic job ids make that a no-op when the
+      // first attempt got that far, and recover the deliveries when it crashed before enqueueing.
+      duplicate = !(await this.deps.inbox.insert({
         id: notificationId,
         userId: cmd.userId,
         template: cmd.template,
@@ -58,8 +61,7 @@ export class NotifyUser {
         data: cmd.data,
         dedupeKey: cmd.sourceEventId,
         createdAt: this.deps.clock.now(),
-      });
-      if (!inserted) return { channels: [], duplicate: true };
+      }));
     }
     const delivered: NotificationChannel[] = channels.includes('in_app') ? ['in_app'] : [];
     for (const channel of channels.filter((c) => c !== 'in_app')) {
@@ -68,7 +70,7 @@ export class NotifyUser {
       await this.deps.queue.enqueue(deliveryJobId(cmd, channel), job);
       delivered.push(channel);
     }
-    return { channels: delivered, duplicate: false };
+    return { channels: delivered, duplicate };
   }
 
   private async buildJob(
