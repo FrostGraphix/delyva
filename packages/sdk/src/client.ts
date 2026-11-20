@@ -68,6 +68,52 @@ import {
   WalletSchema,
   type WalletTransactionsPage,
   WalletTransactionsPageSchema,
+  ADMIN_2FA_HEADER,
+  type AdminRiderApplicationList,
+  AdminRiderApplicationListSchema,
+  type AdminTwoFactorSession,
+  AdminTwoFactorSessionSchema,
+  type AdminVendorApplicationList,
+  AdminVendorApplicationListSchema,
+  type BankAccountInput,
+  type CreateUpload,
+  type DownloadUrl,
+  DownloadUrlSchema,
+  type FeatureFlag,
+  type FeatureFlagList,
+  FeatureFlagListSchema,
+  FeatureFlagSchema,
+  type ListApplicationsQuery,
+  type MenuImport,
+  type MenuImportResult,
+  MenuImportResultSchema,
+  type MenuPhotos,
+  type Quiz,
+  type QuizResult,
+  QuizResultSchema,
+  QuizSchema,
+  type QuizSubmission,
+  type ReviewDecision,
+  type RiderApplication,
+  RiderApplicationSchema,
+  type RiderGuarantor,
+  type RiderIdentity,
+  type RiderPersonalDetails,
+  type RiderStep,
+  type RiderVehicle,
+  type TestOrderChecklist,
+  type TotpCode,
+  type TotpEnrolment,
+  TotpEnrolmentSchema,
+  type UploadTicket,
+  UploadTicketSchema,
+  type UpsertFeatureFlag,
+  type VendorApplication,
+  VendorApplicationSchema,
+  type VendorBusinessDetails,
+  type VendorDocuments,
+  type VendorLocation,
+  type VendorStep,
 } from '@delyva/contracts';
 import type { z } from 'zod';
 
@@ -94,7 +140,45 @@ export interface DelyvaClientOptions {
   readonly idempotencyKey?: () => string;
   /** Current access token (from SecureStore); sent as a Bearer token when present. */
   readonly accessToken?: () => string | null | undefined;
+  /** Admin 2FA session token (from `verifyAdminTotp`); sent as `x-admin-2fa` on admin calls. */
+  readonly adminTwoFactorToken?: () => string | null | undefined;
 }
+
+/** Body type of each rider step. */
+export interface RiderStepBodies {
+  readonly personal_details: RiderPersonalDetails;
+  readonly identity: RiderIdentity;
+  readonly vehicle: RiderVehicle;
+  readonly guarantor: RiderGuarantor;
+  readonly bank_account: BankAccountInput;
+}
+
+const RIDER_STEP_ROUTE = {
+  personal_details: 'saveRiderPersonalDetails',
+  identity: 'saveRiderIdentity',
+  vehicle: 'saveRiderVehicle',
+  guarantor: 'saveRiderGuarantor',
+  bank_account: 'saveRiderBankAccount',
+} as const satisfies Record<keyof RiderStepBodies, keyof typeof ROUTES>;
+
+/** Body type of each PUT vendor step. */
+export interface VendorStepBodies {
+  readonly business_details: VendorBusinessDetails;
+  readonly documents: VendorDocuments;
+  readonly location: VendorLocation;
+  readonly menu_photos: MenuPhotos;
+  readonly bank_account: BankAccountInput;
+  readonly test_order: TestOrderChecklist;
+}
+
+const VENDOR_STEP_ROUTE = {
+  business_details: 'saveVendorBusinessDetails',
+  documents: 'saveVendorDocuments',
+  location: 'saveVendorLocation',
+  menu_photos: 'saveVendorMenuPhotos',
+  bank_account: 'saveVendorBankAccount',
+  test_order: 'saveVendorTestOrder',
+} as const satisfies Record<keyof VendorStepBodies, keyof typeof ROUTES>;
 
 const fallbackProblem = (status: number): Problem => ({
   type: 'about:blank',
@@ -253,6 +337,194 @@ export class DelyvaClient {
       PaymentIntentSchema,
       this.idem(idempotencyKey),
     );
+  }
+
+  // ------------------------------------------------------------ uploads & onboarding (ADR 0700)
+
+  /** POST /v1/uploads — then PUT the bytes to `ticket.url` with `ticket.headers`. */
+  createUpload(body: CreateUpload, idempotencyKey?: string): Promise<UploadTicket> {
+    return this.post(ROUTES.createUpload.path, body, UploadTicketSchema, this.idem(idempotencyKey));
+  }
+
+  /** GET /v1/rider-applications/me */
+  getMyRiderApplication(): Promise<RiderApplication> {
+    return this.send('GET', ROUTES.getMyRiderApplication.path, undefined, RiderApplicationSchema);
+  }
+
+  /** POST /v1/rider-applications/me/step-views (funnel analytics) */
+  async recordRiderStepView(step: RiderStep): Promise<void> {
+    await this.send('POST', ROUTES.recordRiderStepView.path, { step }, null);
+  }
+
+  /** PUT a rider step. */
+  saveRiderStep<K extends keyof RiderStepBodies>(
+    step: K,
+    body: RiderStepBodies[K],
+  ): Promise<RiderApplication> {
+    return this.send('PUT', ROUTES[RIDER_STEP_ROUTE[step]].path, body, RiderApplicationSchema);
+  }
+
+  /** GET /v1/rider-applications/me/quiz */
+  getRiderQuiz(): Promise<Quiz> {
+    return this.send('GET', ROUTES.getRiderQuiz.path, undefined, QuizSchema);
+  }
+
+  /** POST /v1/rider-applications/me/quiz */
+  submitRiderQuiz(body: QuizSubmission, idempotencyKey?: string): Promise<QuizResult> {
+    return this.post(
+      ROUTES.submitRiderQuiz.path,
+      body,
+      QuizResultSchema,
+      this.idem(idempotencyKey),
+    );
+  }
+
+  /** POST /v1/rider-applications/me/submit */
+  submitRiderApplication(idempotencyKey?: string): Promise<RiderApplication> {
+    return this.post(
+      ROUTES.submitRiderApplication.path,
+      undefined,
+      RiderApplicationSchema,
+      this.idem(idempotencyKey),
+    );
+  }
+
+  /** GET /v1/vendor-applications/me */
+  getMyVendorApplication(): Promise<VendorApplication> {
+    return this.send('GET', ROUTES.getMyVendorApplication.path, undefined, VendorApplicationSchema);
+  }
+
+  /** POST /v1/vendor-applications/me/step-views */
+  async recordVendorStepView(step: VendorStep): Promise<void> {
+    await this.send('POST', ROUTES.recordVendorStepView.path, { step }, null);
+  }
+
+  /** PUT a vendor step. */
+  saveVendorStep<K extends keyof VendorStepBodies>(
+    step: K,
+    body: VendorStepBodies[K],
+  ): Promise<VendorApplication> {
+    return this.send('PUT', ROUTES[VENDOR_STEP_ROUTE[step]].path, body, VendorApplicationSchema);
+  }
+
+  /** POST /v1/vendor-applications/me/menu-import */
+  importVendorMenu(body: MenuImport, idempotencyKey?: string): Promise<MenuImportResult> {
+    return this.post(
+      ROUTES.importVendorMenu.path,
+      body,
+      MenuImportResultSchema,
+      this.idem(idempotencyKey),
+    );
+  }
+
+  /** POST /v1/vendor-applications/me/submit */
+  submitVendorApplication(idempotencyKey?: string): Promise<VendorApplication> {
+    return this.post(
+      ROUTES.submitVendorApplication.path,
+      undefined,
+      VendorApplicationSchema,
+      this.idem(idempotencyKey),
+    );
+  }
+
+  // ------------------------------------------------------------ admin (send the 2FA token via `adminTwoFactorToken`)
+
+  /** POST /v1/admin/2fa/enrolment */
+  startAdminTotpEnrolment(idempotencyKey?: string): Promise<TotpEnrolment> {
+    return this.post(
+      ROUTES.startAdminTotpEnrolment.path,
+      undefined,
+      TotpEnrolmentSchema,
+      this.idem(idempotencyKey),
+    );
+  }
+
+  /** POST /v1/admin/2fa/enrolment/confirm */
+  confirmAdminTotpEnrolment(body: TotpCode): Promise<AdminTwoFactorSession> {
+    return this.post(ROUTES.confirmAdminTotpEnrolment.path, body, AdminTwoFactorSessionSchema);
+  }
+
+  /** POST /v1/admin/2fa/verify */
+  verifyAdminTotp(body: TotpCode): Promise<AdminTwoFactorSession> {
+    return this.post(ROUTES.verifyAdminTotp.path, body, AdminTwoFactorSessionSchema);
+  }
+
+  /** GET /v1/admin/rider-applications */
+  listRiderApplications(
+    status: ListApplicationsQuery['status'] = 'pending_review',
+  ): Promise<AdminRiderApplicationList> {
+    const path = `${ROUTES.listRiderApplications.path}?status=${status}`;
+    return this.send('GET', path, undefined, AdminRiderApplicationListSchema, this.admin());
+  }
+
+  /** POST /v1/admin/rider-applications/{id}/approve|reject */
+  decideRiderApplication(
+    id: string,
+    decision: 'approve' | 'reject',
+    body: ReviewDecision,
+    idempotencyKey?: string,
+  ): Promise<RiderApplication> {
+    const route =
+      decision === 'approve' ? ROUTES.approveRiderApplication : ROUTES.rejectRiderApplication;
+    return this.post(withId(route.path, id), body, RiderApplicationSchema, {
+      ...this.admin(),
+      ...this.idem(idempotencyKey),
+    });
+  }
+
+  /** GET /v1/admin/vendor-applications */
+  listVendorApplications(
+    status: ListApplicationsQuery['status'] = 'pending_review',
+  ): Promise<AdminVendorApplicationList> {
+    const path = `${ROUTES.listVendorApplications.path}?status=${status}`;
+    return this.send('GET', path, undefined, AdminVendorApplicationListSchema, this.admin());
+  }
+
+  /** POST /v1/admin/vendor-applications/{id}/approve|reject */
+  decideVendorApplication(
+    id: string,
+    decision: 'approve' | 'reject',
+    body: ReviewDecision,
+    idempotencyKey?: string,
+  ): Promise<VendorApplication> {
+    const route =
+      decision === 'approve' ? ROUTES.approveVendorApplication : ROUTES.rejectVendorApplication;
+    return this.post(withId(route.path, id), body, VendorApplicationSchema, {
+      ...this.admin(),
+      ...this.idem(idempotencyKey),
+    });
+  }
+
+  /** GET /v1/admin/uploads/{id}/download-url */
+  getUploadDownloadUrl(id: string): Promise<DownloadUrl> {
+    return this.send(
+      'GET',
+      withId(ROUTES.getUploadDownloadUrl.path, id),
+      undefined,
+      DownloadUrlSchema,
+      this.admin(),
+    );
+  }
+
+  /** GET /v1/admin/feature-flags */
+  listFeatureFlags(): Promise<FeatureFlagList> {
+    return this.send(
+      'GET',
+      ROUTES.listFeatureFlags.path,
+      undefined,
+      FeatureFlagListSchema,
+      this.admin(),
+    );
+  }
+
+  /** PUT /v1/admin/feature-flags */
+  upsertFeatureFlag(body: UpsertFeatureFlag): Promise<FeatureFlag> {
+    return this.send('PUT', ROUTES.upsertFeatureFlag.path, body, FeatureFlagSchema, this.admin());
+  }
+
+  private admin(): Record<string, string> {
+    const token = this.options.adminTwoFactorToken?.();
+    return token ? { [ADMIN_2FA_HEADER]: token } : {};
   }
 
   private idem(key?: string): Record<string, string> {
