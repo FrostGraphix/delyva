@@ -3,6 +3,10 @@ import { Module } from '@nestjs/common';
 import type { Redis } from 'ioredis';
 import type { Env } from '../../shared/config/env.js';
 import { ENV } from '../../shared/config/env.js';
+import {
+  ACCESS_TOKEN_VERIFIER,
+  JoseAccessTokenVerifier,
+} from '../../shared/auth/access-token.verifier.js';
 import { DB, type Db } from '../../shared/database/database.js';
 import { REDIS } from '../../shared/redis/redis.js';
 import { AuthController } from './api/auth.controller.js';
@@ -55,6 +59,16 @@ function smsFor(env: Env, redis: Redis): SmsSender {
         new JoseAccessTokenSigner({
           privateKeyPemB64: env.JWT_PRIVATE_KEY_PEM_B64,
           keyId: env.JWT_KEY_ID,
+          issuer: env.JWT_ISSUER,
+          audience: env.JWT_AUDIENCE,
+        }),
+    },
+    {
+      provide: ACCESS_TOKEN_VERIFIER,
+      inject: [JoseAccessTokenSigner, ENV],
+      useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
+        new JoseAccessTokenVerifier({
+          key: signer.verificationKey,
           issuer: env.JWT_ISSUER,
           audience: env.JWT_AUDIENCE,
         }),
@@ -140,6 +154,6 @@ function smsFor(env: Env, redis: Redis): SmsSender {
       ) => new Logout({ refreshTokens, hasher, clock }),
     },
   ],
-  exports: [JoseAccessTokenSigner],
+  exports: [JoseAccessTokenSigner, ACCESS_TOKEN_VERIFIER],
 })
 export class IdentityModule {}

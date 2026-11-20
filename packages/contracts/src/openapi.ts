@@ -8,11 +8,19 @@ import {
   TokenPairSchema,
 } from './auth.js';
 import { HealthSchema } from './health.js';
+import {
+  DeviceRegistrationSchema,
+  ListNotificationsQuerySchema,
+  NotificationPageSchema,
+  NotificationPreferencesSchema,
+  RegisterDeviceSchema,
+} from './notifications/index.js';
+import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 
 /** One HTTP operation described from Zod schemas. */
 export interface RouteSpec {
-  readonly method: 'get' | 'post';
+  readonly method: 'get' | 'post' | 'put';
   readonly path: string;
   readonly operationId: string;
   readonly summary: string;
@@ -20,6 +28,10 @@ export interface RouteSpec {
   readonly success: { readonly status: number; readonly schema?: z.ZodType };
   readonly errors: readonly number[];
   readonly idempotent?: boolean;
+  /** Requires `Authorization: Bearer <access JWT>`. */
+  readonly auth?: boolean;
+  /** Query-string schema (object of scalars). */
+  readonly query?: z.ZodObject;
 }
 
 /** Registry of public routes; the API and SDK are both typed against these schemas. */
@@ -77,6 +89,64 @@ export const ROUTES = {
     success: { status: 204 },
     errors: [400],
   },
+  listNotifications: {
+    method: 'get',
+    path: '/v1/notifications',
+    operationId: 'listNotifications',
+    summary: 'List the in-app notification inbox (newest first, cursor paginated)',
+    query: ListNotificationsQuerySchema,
+    success: { status: 200, schema: NotificationPageSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  markNotificationRead: {
+    method: 'post',
+    path: '/v1/notifications/{id}/read',
+    operationId: 'markNotificationRead',
+    summary: 'Mark one inbox notification as read (naturally idempotent)',
+    success: { status: 204 },
+    errors: [400, 401, 404],
+    auth: true,
+  },
+  getNotificationPreferences: {
+    method: 'get',
+    path: '/v1/notifications/preferences',
+    operationId: 'getNotificationPreferences',
+    summary: 'Effective notification preferences per category and channel',
+    success: { status: 200, schema: NotificationPreferencesSchema },
+    errors: [401],
+    auth: true,
+  },
+  updateNotificationPreferences: {
+    method: 'put',
+    path: '/v1/notifications/preferences',
+    operationId: 'updateNotificationPreferences',
+    summary: 'Upsert notification preferences (full or partial list; naturally idempotent)',
+    body: NotificationPreferencesSchema,
+    success: { status: 200, schema: NotificationPreferencesSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  registerDevice: {
+    method: 'post',
+    path: '/v1/devices',
+    operationId: 'registerDevice',
+    summary: 'Register the Expo push token of the device bound to the access token (upsert)',
+    body: RegisterDeviceSchema,
+    success: { status: 200, schema: DeviceRegistrationSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  postRiderLocations: {
+    method: 'post',
+    path: '/v1/riders/me/locations',
+    operationId: 'postRiderLocations',
+    summary: 'HTTP fallback for rider location updates (batched points)',
+    body: RiderLocationBatchSchema,
+    success: { status: 202, schema: LocationBatchResultSchema },
+    errors: [400, 401, 403, 429],
+    auth: true,
+  },
 } as const satisfies Record<string, RouteSpec>;
 
 const json = (schema: z.ZodType): object => z.toJSONSchema(schema, { target: 'draft-2020-12' });
@@ -88,6 +158,26 @@ function problemResponses(statuses: readonly number[]): Record<string, object> {
   return Object.fromEntries(
     statuses.map((s) => [String(s), { description: 'Problem', ...problem }]),
   );
+}
+
+function pathParameters(path: string): object[] {
+  return [...path.matchAll(/\{(\w+)\}/g)].map((m) => ({
+    name: m[1],
+    in: 'path',
+    required: true,
+    schema: { type: 'string', format: 'uuid' },
+  }));
+}
+
+function queryParameters(query: z.ZodObject | undefined): object[] {
+  if (!query) return [];
+  const shape: Record<string, z.ZodType> = query.shape;
+  return Object.entries(shape).map(([name, schema]) => ({
+    name,
+    in: 'query',
+    required: !schema.safeParse(undefined).success,
+    schema: z.toJSONSchema(schema, { target: 'draft-2020-12', io: 'input' }),
+  }));
 }
 
 function operation(route: RouteSpec): object {
@@ -107,10 +197,12 @@ function operation(route: RouteSpec): object {
         },
       ]
     : [];
+  const parameters = [...headers, ...pathParameters(route.path), ...queryParameters(route.query)];
   return {
     operationId: route.operationId,
     summary: route.summary,
-    ...(headers.length > 0 ? { parameters: headers } : {}),
+    ...(parameters.length > 0 ? { parameters } : {}),
+    ...(route.auth ? { security: [{ bearerAuth: [] }] } : {}),
     ...(route.body
       ? {
           requestBody: {
@@ -134,6 +226,9 @@ export function buildOpenApiDocument(version: string): Record<string, unknown> {
     info: { title: 'Delyva API', version },
     jsonSchemaDialect: 'https://json-schema.org/draft/2020-12/schema',
     paths,
-    components: { schemas: { Problem: json(ProblemSchema) } },
+    components: {
+      schemas: { Problem: json(ProblemSchema) },
+      securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } },
+    },
   };
 }
