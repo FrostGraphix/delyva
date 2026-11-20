@@ -3,9 +3,11 @@ import type { INestApplicationContext } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import {
   type ClientToServerEvents,
+  type DispatchOffer,
   type OrderStatusBroadcast,
   orderRoom,
   type RiderLocationBroadcast,
+  riderRoom,
   type ServerToClientEvents,
   SOCKET_EVENTS,
 } from '@delyva/contracts';
@@ -81,5 +83,10 @@ export class SocketRoomBroadcaster implements RoomBroadcaster {
   /** @inheritdoc */
   orderStatus(payload: OrderStatusBroadcast): void {
     this.server?.to(orderRoom(payload.orderId)).emit(SOCKET_EVENTS.orderStatus, payload);
+  }
+
+  /** Job offer to one rider's private room (`rider:<id>`); used by the dispatch context. */
+  dispatchOffer(riderId: string, payload: DispatchOffer): void {
+    this.server?.to(riderRoom(riderId)).emit(SOCKET_EVENTS.dispatchOffer, payload);
   }
 }
