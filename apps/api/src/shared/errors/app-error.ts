@@ -18,6 +18,10 @@ export const STATUS_BY_CODE: Record<ErrorCode, number> = {
   internal_error: 500,
   promo_ineligible: 422,
   zone_not_serviceable: 422,
+  kyc_verification_failed: 422,
+  bank_account_name_mismatch: 422,
+  two_factor_required: 403,
+  upload_rejected: 422,
 };
 
 /** Error with a stable code, mapped to RFC 9457 problem+json by the exception filter. */

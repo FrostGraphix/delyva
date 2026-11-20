@@ -17,6 +17,9 @@ import { IdempotencyInterceptor } from './idempotency/idempotency.interceptor.js
 import { LOGGER } from './logging/logger.js';
 import { EVENT_BUS, LoggingEventBus, OutboxPublisher } from './outbox/outbox.publisher.js';
 import { createRedis, REDIS } from './redis/redis.js';
+import { buildFieldEncryptor, FIELD_ENCRYPTOR } from './crypto/field-encryption.js';
+import { buildStorage } from './storage/build-storage.js';
+import { STORAGE_PROVIDER } from './storage/storage.js';
 
 /** Cross-cutting infrastructure: config, logger, Postgres, Redis, outbox, idempotency, errors, health. */
 @Global()
@@ -43,8 +46,18 @@ export class SharedModule implements OnApplicationShutdown {
         OutboxPublisher,
         { provide: APP_FILTER, useClass: ProblemExceptionFilter },
         { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
+        {
+          provide: FIELD_ENCRYPTOR,
+          useFactory: () =>
+            buildFieldEncryptor({
+              keys: env.FIELD_ENCRYPTION_KEYS,
+              activeKid: env.FIELD_ENCRYPTION_ACTIVE_KID,
+              devPepper: env.HASH_PEPPER,
+            }),
+        },
+        { provide: STORAGE_PROVIDER, useFactory: () => buildStorage(env) },
       ],
-      exports: [ENV, LOGGER, PG_POOL, DB, REDIS, EVENT_BUS],
+      exports: [ENV, LOGGER, PG_POOL, DB, REDIS, EVENT_BUS, FIELD_ENCRYPTOR, STORAGE_PROVIDER],
     };
   }
 
