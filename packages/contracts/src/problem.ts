@@ -18,6 +18,10 @@ export const ERROR_CODES = [
   'internal_error',
   'promo_ineligible',
   'zone_not_serviceable',
+  'kyc_verification_failed',
+  'bank_account_name_mismatch',
+  'two_factor_required',
+  'upload_rejected',
 ] as const;
 
 /** Error code enum. */

@@ -19,6 +19,8 @@ import {
 } from './notifications/index.js';
 import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PAYMENT_ROUTES } from './payments/payment-routes.js';
+import { ONBOARDING_ROUTES } from './onboarding/routes.js';
+import { ADMIN_ROUTES } from './admin/routes.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 import {
   CreateFeeRuleSchema,
@@ -269,6 +271,8 @@ export const ROUTES = {
     auth: true,
   },
   ...PAYMENT_ROUTES,
+  ...ONBOARDING_ROUTES,
+  ...ADMIN_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
 
 const json = (schema: z.ZodType): object => z.toJSONSchema(schema, { target: 'draft-2020-12' });
