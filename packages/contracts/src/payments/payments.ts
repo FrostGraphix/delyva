@@ -5,12 +5,12 @@ export const PaymentCurrencySchema = z.enum(['NGN']);
 /** Payment currency. */
 export type PaymentCurrency = z.infer<typeof PaymentCurrencySchema>;
 
-/** Integer minor units (kobo). Never a float. */
-export const AmountMinorSchema = z.number().int();
+/** Signed integer minor units (kobo); negative for debits in wallet history. Never a float. */
+export const SignedAmountMinorSchema = z.number().int();
 
 /** Money on the wire: integer minor units plus ISO 4217 code. */
 export const MoneyDtoSchema = z.strictObject({
-  amountMinor: AmountMinorSchema,
+  amountMinor: SignedAmountMinorSchema,
   currency: PaymentCurrencySchema,
 });
 /** Money on the wire. */

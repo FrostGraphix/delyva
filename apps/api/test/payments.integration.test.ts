@@ -22,7 +22,7 @@ import { loadEnv } from '../src/shared/config/env.js';
 const ADMIN_URL =
   process.env.TEST_PG_ADMIN_URL ?? 'postgres://delyva:delyva_local_only@127.0.0.1:55432/delyva';
 const DB_URL = ADMIN_URL.replace(/\/[^/]+$/, '/delyva_payments_test');
-const REDIS_URL = process.env.TEST_REDIS_URL ?? 'redis://127.0.0.1:56379/14';
+const REDIS_URL = process.env.TEST_REDIS_URL ?? 'redis://127.0.0.1:56379/11';
 const SECRET = 'payments-integration-webhook-secret';
 const JOBS_TOKEN = 'integration-internal-jobs-token-0123456789';
 
