@@ -16,6 +16,8 @@ export const ERROR_CODES = [
   'idempotency_key_required',
   'idempotency_key_conflict',
   'internal_error',
+  'promo_ineligible',
+  'zone_not_serviceable',
 ] as const;
 
 /** Error code enum. */
