@@ -12,6 +12,10 @@ import { RedisIoAdapter } from './modules/realtime/infrastructure/socket-io.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { PricingModule } from './modules/pricing/pricing.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
+import {
+  OrderingModule,
+  orderRoomAuthorizerProvider,
+} from './modules/ordering/ordering.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';
@@ -47,9 +51,10 @@ export async function createApp(
 ): Promise<{ app: INestApplication; logger: Logger }> {
   const logger = createRootLogger(env.LOG_LEVEL);
 
+  // The ordering context supplies the order-room authorizer unless a test overrides it.
   const realtime = options.orderRoomAuthorizer
     ? RealtimeModule.withAuthorizer(options.orderRoomAuthorizer)
-    : RealtimeModule;
+    : { module: RealtimeModule, providers: [orderRoomAuthorizerProvider] };
 
   @Module({
     imports: [
@@ -61,6 +66,7 @@ export async function createApp(
       NotificationsModule,
       realtime,
       PaymentsModule,
+      OrderingModule.register(realtime),
     ],
   })
   class AppModule {}
