@@ -682,9 +682,7 @@ describe.skipIf(!available)('ordering (integration: Postgres + Redis)', () => {
     await locate({ lat: 6.4301, lng: 3.4101 });
 
     // Act: vendor accepts → event → dispatch schedules and offers.
-    await (
-      await vendorAct(vendorA, id, 'accept', { prepMinutes: 1 })
-    ).ok;
+    expect((await vendorAct(vendorA, id, 'accept', { prepMinutes: 1 })).status).toBe(200);
     expect(await app.get(OutboxDispatchConsumer).consumeBatch()).toBeGreaterThanOrEqual(1);
     await app.get(RunDispatchRound).execute(id);
     const offer = await pool.query<{ id: string; rider_id: string }>(
