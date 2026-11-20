@@ -40,7 +40,7 @@ const address = {
 function client(body: unknown, captured: Captured[], status = 200) {
   return new DelyvaClient({
     baseUrl: 'https://api.test',
-    getAccessToken: () => 'token-abc',
+    accessToken: () => 'token-abc',
     idempotencyKey: () => 'gen-key-1',
     fetch: (input, init) => {
       captured.push({ url: input as string, init });

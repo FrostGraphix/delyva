@@ -8,3 +8,4 @@ export * from './geo/geo.js';
 export * from './geo/routes.js';
 export * from './catalog/catalog.js';
 export * from './catalog/routes.js';
+export * from './pricing/index.js';

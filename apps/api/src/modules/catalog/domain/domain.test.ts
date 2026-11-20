@@ -55,42 +55,50 @@ describe('opening hours (Africa/Lagos)', () => {
     expect(toMinutes('24:00')).toBe(1440);
     expect(() => toMinutes('24:30')).toThrow(CatalogError);
     expect(() => toMinutes('7:00')).toThrow(CatalogError);
-    expect(() => { assertValidWeeklyHours([{ dayOfWeek: 7, opensAt: '08:00', closesAt: '09:00' }]); },
-    ).toThrow('dayOfWeek');
-    expect(() => { assertValidWeeklyHours([{ dayOfWeek: 1, opensAt: '08:00', closesAt: '08:00' }]); },
-    ).toThrow('non-empty');
-    expect(() => { assertValidWeeklyHours([
+    expect(() => {
+      assertValidWeeklyHours([{ dayOfWeek: 7, opensAt: '08:00', closesAt: '09:00' }]);
+    }).toThrow('dayOfWeek');
+    expect(() => {
+      assertValidWeeklyHours([{ dayOfWeek: 1, opensAt: '08:00', closesAt: '08:00' }]);
+    }).toThrow('non-empty');
+    expect(() => {
+      assertValidWeeklyHours([
         { dayOfWeek: 1, opensAt: '08:00', closesAt: '14:00' },
         { dayOfWeek: 1, opensAt: '13:00', closesAt: '18:00' },
-      ]); },
-    ).toThrow('overlap');
-    expect(() => { assertValidWeeklyHours([
+      ]);
+    }).toThrow('overlap');
+    expect(() => {
+      assertValidWeeklyHours([
         { dayOfWeek: 6, opensAt: '20:00', closesAt: '03:00' },
         { dayOfWeek: 0, opensAt: '02:00', closesAt: '10:00' },
-      ]); },
-    ).toThrow('overlap');
-    expect(() => { assertValidWeeklyHours([
+      ]);
+    }).toThrow('overlap');
+    expect(() => {
+      assertValidWeeklyHours([
         { dayOfWeek: 1, opensAt: '08:00', closesAt: '14:00' },
         { dayOfWeek: 1, opensAt: '14:00', closesAt: '02:00' },
-      ]); },
-    ).not.toThrow();
+      ]);
+    }).not.toThrow();
   });
 });
 
 describe('modifier groups', () => {
   it('validates group bounds', () => {
-    expect(() => { assertValidModifierGroup({ minSelect: 0, maxSelect: 2, optionCount: 3 }); },
-    ).not.toThrow();
-    expect(() => { assertValidModifierGroup({ minSelect: -1, maxSelect: 1, optionCount: 1 }); },
-    ).toThrow();
-    expect(() => { assertValidModifierGroup({ minSelect: 0.5, maxSelect: 1, optionCount: 1 }); },
-    ).toThrow();
-    expect(() => { assertValidModifierGroup({ minSelect: 2, maxSelect: 1, optionCount: 3 }); }).toThrow(
-      '<= maxSelect',
-    );
-    expect(() => { assertValidModifierGroup({ minSelect: 0, maxSelect: 4, optionCount: 3 }); }).toThrow(
-      'number of options',
-    );
+    expect(() => {
+      assertValidModifierGroup({ minSelect: 0, maxSelect: 2, optionCount: 3 });
+    }).not.toThrow();
+    expect(() => {
+      assertValidModifierGroup({ minSelect: -1, maxSelect: 1, optionCount: 1 });
+    }).toThrow();
+    expect(() => {
+      assertValidModifierGroup({ minSelect: 0.5, maxSelect: 1, optionCount: 1 });
+    }).toThrow();
+    expect(() => {
+      assertValidModifierGroup({ minSelect: 2, maxSelect: 1, optionCount: 3 });
+    }).toThrow('<= maxSelect');
+    expect(() => {
+      assertValidModifierGroup({ minSelect: 0, maxSelect: 4, optionCount: 3 });
+    }).toThrow('number of options');
   });
 
   const groups: ModifierGroupRule[] = [

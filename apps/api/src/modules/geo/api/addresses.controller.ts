@@ -18,8 +18,12 @@ import {
   type UpdateAddress as UpdateAddressBody,
   UpdateAddressSchema,
 } from '@delyva/contracts';
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
-import { AuthGuard, CurrentPrincipal, Roles } from '../../../shared/auth/auth.guard.js';
+import {
+  type AuthPrincipal,
+  AuthGuard,
+  Principal,
+  Roles,
+} from '../../../shared/auth/auth.guard.js';
 import { Idempotent } from '../../../shared/idempotency/idempotency.interceptor.js';
 import { ZodBodyPipe } from '../../../shared/validation/zod-body.pipe.js';
 import { CreateAddress } from '../application/create-address.use-case.js';
@@ -42,7 +46,7 @@ export class AddressesController {
 
   /** GET /v1/addresses */
   @Get()
-  async list(@CurrentPrincipal() p: Principal): Promise<AddressList> {
+  async list(@Principal() p: AuthPrincipal): Promise<AddressList> {
     return { items: await this.listAddresses.execute(p.userId) };
   }
 
@@ -51,7 +55,7 @@ export class AddressesController {
   @HttpCode(201)
   @Idempotent()
   create(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Body(new ZodBodyPipe(CreateAddressSchema)) body: CreateAddressBody,
   ): Promise<Address> {
     return this.createAddress.execute(p.userId, body);
@@ -61,7 +65,7 @@ export class AddressesController {
   @Patch(':addressId')
   @Idempotent()
   update(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('addressId', ParseUUIDPipe) addressId: string,
     @Body(new ZodBodyPipe(UpdateAddressSchema)) body: UpdateAddressBody,
   ): Promise<Address> {
@@ -73,7 +77,7 @@ export class AddressesController {
   @HttpCode(204)
   @Idempotent()
   async remove(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('addressId', ParseUUIDPipe) addressId: string,
   ): Promise<void> {
     await this.deleteAddress.execute(p.userId, addressId);

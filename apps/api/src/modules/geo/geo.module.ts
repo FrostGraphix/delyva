@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { Module } from '@nestjs/common';
+import { ACCESS_TOKEN_VERIFIER, AuthGuard } from '../../shared/auth/auth.guard.js';
+import { JoseAccessTokenVerifier } from '../../shared/auth/jose-access-token.verifier.js';
 import { ENV, type Env } from '../../shared/config/env.js';
 import { DB, type Db } from '../../shared/database/database.js';
 import { IdentityModule } from '../identity/identity.module.js';
+import { JoseAccessTokenSigner } from '../identity/infrastructure/jose-access-token.signer.js';
 import { AddressesController } from './api/addresses.controller.js';
 import { CreateAddress } from './application/create-address.use-case.js';
 import { DeleteAddress } from './application/delete-address.use-case.js';
@@ -36,6 +39,17 @@ function etaFor(env: Env): EtaProvider {
   imports: [IdentityModule],
   controllers: [AddressesController],
   providers: [
+    {
+      provide: ACCESS_TOKEN_VERIFIER,
+      inject: [JoseAccessTokenSigner, ENV],
+      useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
+        new JoseAccessTokenVerifier({
+          key: signer.verificationKey,
+          issuer: env.JWT_ISSUER,
+          audience: env.JWT_AUDIENCE,
+        }),
+    },
+    AuthGuard,
     { provide: ETA, inject: [ENV], useFactory: etaFor },
     {
       provide: DrizzleAddressRepository,

@@ -25,8 +25,12 @@ import {
   type UpdateMenuItem as UpdateMenuItemBody,
   UpdateMenuItemSchema,
 } from '@delyva/contracts';
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
-import { AuthGuard, CurrentPrincipal, Roles } from '../../../shared/auth/auth.guard.js';
+import {
+  type AuthPrincipal,
+  AuthGuard,
+  Principal,
+  Roles,
+} from '../../../shared/auth/auth.guard.js';
 import { OwnershipGuard, OwnsResource } from '../../../shared/auth/ownership.guard.js';
 import { Idempotent } from '../../../shared/idempotency/idempotency.interceptor.js';
 import { ZodBodyPipe } from '../../../shared/validation/zod-body.pipe.js';
@@ -63,7 +67,7 @@ export class VendorMenuController {
   @HttpCode(201)
   @Idempotent()
   create(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('vendorId', uuid) vendorId: string,
     @Body(new ZodBodyPipe(CreateMenuItemSchema)) body: CreateMenuItemBody,
   ): Promise<MenuItem> {
@@ -74,7 +78,7 @@ export class VendorMenuController {
   @Patch('items/:itemId')
   @Idempotent()
   update(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('vendorId', uuid) vendorId: string,
     @Param('itemId', uuid) itemId: string,
     @Body(new ZodBodyPipe(UpdateMenuItemSchema)) body: UpdateMenuItemBody,
@@ -86,7 +90,7 @@ export class VendorMenuController {
   @Put('items/:itemId/availability')
   @Idempotent()
   itemAvailability(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('vendorId', uuid) vendorId: string,
     @Param('itemId', uuid) itemId: string,
     @Body(new ZodBodyPipe(SetAvailabilitySchema)) body: SetAvailability,
@@ -98,7 +102,7 @@ export class VendorMenuController {
   @Put('modifier-options/:optionId/availability')
   @Idempotent()
   optionAvailability(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('vendorId', uuid) vendorId: string,
     @Param('optionId', uuid) optionId: string,
     @Body(new ZodBodyPipe(SetAvailabilitySchema)) body: SetAvailability,
@@ -111,7 +115,7 @@ export class VendorMenuController {
   @HttpCode(201)
   @Idempotent()
   group(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('vendorId', uuid) vendorId: string,
     @Param('itemId', uuid) itemId: string,
     @Body(new ZodBodyPipe(CreateModifierGroupSchema)) body: CreateModifierGroupBody,
@@ -123,7 +127,7 @@ export class VendorMenuController {
   @Put('branches/:branchId/opening-hours')
   @Idempotent()
   async hours(
-    @CurrentPrincipal() p: Principal,
+    @Principal() p: AuthPrincipal,
     @Param('vendorId', uuid) vendorId: string,
     @Param('branchId', uuid) branchId: string,
     @Body(new ZodBodyPipe(ReplaceOpeningHoursSchema)) body: ReplaceOpeningHoursBody,

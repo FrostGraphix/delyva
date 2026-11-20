@@ -1,4 +1,4 @@
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
+import type { AuthPrincipal } from '../../../shared/auth/auth.guard.js';
 import type { OwnershipChecker } from '../../../shared/auth/ownership.guard.js';
 import type { CatalogWriteRepository } from '../application/ports.js';
 
@@ -10,7 +10,7 @@ export class VendorOwnershipChecker implements OwnershipChecker {
   constructor(private readonly repo: Pick<CatalogWriteRepository, 'memberRole'>) {}
 
   /** @inheritdoc */
-  async canAccess(principal: Principal, vendorId: string): Promise<boolean> {
+  async canAccess(principal: AuthPrincipal, vendorId: string): Promise<boolean> {
     if (!UUID.test(vendorId)) return false;
     return (await this.repo.memberRole(vendorId, principal.userId)) !== null;
   }

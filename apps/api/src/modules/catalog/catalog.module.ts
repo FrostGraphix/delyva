@@ -1,10 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { Module } from '@nestjs/common';
+import { ACCESS_TOKEN_VERIFIER, AuthGuard } from '../../shared/auth/auth.guard.js';
+import { JoseAccessTokenVerifier } from '../../shared/auth/jose-access-token.verifier.js';
 import { OWNERSHIP_CHECKER } from '../../shared/auth/ownership.guard.js';
+import { ENV, type Env } from '../../shared/config/env.js';
 import { DB, type Db } from '../../shared/database/database.js';
 import { GeoService } from '../geo/application/geo.service.js';
 import { GeoModule } from '../geo/geo.module.js';
 import { IdentityModule } from '../identity/identity.module.js';
+import { JoseAccessTokenSigner } from '../identity/infrastructure/jose-access-token.signer.js';
 import { VendorApprovalsController } from './api/vendor-approvals.controller.js';
 import { VendorMenuController } from './api/vendor-menu.controller.js';
 import { VendorsController } from './api/vendors.controller.js';
@@ -31,6 +35,17 @@ type W = DrizzleCatalogWriteRepository;
   imports: [IdentityModule, GeoModule],
   controllers: [VendorsController, VendorMenuController, VendorApprovalsController],
   providers: [
+    {
+      provide: ACCESS_TOKEN_VERIFIER,
+      inject: [JoseAccessTokenSigner, ENV],
+      useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
+        new JoseAccessTokenVerifier({
+          key: signer.verificationKey,
+          issuer: env.JWT_ISSUER,
+          audience: env.JWT_AUDIENCE,
+        }),
+    },
+    AuthGuard,
     {
       provide: DrizzleCatalogReadRepository,
       inject: [DB],

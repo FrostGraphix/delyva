@@ -6,6 +6,7 @@ import type { Logger } from 'pino';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { GeoModule } from './modules/geo/geo.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
+import { PricingModule } from './modules/pricing/pricing.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';
@@ -34,7 +35,13 @@ export async function createApp(env: Env): Promise<{ app: INestApplication; logg
   const logger = createRootLogger(env.LOG_LEVEL);
 
   @Module({
-    imports: [SharedModule.forRoot(env, logger), IdentityModule, GeoModule, CatalogModule],
+    imports: [
+      SharedModule.forRoot(env, logger),
+      IdentityModule,
+      PricingModule,
+      GeoModule,
+      CatalogModule,
+    ],
   })
   class AppModule {}
 

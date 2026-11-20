@@ -11,6 +11,22 @@ import { CATALOG_ROUTES } from './catalog/routes.js';
 import { GEO_ROUTES } from './geo/routes.js';
 import { HealthSchema } from './health.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
+import {
+  CreateFeeRuleSchema,
+  CreatePromoSchema,
+  CreateSurgeRuleSchema,
+  FeeRuleListSchema,
+  FeeRuleSchema,
+  PromoListSchema,
+  PromoSchema,
+  QuoteRequestSchema,
+  QuoteResponseSchema,
+  SurgeRuleListSchema,
+  SurgeRuleSchema,
+  UpdateFeeRuleSchema,
+  UpdatePromoSchema,
+  UpdateSurgeRuleSchema,
+} from './pricing/index.js';
 
 /** One HTTP operation described from Zod schemas. Path params are taken from `{name}` segments. */
 export interface RouteSpec {
@@ -83,6 +99,106 @@ export const ROUTES = {
     success: { status: 204 },
     errors: [400],
   },
+  createQuote: {
+    method: 'post',
+    path: '/v1/quotes',
+    operationId: 'createQuote',
+    summary: 'Price a cart: itemised fees, surge, promo, VAT and total (server-computed)',
+    body: QuoteRequestSchema,
+    success: { status: 200, schema: QuoteResponseSchema },
+    errors: [400, 401, 422],
+    auth: true,
+  },
+  listFeeRules: {
+    method: 'get',
+    path: '/v1/admin/fee-rules',
+    operationId: 'listFeeRules',
+    summary: 'List delivery fee rules (ops, super_admin)',
+    success: { status: 200, schema: FeeRuleListSchema },
+    errors: [401, 403],
+    auth: true,
+  },
+  createFeeRule: {
+    method: 'post',
+    path: '/v1/admin/fee-rules',
+    operationId: 'createFeeRule',
+    summary: 'Create a zone fee rule (ops, super_admin)',
+    body: CreateFeeRuleSchema,
+    success: { status: 201, schema: FeeRuleSchema },
+    errors: [400, 401, 403, 409],
+    idempotent: true,
+    auth: true,
+  },
+  updateFeeRule: {
+    method: 'patch',
+    path: '/v1/admin/fee-rules/{id}',
+    operationId: 'updateFeeRule',
+    summary: 'Update a zone fee rule (ops, super_admin)',
+    body: UpdateFeeRuleSchema,
+    success: { status: 200, schema: FeeRuleSchema },
+    errors: [400, 401, 403, 404],
+    auth: true,
+  },
+  listSurgeRules: {
+    method: 'get',
+    path: '/v1/admin/surge-rules',
+    operationId: 'listSurgeRules',
+    summary: 'List surge rules (ops, super_admin)',
+    success: { status: 200, schema: SurgeRuleListSchema },
+    errors: [401, 403],
+    auth: true,
+  },
+  createSurgeRule: {
+    method: 'post',
+    path: '/v1/admin/surge-rules',
+    operationId: 'createSurgeRule',
+    summary: 'Create a surge rule (ops, super_admin)',
+    body: CreateSurgeRuleSchema,
+    success: { status: 201, schema: SurgeRuleSchema },
+    errors: [400, 401, 403],
+    idempotent: true,
+    auth: true,
+  },
+  updateSurgeRule: {
+    method: 'patch',
+    path: '/v1/admin/surge-rules/{id}',
+    operationId: 'updateSurgeRule',
+    summary: 'Update a surge rule (ops, super_admin)',
+    body: UpdateSurgeRuleSchema,
+    success: { status: 200, schema: SurgeRuleSchema },
+    errors: [400, 401, 403, 404],
+    auth: true,
+  },
+  listPromos: {
+    method: 'get',
+    path: '/v1/admin/promos',
+    operationId: 'listPromos',
+    summary: 'List promos with usage counters (ops, super_admin)',
+    success: { status: 200, schema: PromoListSchema },
+    errors: [401, 403],
+    auth: true,
+  },
+  createPromo: {
+    method: 'post',
+    path: '/v1/admin/promos',
+    operationId: 'createPromo',
+    summary: 'Create a promo code (ops, super_admin)',
+    body: CreatePromoSchema,
+    success: { status: 201, schema: PromoSchema },
+    errors: [400, 401, 403, 409],
+    idempotent: true,
+    auth: true,
+  },
+  updatePromo: {
+    method: 'patch',
+    path: '/v1/admin/promos/{id}',
+    operationId: 'updatePromo',
+    summary: 'Update a promo code (ops, super_admin)',
+    body: UpdatePromoSchema,
+    success: { status: 200, schema: PromoSchema },
+    errors: [400, 401, 403, 404],
+    auth: true,
+  },
   ...GEO_ROUTES,
   ...CATALOG_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
@@ -98,9 +214,10 @@ function problemResponses(statuses: readonly number[]): Record<string, object> {
   );
 }
 
+/** Declares `{name}` path segments as required UUID path parameters. */
 function pathParameters(path: string): object[] {
-  return [...path.matchAll(/\{(\w+)\}/g)].map((m) => ({
-    name: m[1],
+  return [...path.matchAll(/\{(\w+)\}/g)].map(([, name]) => ({
+    name,
     in: 'path',
     required: true,
     schema: { type: 'string', format: 'uuid' },

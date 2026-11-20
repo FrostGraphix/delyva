@@ -7,15 +7,17 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AppError } from '../errors/app-error.js';
-import type { Principal } from './access-token.verifier.js';
-import type { AuthenticatedRequest } from './auth.guard.js';
+import type { AuthPrincipal } from './auth.guard.js';
+import type { Request } from 'express';
+
+type AuthenticatedRequest = Request & { principal?: AuthPrincipal };
 
 const OWNED_PARAM = 'delyva:owned-param';
 
 /** Answers "may this principal act on resource `id`?" for one resource type. */
 export interface OwnershipChecker {
   /** True when the principal owns (or is a member of) the resource. */
-  canAccess(principal: Principal, resourceId: string): Promise<boolean>;
+  canAccess(principal: AuthPrincipal, resourceId: string): Promise<boolean>;
 }
 
 /** DI token for the module-local {@link OwnershipChecker}. Each module provides its own. */
