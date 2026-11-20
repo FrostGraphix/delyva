@@ -18,6 +18,10 @@ export const ERROR_CODES = [
   'internal_error',
   'promo_ineligible',
   'zone_not_serviceable',
+  'rider_too_far',
+  'offer_unavailable',
+  'order_already_assigned',
+  'rider_unavailable',
 ] as const;
 
 /** Error code enum. */

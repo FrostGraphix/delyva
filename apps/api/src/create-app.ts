@@ -4,6 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from 'pino';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import type { OrderFulfilmentPort } from '@delyva/contracts';
+import { DispatchModule } from './modules/dispatch/dispatch.module.js';
 import { GeoModule } from './modules/geo/geo.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
@@ -39,6 +41,8 @@ function requestContext(logger: Logger) {
 /** Optional overrides (integration tests; the ordering module will supply its authorizer). */
 export interface CreateAppOptions {
   readonly orderRoomAuthorizer?: OrderRoomAuthorizer;
+  /** Test double for ordering's fulfilment port (dispatch tests); real ordering otherwise. */
+  readonly orderFulfilment?: OrderFulfilmentPort;
 }
 
 /** Builds the Nest application (used by main and integration tests). */
@@ -52,6 +56,8 @@ export async function createApp(
   const realtime = options.orderRoomAuthorizer
     ? RealtimeModule.withAuthorizer(options.orderRoomAuthorizer)
     : { module: RealtimeModule, providers: [orderRoomAuthorizerProvider] };
+  // One instance shared by the app and dispatch (which consumes ORDER_FULFILMENT_PORT from it).
+  const ordering = OrderingModule.register(realtime);
 
   @Module({
     imports: [
@@ -63,7 +69,12 @@ export async function createApp(
       NotificationsModule,
       realtime,
       PaymentsModule,
-      OrderingModule.register(realtime),
+      ordering,
+      DispatchModule.forRoot({
+        realtime,
+        ordering,
+        ...(options.orderFulfilment ? { orderFulfilment: options.orderFulfilment } : {}),
+      }),
     ],
   })
   class AppModule {}

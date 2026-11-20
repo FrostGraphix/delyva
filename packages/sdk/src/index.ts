@@ -6,3 +6,4 @@ export * from './notification-hooks.js';
 export * from './realtime.js';
 export * from './payments.js';
 export * from './ordering.js';
+export * from './dispatch-hooks.js';
