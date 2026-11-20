@@ -43,6 +43,13 @@
       "when": 1795153164140,
       "tag": "0300_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795155093392,
+      "tag": "0600_dispatch",
+      "breakpoints": true
     }
   ]
 }

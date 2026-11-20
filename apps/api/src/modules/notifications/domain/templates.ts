@@ -44,6 +44,14 @@ export const TEMPLATES: Readonly<Record<NotificationTemplateId, TemplateDefiniti
   'order.picked_up': order('order.picked_up'),
   'order.delivered': order('order.delivered'),
   'order.cancelled': order('order.cancelled', ['push', 'in_app', 'sms']),
+  // Dispatch job offer to a rider: push only (the offer itself arrives over the rider socket).
+  'rider.dispatch_offer': {
+    id: 'rider.dispatch_offer',
+    category: 'order_updates',
+    channels: ['push'],
+    mandatory: false,
+    params: ['seconds'],
+  },
 };
 
 /** Rendered copy for one locale. */

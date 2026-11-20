@@ -24,6 +24,7 @@ export const NotificationTemplateIdSchema = z.enum([
   'order.picked_up',
   'order.delivered',
   'order.cancelled',
+  'rider.dispatch_offer',
 ]);
 /** Template identifier. */
 export type NotificationTemplateId = z.infer<typeof NotificationTemplateIdSchema>;

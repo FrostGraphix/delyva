@@ -43,6 +43,27 @@ export const EnvSchema = z
     PAYMENTS_CUSTOMER_EMAIL_DOMAIN: z.string().min(3).default('customers.delyva.invalid'),
     PAYOUT_MIN_MINOR: z.coerce.number().int().min(1).default(100_000),
     INTERNAL_JOBS_TOKEN: z.string().optional().default(''),
+    // dispatch (ADR 0600)
+    DISPATCH_OFFER_TIMEOUT_MS: z.coerce.number().int().min(100).default(20_000),
+    DISPATCH_RADII_M: z
+      .string()
+      .default('3000,5000,8000')
+      .transform((s) => s.split(',').map((x) => Number(x.trim())))
+      .pipe(z.array(z.number().int().positive()).min(1)),
+    DISPATCH_DECLINES_BEFORE_WIDEN: z.coerce.number().int().min(1).default(3),
+    DISPATCH_MAX_OFFERS: z.coerce.number().int().min(1).default(12),
+    DISPATCH_GPS_MAX_DISTANCE_M: z.coerce.number().int().min(10).default(300),
+    DISPATCH_RIDER_SPEED_MPS: z.coerce.number().positive().default(6),
+    DISPATCH_DEFAULT_TRAVEL_SECONDS: z.coerce.number().int().min(0).default(600),
+    DISPATCH_MIN_BATTERY_PCT: z.coerce.number().int().min(0).max(100).default(15),
+    DISPATCH_CONSUMER_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
+    DISPATCH_WORKER_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
   })
   .superRefine((env, ctx) => {
     if (env.ETA_PROVIDER === 'google' && env.GOOGLE_MAPS_API_KEY === '') {

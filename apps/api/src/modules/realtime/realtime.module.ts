@@ -57,7 +57,7 @@ import { SocketRoomBroadcaster } from './infrastructure/socket-io.js';
         new DefaultLiveTrackingService(store, rooms),
     },
   ],
-  exports: [LIVE_TRACKING, ORDER_ROOM_AUTHORIZER],
+  exports: [LIVE_TRACKING, ORDER_ROOM_AUTHORIZER, SocketRoomBroadcaster],
 })
 export class RealtimeModule {
   /** Replaces the deny-by-default authorizer (ordering module implementation, or a test double). */
