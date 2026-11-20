@@ -3,6 +3,8 @@ import { type INestApplication, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from 'pino';
+import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { GeoModule } from './modules/geo/geo.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import type { OrderRoomAuthorizer } from './modules/realtime/application/ports.js';
@@ -54,6 +56,8 @@ export async function createApp(
       SharedModule.forRoot(env, logger),
       IdentityModule,
       PricingModule,
+      GeoModule,
+      CatalogModule,
       NotificationsModule,
       realtime,
       PaymentsModule,

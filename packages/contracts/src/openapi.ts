@@ -7,6 +7,8 @@ import {
   RefreshRequestSchema,
   TokenPairSchema,
 } from './auth.js';
+import { CATALOG_ROUTES } from './catalog/routes.js';
+import { GEO_ROUTES } from './geo/routes.js';
 import { HealthSchema } from './health.js';
 import {
   DeviceRegistrationSchema,
@@ -35,20 +37,20 @@ import {
   UpdateSurgeRuleSchema,
 } from './pricing/index.js';
 
-/** One HTTP operation described from Zod schemas. */
+/** One HTTP operation described from Zod schemas. Path params are taken from `{name}` segments. */
 export interface RouteSpec {
-  readonly method: 'get' | 'post' | 'put' | 'patch';
+  readonly method: 'get' | 'post' | 'put' | 'patch' | 'delete';
   readonly path: string;
   readonly operationId: string;
   readonly summary: string;
   readonly body?: z.ZodType;
+  /** Query-string schema (object). */
+  readonly query?: z.ZodObject;
+  /** Requires a Bearer access token. */
+  readonly auth?: boolean;
   readonly success: { readonly status: number; readonly schema?: z.ZodType };
   readonly errors: readonly number[];
   readonly idempotent?: boolean;
-  /** Requires `Authorization: Bearer <access JWT>`. */
-  readonly auth?: boolean;
-  /** Query-string schema (object of scalars). */
-  readonly query?: z.ZodObject;
 }
 
 /** Registry of public routes; the API and SDK are both typed against these schemas. */
@@ -206,6 +208,8 @@ export const ROUTES = {
     errors: [400, 401, 403, 404],
     auth: true,
   },
+  ...GEO_ROUTES,
+  ...CATALOG_ROUTES,
   listNotifications: {
     method: 'get',
     path: '/v1/notifications',
@@ -295,7 +299,11 @@ function queryParameters(query: z.ZodObject | undefined): object[] {
     name,
     in: 'query',
     required: !schema.safeParse(undefined).success,
-    schema: z.toJSONSchema(schema, { target: 'draft-2020-12', io: 'input' }),
+    schema: z.toJSONSchema(schema, {
+      target: 'draft-2020-12',
+      io: 'input',
+      unrepresentable: 'any',
+    }),
   }));
 }
 

@@ -26,15 +26,22 @@
     {
       "idx": 3,
       "version": "7",
-      "when": 1795152274014,
-      "tag": "0300_payments",
+      "when": 1795150145160,
+      "tag": "0400_notifications",
       "breakpoints": true
     },
     {
       "idx": 4,
       "version": "7",
-      "when": 1795150145160,
-      "tag": "0400_notifications",
+      "when": 1795152284858,
+      "tag": "0100_catalog_geo",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795153164140,
+      "tag": "0300_payments",
       "breakpoints": true
     }
   ]
