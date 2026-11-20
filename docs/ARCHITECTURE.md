@@ -554,3 +554,24 @@ See ADR 0300. Module `apps/api/src/modules/payments` (api / application / domain
 - DEBT(payments): webhook IP check uses `req.ip`; needs `trust proxy` behind the LB.
 - DEBT(payments): reconciliation compares charges only (not refunds, transfers or settlement reports); alerting is log + outbox, no pager.
 - DEBT(payments): no admin refund endpoint with reason, audit log and second approver yet (service method only).
+
+## Dispatch (Phase 1, 2026-11-20)
+
+See ADR 0600. Module `apps/api/src/modules/dispatch` (api / application / domain / infrastructure), migration `0600_dispatch.sql`, contracts `packages/contracts/src/dispatch/`, SDK methods on `DelyvaClient` + hooks in `packages/sdk/src/dispatch-hooks.ts`.
+
+- **Flow:** `ordering.order.vendor_accepted` (outbox consumer) → BullMQ delayed `start` at `readyAt − travel` → round: `LIVE_TRACKING.ridersNear` → online, not already offered, no pending offer, in a zone serving the pickup → `DispatchStrategy` (default `EtaFirstStrategy`: ETA bucket, acceptance rate, rating, fairness) → one pending offer (socket `dispatch:offer` to `rider:<id>` + push `rider.dispatch_offer`) → timeout/decline → next candidate; radius widens every N declines; exhausted → `dispatch.order.unassigned`.
+- **Locking:** per-order Redis lock `dispatch:lock:<orderId>` around every assignment/offer/trip mutation; partial unique indexes (one pending offer per order and per rider, one active trip per order and per rider).
+- **Endpoints:** rider — `GET /v1/riders/me`, `POST /v1/riders/me/online|offline {batteryPct}`, `GET /v1/riders/me/trips/current`, `GET /v1/riders/me/earnings` (placeholder), `POST /v1/dispatch-offers/{id}/accept|decline`, `POST /v1/trips/{id}/arrived-at-vendor {pickupCode} | picked-up | arrived-at-customer | delivered {deliveryOtp} | undeliverable {reason}` (optional device `location` for offline replays); ops — `GET /v1/admin/dispatch/riders`, `POST /v1/admin/dispatch/orders/{orderId}/assign {riderId, reason}`. All writes need `Idempotency-Key`; other riders' offers/trips are 404.
+- **Ordering port:** `ORDER_FULFILMENT_PORT` (`markRiderAssigned`, `markRiderAtVendor`, `markPickedUp`, `markRiderAtCustomer`, `markDelivered`, `markUndeliverable`). TEMP local contract in `application/ordering-contract.temp.ts`, in-memory double in `infrastructure/in-memory-order-fulfilment.temp.ts` until ordering merges.
+- **Events:** `dispatch.offer.sent`, `dispatch.offer.accepted`, `dispatch.offer.declined` (`reason: declined|expired`), `dispatch.order.unassigned`, `dispatch.order.manually_assigned`.
+- **Problem codes:** `rider_too_far` 422; `offer_unavailable`, `order_already_assigned`, `rider_unavailable` 409.
+- **Env:** `DISPATCH_OFFER_TIMEOUT_MS` (20000), `DISPATCH_RADII_M` (3000,5000,8000), `DISPATCH_DECLINES_BEFORE_WIDEN` (3), `DISPATCH_MAX_OFFERS` (12), `DISPATCH_GPS_MAX_DISTANCE_M` (300), `DISPATCH_RIDER_SPEED_MPS` (6), `DISPATCH_DEFAULT_TRAVEL_SECONDS` (600), `DISPATCH_MIN_BATTERY_PCT` (15), `DISPATCH_CONSUMER_ENABLED`, `DISPATCH_WORKER_ENABLED`.
+
+### Known technical debt (dispatch)
+
+- DEBT(dispatch): earnings `balanceMinor` is null; PaymentsService has no rider_payable read.
+- DEBT(dispatch): ordering port is called inside the dispatch DB transaction; a commit failure after it succeeded needs an idempotent `markRiderAssigned` + a reconciliation sweep.
+- DEBT(dispatch): BullMQ worker runs in the API process; move to `apps/workers` on extraction.
+- DEBT(dispatch): single-instance Redis lock (not Redlock); unique indexes are the fence.
+- DEBT(dispatch): device location trusted for offline replays (mock-location detection pending); straight-line ETA; no writer yet for plate/hub/rating (onboarding, ratings); no batching.
+- DEBT(dispatch): outbox consumer polls the shared table (as notifications); manual override has no admin audit-log entry (reason on trip row + event only).
