@@ -10,6 +10,14 @@ import {
 import { CATALOG_ROUTES } from './catalog/routes.js';
 import { GEO_ROUTES } from './geo/routes.js';
 import { HealthSchema } from './health.js';
+import {
+  DeviceRegistrationSchema,
+  ListNotificationsQuerySchema,
+  NotificationPageSchema,
+  NotificationPreferencesSchema,
+  RegisterDeviceSchema,
+} from './notifications/index.js';
+import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 import {
   CreateFeeRuleSchema,
@@ -201,6 +209,64 @@ export const ROUTES = {
   },
   ...GEO_ROUTES,
   ...CATALOG_ROUTES,
+  listNotifications: {
+    method: 'get',
+    path: '/v1/notifications',
+    operationId: 'listNotifications',
+    summary: 'List the in-app notification inbox (newest first, cursor paginated)',
+    query: ListNotificationsQuerySchema,
+    success: { status: 200, schema: NotificationPageSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  markNotificationRead: {
+    method: 'post',
+    path: '/v1/notifications/{id}/read',
+    operationId: 'markNotificationRead',
+    summary: 'Mark one inbox notification as read (naturally idempotent)',
+    success: { status: 204 },
+    errors: [400, 401, 404],
+    auth: true,
+  },
+  getNotificationPreferences: {
+    method: 'get',
+    path: '/v1/notifications/preferences',
+    operationId: 'getNotificationPreferences',
+    summary: 'Effective notification preferences per category and channel',
+    success: { status: 200, schema: NotificationPreferencesSchema },
+    errors: [401],
+    auth: true,
+  },
+  updateNotificationPreferences: {
+    method: 'put',
+    path: '/v1/notifications/preferences',
+    operationId: 'updateNotificationPreferences',
+    summary: 'Upsert notification preferences (full or partial list; naturally idempotent)',
+    body: NotificationPreferencesSchema,
+    success: { status: 200, schema: NotificationPreferencesSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  registerDevice: {
+    method: 'post',
+    path: '/v1/devices',
+    operationId: 'registerDevice',
+    summary: 'Register the Expo push token of the device bound to the access token (upsert)',
+    body: RegisterDeviceSchema,
+    success: { status: 200, schema: DeviceRegistrationSchema },
+    errors: [400, 401],
+    auth: true,
+  },
+  postRiderLocations: {
+    method: 'post',
+    path: '/v1/riders/me/locations',
+    operationId: 'postRiderLocations',
+    summary: 'HTTP fallback for rider location updates (batched points)',
+    body: RiderLocationBatchSchema,
+    success: { status: 202, schema: LocationBatchResultSchema },
+    errors: [400, 401, 403, 429],
+    auth: true,
+  },
 } as const satisfies Record<string, RouteSpec>;
 
 const json = (schema: z.ZodType): object => z.toJSONSchema(schema, { target: 'draft-2020-12' });
@@ -256,7 +322,7 @@ function operation(route: RouteSpec): object {
         },
       ]
     : [];
-  const parameters = [...pathParameters(route.path), ...queryParameters(route.query), ...headers];
+  const parameters = [...pathParameters(route.path), ...headers, ...queryParameters(route.query)];
   return {
     operationId: route.operationId,
     summary: route.summary,

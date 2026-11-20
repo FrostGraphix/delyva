@@ -21,6 +21,11 @@ export const EnvSchema = z
     TERMII_BASE_URL: z.url().default('https://api.ng.termii.com'),
     ETA_PROVIDER: z.enum(['haversine', 'google']).default('haversine'),
     GOOGLE_MAPS_API_KEY: z.string().optional().default(''),
+    BULLMQ_PREFIX: z.string().min(1).default('bull'),
+    NOTIFICATIONS_CONSUMER_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
   })
   .superRefine((env, ctx) => {
     if (env.ETA_PROVIDER === 'google' && env.GOOGLE_MAPS_API_KEY === '') {

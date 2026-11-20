@@ -15,6 +15,8 @@ import { AppError } from '../errors/app-error.js';
 export interface AuthPrincipal {
   readonly userId: string;
   readonly roles: readonly string[];
+  /** Device the token is bound to (`did` claim), when present. */
+  readonly deviceId?: string;
 }
 
 /** Verifies a raw access token; rejects (throws) when invalid or expired. */

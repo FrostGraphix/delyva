@@ -25,6 +25,10 @@ export class JoseAccessTokenVerifier implements AccessTokenVerifier {
     if (!payload.sub || !Array.isArray(roles) || !roles.every((r) => typeof r === 'string')) {
       throw new Error('access token is missing sub or roles');
     }
-    return { userId: payload.sub, roles };
+    return {
+      userId: payload.sub,
+      roles,
+      ...(typeof payload.did === 'string' ? { deviceId: payload.did } : {}),
+    };
   }
 }

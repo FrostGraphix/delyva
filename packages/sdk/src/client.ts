@@ -50,6 +50,17 @@ import {
   QuoteResponseSchema,
   type UpdateFeeRule,
   type UpdatePromo,
+  type DeviceRegistration,
+  DeviceRegistrationSchema,
+  type ListNotificationsQuery,
+  type LocationBatchResult,
+  LocationBatchResultSchema,
+  type NotificationPage,
+  NotificationPageSchema,
+  type NotificationPreferences,
+  NotificationPreferencesSchema,
+  type RegisterDevice,
+  type RiderLocationBatch,
 } from '@delyva/contracts';
 import type { z } from 'zod';
 
@@ -150,6 +161,44 @@ export class DelyvaClient {
   /** PATCH /v1/admin/promos/{id} */
   updatePromo(id: string, body: UpdatePromo): Promise<Promo> {
     return this.send('PATCH', withId(ROUTES.updatePromo.path, id), body, PromoSchema);
+  }
+
+  /** GET /v1/notifications — the caller's inbox. */
+  listNotifications(query: ListNotificationsQuery = {}): Promise<NotificationPage> {
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(query)) {
+      if (typeof v === 'string' || typeof v === 'number') params.set(k, String(v));
+    }
+    const qs = params.size > 0 ? `?${params.toString()}` : '';
+    const path = `${ROUTES.listNotifications.path}${qs}`;
+    return this.send('GET', path, undefined, NotificationPageSchema);
+  }
+
+  /** POST /v1/notifications/{id}/read */
+  async markNotificationRead(id: string): Promise<void> {
+    await this.send('POST', withId(ROUTES.markNotificationRead.path, id), undefined, null);
+  }
+
+  /** GET /v1/notifications/preferences */
+  getNotificationPreferences(): Promise<NotificationPreferences> {
+    const path = ROUTES.getNotificationPreferences.path;
+    return this.send('GET', path, undefined, NotificationPreferencesSchema);
+  }
+
+  /** PUT /v1/notifications/preferences */
+  updateNotificationPreferences(body: NotificationPreferences): Promise<NotificationPreferences> {
+    const path = ROUTES.updateNotificationPreferences.path;
+    return this.send('PUT', path, body, NotificationPreferencesSchema);
+  }
+
+  /** POST /v1/devices — binds the Expo push token to the token's device. */
+  registerDevice(body: RegisterDevice): Promise<DeviceRegistration> {
+    return this.send('POST', ROUTES.registerDevice.path, body, DeviceRegistrationSchema);
+  }
+
+  /** POST /v1/riders/me/locations — HTTP fallback when the socket is down. */
+  postRiderLocations(body: RiderLocationBatch): Promise<LocationBatchResult> {
+    return this.send('POST', ROUTES.postRiderLocations.path, body, LocationBatchResultSchema);
   }
 
   private idem(key?: string): Record<string, string> {
@@ -312,7 +361,8 @@ export function pathOf(template: string, params: Record<string, string>): string
   });
 }
 
-async function parseProblem(response: Response): Promise<Problem> {
+/** Parses an RFC 9457 problem body, falling back to a generic problem. */
+export async function parseProblem(response: Response): Promise<Problem> {
   try {
     const parsed = ProblemSchema.safeParse(await response.json());
     return parsed.success ? parsed.data : fallbackProblem(response.status);
