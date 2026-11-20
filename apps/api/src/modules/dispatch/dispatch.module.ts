@@ -34,10 +34,7 @@ import { RidersController } from './api/riders.controller.js';
 import { TripsController } from './api/trips.controller.js';
 import { HandleOrderingEvent } from './application/handle-ordering-event.use-case.js';
 import { OpsDispatch } from './application/ops-dispatch.use-cases.js';
-import {
-  ORDER_FULFILMENT_PORT,
-  type OrderFulfilmentPort,
-} from './application/ordering-contract.temp.js';
+import { ORDER_FULFILMENT_PORT, type OrderFulfilmentPort } from '@delyva/contracts';
 import {
   type Clock,
   DISPATCH_CLOCK,
@@ -64,7 +61,6 @@ import { type DispatchStrategy, EtaFirstStrategy } from './domain/dispatch-strat
 import { GeoZoneLookup, SocketAndPushOfferNotifier } from './infrastructure/adapters.js';
 import { BullMqDispatchScheduler, DispatchWorker } from './infrastructure/bullmq-dispatch.queue.js';
 import { DrizzleDispatchStore } from './infrastructure/drizzle-dispatch.store.js';
-import { InMemoryOrderFulfilment } from './infrastructure/in-memory-order-fulfilment.temp.js';
 import { OutboxDispatchConsumer } from './infrastructure/outbox-dispatch.consumer.js';
 import { RedisOrderLock } from './infrastructure/redis-order.lock.js';
 
@@ -90,7 +86,9 @@ export function dispatchConfigFromEnv(env: Env): DispatchConfig {
 export interface DispatchModuleOptions {
   /** The same RealtimeModule reference the app imports (static or `withAuthorizer`). */
   readonly realtime: Type | DynamicModule;
-  /** Ordering's fulfilment port; defaults to the TEMP in-memory double until ordering merges. */
+  /** The ordering module (exports the real ORDER_FULFILMENT_PORT); same instance the app imports. */
+  readonly ordering?: Type | DynamicModule;
+  /** Test double for the fulfilment port (e.g. InMemoryOrderFulfilment); overrides `ordering`. */
   readonly orderFulfilment?: OrderFulfilmentPort;
 }
 
@@ -281,19 +279,24 @@ export class DispatchModule implements OnApplicationBootstrap, OnApplicationShut
 
   /** Builds the module bound to the app's realtime module instance. */
   static forRoot(options: DispatchModuleOptions): DynamicModule {
-    const port = options.orderFulfilment ?? new InMemoryOrderFulfilment();
+    const port: Provider[] = options.orderFulfilment
+      ? [{ provide: ORDER_FULFILMENT_PORT, useValue: options.orderFulfilment }]
+      : [];
+    if (!options.orderFulfilment && !options.ordering) {
+      throw new Error('DispatchModule needs the ordering module or an orderFulfilment double.');
+    }
+    const ordering = options.orderFulfilment || !options.ordering ? [] : [options.ordering];
     return {
       module: DispatchModule,
-      imports: [IdentityModule, GeoModule, NotificationsModule, options.realtime],
+      imports: [IdentityModule, GeoModule, NotificationsModule, options.realtime, ...ordering],
       controllers: [
         RidersController,
         DispatchOffersController,
         TripsController,
         DispatchAdminController,
       ],
-      providers: [...factories, { provide: ORDER_FULFILMENT_PORT, useValue: port }],
+      providers: [...factories, ...port],
       exports: [
-        ORDER_FULFILMENT_PORT,
         RunDispatchRound,
         RespondToOffer,
         OutboxDispatchConsumer,

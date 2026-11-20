@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from 'pino';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
-import type { OrderFulfilmentPort } from './modules/dispatch/application/ordering-contract.temp.js';
+import type { OrderFulfilmentPort } from '@delyva/contracts';
 import { DispatchModule } from './modules/dispatch/dispatch.module.js';
 import { GeoModule } from './modules/geo/geo.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
@@ -14,6 +14,7 @@ import { RedisIoAdapter } from './modules/realtime/infrastructure/socket-io.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { PricingModule } from './modules/pricing/pricing.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
+import { OrderingModule, orderRoomAuthorizerProvider } from './modules/ordering/ordering.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
 import { OnboardingModule } from './modules/onboarding/onboarding.module.js';
 import type { Env } from './shared/config/env.js';
@@ -42,7 +43,7 @@ function requestContext(logger: Logger) {
 /** Optional overrides (integration tests; the ordering module will supply its authorizer). */
 export interface CreateAppOptions {
   readonly orderRoomAuthorizer?: OrderRoomAuthorizer;
-  /** TEMP(ordering-contract): ordering's fulfilment port (tests inject a double). */
+  /** Test double for ordering's fulfilment port (dispatch tests); real ordering otherwise. */
   readonly orderFulfilment?: OrderFulfilmentPort;
 }
 
@@ -53,9 +54,12 @@ export async function createApp(
 ): Promise<{ app: INestApplication; logger: Logger }> {
   const logger = createRootLogger(env.LOG_LEVEL);
 
+  // The ordering context supplies the order-room authorizer unless a test overrides it.
   const realtime = options.orderRoomAuthorizer
     ? RealtimeModule.withAuthorizer(options.orderRoomAuthorizer)
-    : RealtimeModule;
+    : { module: RealtimeModule, providers: [orderRoomAuthorizerProvider] };
+  // One instance shared by the app and dispatch (which consumes ORDER_FULFILMENT_PORT from it).
+  const ordering = OrderingModule.register(realtime);
 
   @Module({
     imports: [
@@ -67,10 +71,12 @@ export async function createApp(
       NotificationsModule,
       realtime,
       PaymentsModule,
+      ordering,
       AdminModule,
       OnboardingModule,
       DispatchModule.forRoot({
         realtime,
+        ordering,
         ...(options.orderFulfilment ? { orderFulfilment: options.orderFulfilment } : {}),
       }),
     ],

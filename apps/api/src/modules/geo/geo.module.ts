@@ -58,9 +58,14 @@ function etaFor(env: Env): EtaProvider {
     },
     {
       provide: GeoService,
-      inject: [DB, ETA],
-      useFactory: (db: Db, eta: EtaProvider) =>
-        new GeoService({ zones: new PostgisZoneRepository(db), eta, policy: LAGOS_ETA_POLICY }),
+      inject: [DB, ETA, DrizzleAddressRepository],
+      useFactory: (db: Db, eta: EtaProvider, addresses: DrizzleAddressRepository) =>
+        new GeoService({
+          zones: new PostgisZoneRepository(db),
+          addresses,
+          eta,
+          policy: LAGOS_ETA_POLICY,
+        }),
     },
     {
       provide: ListAddresses,

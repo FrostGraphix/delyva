@@ -1,5 +1,5 @@
 import { DispatchError } from '../domain/dispatch-errors.js';
-import type { OrderFulfilmentPort } from './ordering-contract.temp.js';
+import type { OrderFulfilmentPort } from '@delyva/contracts';
 import type {
   Clock,
   DispatchEvent,

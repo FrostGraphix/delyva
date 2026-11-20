@@ -11,7 +11,7 @@ import type { DispatchOffer } from '@delyva/contracts';
 import pg from 'pg';
 import { io } from 'socket.io-client';
 import { createApp } from '../src/create-app.js';
-import { InMemoryOrderFulfilment } from '../src/modules/dispatch/infrastructure/in-memory-order-fulfilment.temp.js';
+import { InMemoryOrderFulfilment } from '../src/modules/dispatch/infrastructure/in-memory-order-fulfilment.js';
 import { JoseAccessTokenSigner } from '../src/modules/identity/infrastructure/jose-access-token.signer.js';
 import { loadEnv } from '../src/shared/config/env.js';
 

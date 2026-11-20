@@ -30,12 +30,23 @@ export interface AddressRepository {
   update(userId: string, id: string, changes: AddressChanges): Promise<AddressRecord | null>;
   /** Deletes the user's address; false when it does not exist for that user. */
   delete(userId: string, id: string): Promise<boolean>;
+  /** The user's address; null when it does not exist for that user. */
+  findForUser(userId: string, id: string): Promise<AddressRecord | null>;
+}
+
+/** A delivery zone reference with its city (used to map to a pricing zone code). */
+export interface ZoneRef {
+  readonly id: string;
+  readonly city: string;
+  readonly name: string;
 }
 
 /** Delivery-zone lookups (PostGIS). */
 export interface ZoneRepository {
   /** Ids of active zones whose polygon covers the point. */
   zoneIdsContaining(point: LatLng): Promise<string[]>;
+  /** Active zones (with city) whose polygon covers the point. */
+  zonesContaining(point: LatLng): Promise<ZoneRef[]>;
 }
 
 /** Distance/ETA provider (haversine heuristic now; Google Distance Matrix later). */

@@ -20,6 +20,9 @@ export function createPool(connectionString: string): pg.Pool {
   });
 }
 
+/** A Drizzle transaction handle (a nested `transaction` call opens a SAVEPOINT). */
+export type DbTx = Parameters<Parameters<Db['transaction']>[0]>[0];
+
 /** Wraps a pool in Drizzle. */
 export function createDb(pool: pg.Pool): Db {
   return drizzle(pool);

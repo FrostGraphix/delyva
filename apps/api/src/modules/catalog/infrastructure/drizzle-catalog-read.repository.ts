@@ -9,7 +9,9 @@ import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import type { Db } from '../../../shared/database/database.js';
 import type {
   BranchCandidate,
+  BranchSummary,
   CatalogReadRepository,
+  OrderingCatalogReads,
   VendorAggregate,
 } from '../application/ports.js';
 import type { WeeklyInterval } from '../domain/opening-hours.js';
@@ -27,7 +29,7 @@ import {
 const ngn = (amountMinor: number) => ({ amountMinor, currency: 'NGN' as const });
 
 /** Drizzle/PostGIS read model for discovery and vendor menus. */
-export class DrizzleCatalogReadRepository implements CatalogReadRepository {
+export class DrizzleCatalogReadRepository implements CatalogReadRepository, OrderingCatalogReads {
   /** @param db drizzle db */
   constructor(private readonly db: Db) {}
 
@@ -103,6 +105,45 @@ export class DrizzleCatalogReadRepository implements CatalogReadRepository {
       })),
       menu: { categories: await this.menuOf(vendorId) },
     };
+  }
+
+  /** @inheritdoc */
+  async branchSummary(branchId: string): Promise<BranchSummary | null> {
+    const [r] = await this.db
+      .select({
+        branchId: branches.id,
+        branchName: branches.name,
+        vendorId: vendors.id,
+        vendorName: vendors.name,
+        vendorStatus: vendors.status,
+        active: branches.active,
+        zoneId: branches.zoneId,
+        lat: sql<number>`ST_Y(${branches.location})`.mapWith(Number),
+        lng: sql<number>`ST_X(${branches.location})`.mapWith(Number),
+        prepMinutes: branches.prepMinutes,
+      })
+      .from(branches)
+      .innerJoin(vendors, eq(vendors.id, branches.vendorId))
+      .where(eq(branches.id, branchId));
+    if (!r) return null;
+    const hours = await this.hoursFor([r.branchId]);
+    return {
+      branchId: r.branchId,
+      branchName: r.branchName,
+      vendorId: r.vendorId,
+      vendorName: r.vendorName,
+      vendorStatus: r.vendorStatus as VendorStatus,
+      active: r.active,
+      zoneId: r.zoneId,
+      location: { lat: r.lat, lng: r.lng },
+      prepMinutes: r.prepMinutes,
+      hours: hours.get(r.branchId) ?? [],
+    };
+  }
+
+  /** @inheritdoc */
+  vendorItems(vendorId: string): Promise<MenuItem[]> {
+    return loadItems(this.db, vendorId);
   }
 
   private async hoursFor(branchIds: string[]): Promise<Map<string, WeeklyInterval[]>> {

@@ -1,7 +1,5 @@
-// TEMP(ordering-contract): in-memory test double for OrderFulfilmentPort, bound to
-// ORDER_FULFILMENT_PORT until ordering merges. After the merge, bind ordering's real
-// implementation in DispatchModule and keep this class for unit/integration tests only.
-import type { OrderFulfilmentPort } from '../application/ordering-contract.temp.js';
+/** In-memory test double for ordering's OrderFulfilmentPort (dispatch unit/integration tests). */
+import type { OrderFulfilmentPort, OrderFulfilmentResult } from '@delyva/contracts';
 import { DispatchError } from '../domain/dispatch-errors.js';
 
 type Stage =
@@ -57,7 +55,7 @@ export class InMemoryOrderFulfilment implements OrderFulfilmentPort {
     to: Stage,
     method: keyof OrderFulfilmentPort,
     arg?: string,
-  ): Promise<void> {
+  ): Promise<OrderFulfilmentResult> {
     const current = this.stage.get(orderId) ?? 'READY';
     if (!FROM[to].includes(current)) {
       return Promise.reject(
@@ -71,7 +69,7 @@ export class InMemoryOrderFulfilment implements OrderFulfilmentPort {
     if (to === 'RIDER_ASSIGNED') this.rider.set(orderId, riderId);
     this.stage.set(orderId, to);
     this.calls.push({ method, orderId, riderId, ...(arg === undefined ? {} : { arg }) });
-    return Promise.resolve();
+    return Promise.resolve({ orderId, status: to });
   }
 
   private checkCode(
@@ -92,34 +90,46 @@ export class InMemoryOrderFulfilment implements OrderFulfilmentPort {
   }
 
   /** @inheritdoc */
-  markRiderAssigned(orderId: string, riderId: string): Promise<void> {
+  markRiderAssigned(orderId: string, riderId: string): Promise<OrderFulfilmentResult> {
     return this.move(orderId, riderId, 'RIDER_ASSIGNED', 'markRiderAssigned');
   }
 
   /** @inheritdoc */
-  async markRiderAtVendor(orderId: string, riderId: string, pickupCode: string): Promise<void> {
+  async markRiderAtVendor(
+    orderId: string,
+    riderId: string,
+    pickupCode: string,
+  ): Promise<OrderFulfilmentResult> {
     await this.checkCode(orderId, 'pickupCode', pickupCode);
     return this.move(orderId, riderId, 'RIDER_AT_VENDOR', 'markRiderAtVendor');
   }
 
   /** @inheritdoc */
-  markPickedUp(orderId: string, riderId: string): Promise<void> {
+  markPickedUp(orderId: string, riderId: string): Promise<OrderFulfilmentResult> {
     return this.move(orderId, riderId, 'PICKED_UP', 'markPickedUp');
   }
 
   /** @inheritdoc */
-  markRiderAtCustomer(orderId: string, riderId: string): Promise<void> {
+  markRiderAtCustomer(orderId: string, riderId: string): Promise<OrderFulfilmentResult> {
     return this.move(orderId, riderId, 'RIDER_AT_CUSTOMER', 'markRiderAtCustomer');
   }
 
   /** @inheritdoc */
-  async markDelivered(orderId: string, riderId: string, deliveryOtp: string): Promise<void> {
+  async markDelivered(
+    orderId: string,
+    riderId: string,
+    deliveryOtp: string,
+  ): Promise<OrderFulfilmentResult> {
     await this.checkCode(orderId, 'deliveryOtp', deliveryOtp);
     return this.move(orderId, riderId, 'DELIVERED', 'markDelivered');
   }
 
   /** @inheritdoc */
-  markUndeliverable(orderId: string, riderId: string, reason: string): Promise<void> {
+  markUndeliverable(
+    orderId: string,
+    riderId: string,
+    reason: string,
+  ): Promise<OrderFulfilmentResult> {
     return this.move(orderId, riderId, 'UNDELIVERABLE', 'markUndeliverable', reason);
   }
 }

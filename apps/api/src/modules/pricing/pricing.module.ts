@@ -21,6 +21,7 @@ import {
   DrizzlePromoRedemptionUnitOfWork,
   DrizzlePromoUsageReader,
 } from './infrastructure/drizzle-promo-redemption.js';
+import { TransactionalRedeemPromo } from './infrastructure/transactional-redeem-promo.js';
 
 const CLOCK = Symbol('PRICING_CLOCK');
 const systemClock: Clock = { now: () => new Date(), uuid: () => randomUUID() };
@@ -94,6 +95,11 @@ const systemClock: Clock = { now: () => new Date(), uuid: () => randomUUID() };
         new RedeemPromo({ uow, clock }),
     },
     {
+      provide: TransactionalRedeemPromo,
+      inject: [CLOCK],
+      useFactory: (clock: Clock) => new TransactionalRedeemPromo(clock),
+    },
+    {
       provide: PricingAdmin,
       inject: [DrizzleFeeRuleRepository, DrizzleSurgeRuleRepository, DrizzlePromoRepository, CLOCK],
       useFactory: (
@@ -104,6 +110,6 @@ const systemClock: Clock = { now: () => new Date(), uuid: () => randomUUID() };
       ) => new PricingAdmin({ feeRules, surgeRules, promos, clock }),
     },
   ],
-  exports: [PricingService, RedeemPromo],
+  exports: [PricingService, RedeemPromo, TransactionalRedeemPromo],
 })
 export class PricingModule {}

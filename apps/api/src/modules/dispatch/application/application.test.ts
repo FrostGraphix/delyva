@@ -5,8 +5,8 @@ import type { AuthPrincipal } from '../../../shared/auth/auth.guard.js';
 import { EtaFirstStrategy } from '../domain/dispatch-strategy.js';
 import { INITIAL_RATING_X100, type RiderProfileState, type RiderStatus } from '../domain/rider.js';
 import { ACTIVE_TRIP_STATUSES, type TripStatus } from '../domain/trip.js';
-// eslint-disable-next-line no-restricted-imports -- TEMP(ordering-contract): port test double lives in infrastructure
-import { InMemoryOrderFulfilment } from '../infrastructure/in-memory-order-fulfilment.temp.js';
+// eslint-disable-next-line no-restricted-imports -- port test double lives in infrastructure
+import { InMemoryOrderFulfilment } from '../infrastructure/in-memory-order-fulfilment.js';
 import { HandleOrderingEvent } from './handle-ordering-event.use-case.js';
 import { OpsDispatch } from './ops-dispatch.use-cases.js';
 import type {

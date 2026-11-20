@@ -5,7 +5,7 @@ import { DispatchError } from '../domain/dispatch-errors.js';
 import { assertNear, chooseFix, type Fix, type GpsPolicy } from '../domain/gps.js';
 import { isTerminalTrip, planTripAction, type TripActionKind } from '../domain/trip.js';
 import { toTripDto } from './dto.js';
-import type { OrderFulfilmentPort } from './ordering-contract.temp.js';
+import type { OrderFulfilmentPort } from '@delyva/contracts';
 import type {
   Clock,
   DispatchConfig,
@@ -99,15 +99,20 @@ export class PerformTripAction {
     const { orderId, riderId } = trip;
     switch (action) {
       case 'arrived_at_vendor':
-        return port.markRiderAtVendor(orderId, riderId, required(input.pickupCode, 'pickupCode'));
+        await port.markRiderAtVendor(orderId, riderId, required(input.pickupCode, 'pickupCode'));
+        return;
       case 'picked_up':
-        return port.markPickedUp(orderId, riderId);
+        await port.markPickedUp(orderId, riderId);
+        return;
       case 'arrived_at_customer':
-        return port.markRiderAtCustomer(orderId, riderId);
+        await port.markRiderAtCustomer(orderId, riderId);
+        return;
       case 'delivered':
-        return port.markDelivered(orderId, riderId, required(input.deliveryOtp, 'deliveryOtp'));
+        await port.markDelivered(orderId, riderId, required(input.deliveryOtp, 'deliveryOtp'));
+        return;
       case 'undeliverable':
-        return port.markUndeliverable(orderId, riderId, required(input.reason, 'reason'));
+        await port.markUndeliverable(orderId, riderId, required(input.reason, 'reason'));
+        return;
     }
   }
 

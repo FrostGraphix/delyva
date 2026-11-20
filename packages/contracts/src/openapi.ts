@@ -19,6 +19,7 @@ import {
 } from './notifications/index.js';
 import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PAYMENT_ROUTES } from './payments/payment-routes.js';
+import { ORDERING_ROUTES } from './ordering/routes.js';
 import { ONBOARDING_ROUTES } from './onboarding/routes.js';
 import { ADMIN_ROUTES } from './admin/routes.js';
 import { DISPATCH_ROUTES } from './dispatch/routes.js';
@@ -272,6 +273,7 @@ export const ROUTES = {
     auth: true,
   },
   ...PAYMENT_ROUTES,
+  ...ORDERING_ROUTES,
   ...ONBOARDING_ROUTES,
   ...ADMIN_ROUTES,
   ...DISPATCH_ROUTES,

@@ -1,5 +1,11 @@
 import { dispatchDelayMs } from '../domain/dispatch-strategy.js';
-import type { VendorAcceptedPayload } from './ordering-contract.temp.js';
+import type { OrderVendorAcceptedPayload } from '@delyva/contracts';
+
+/** The part of `ordering.order.vendor_accepted` dispatch needs. */
+type VendorAcceptedPayload = Pick<
+  OrderVendorAcceptedPayload,
+  'orderId' | 'branchId' | 'pickup' | 'dropoff' | 'prepMinutes' | 'readyAt'
+>;
 import type { Clock, DispatchConfig, DispatchScheduler, DispatchStore, Tracking } from './ports.js';
 
 /** Outcome of handling `ordering.order.vendor_accepted`. */
