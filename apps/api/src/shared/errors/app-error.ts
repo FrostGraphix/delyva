@@ -22,6 +22,10 @@ export const STATUS_BY_CODE: Record<ErrorCode, number> = {
   bank_account_name_mismatch: 422,
   two_factor_required: 403,
   upload_rejected: 422,
+  rider_too_far: 422,
+  offer_unavailable: 409,
+  order_already_assigned: 409,
+  rider_unavailable: 409,
 };
 
 /** Error with a stable code, mapped to RFC 9457 problem+json by the exception filter. */

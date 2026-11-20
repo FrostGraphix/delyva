@@ -14,3 +14,4 @@ export * from './realtime/index.js';
 export * from './payments/index.js';
 export * from './onboarding/index.js';
 export * from './admin/index.js';
+export * from './dispatch/index.js';

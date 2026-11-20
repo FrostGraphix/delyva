@@ -114,7 +114,37 @@ import {
   type VendorDocuments,
   type VendorLocation,
   type VendorStep,
+  type AdminDispatchRiderList,
+  AdminDispatchRiderListSchema,
+  type ArrivedAtVendor,
+  type CurrentTrip,
+  CurrentTripSchema,
+  type Delivered,
+  type DispatchOffer,
+  DispatchOfferSchema,
+  type ManualAssign,
+  type RiderEarnings,
+  RiderEarningsSchema,
+  type RiderProfile,
+  RiderProfileSchema,
+  type Trip,
+  type TripAction,
+  TripSchema,
+  type Undeliverable,
 } from '@delyva/contracts';
+
+/** Trip action path segments (POST /v1/trips/{id}/<segment>). */
+export type TripActionSegment =
+  'arrived-at-vendor' | 'picked-up' | 'arrived-at-customer' | 'delivered' | 'undeliverable';
+
+/** Body for each trip action. */
+export interface TripActionBodies {
+  'arrived-at-vendor': ArrivedAtVendor;
+  'picked-up': TripAction;
+  'arrived-at-customer': TripAction;
+  delivered: Delivered;
+  undeliverable: Undeliverable;
+}
 import type { z } from 'zod';
 
 const withId = (path: string, id: string): string => path.replace('{id}', encodeURIComponent(id));
@@ -525,6 +555,71 @@ export class DelyvaClient {
   private admin(): Record<string, string> {
     const token = this.options.adminTwoFactorToken?.();
     return token ? { [ADMIN_2FA_HEADER]: token } : {};
+  }
+
+  /** GET /v1/riders/me (rider) */
+  getMyRiderProfile(): Promise<RiderProfile> {
+    return this.send('GET', ROUTES.getMyRiderProfile.path, undefined, RiderProfileSchema);
+  }
+
+  /** POST /v1/riders/me/online (rider) */
+  goOnline(batteryPct: number, idempotencyKey?: string): Promise<RiderProfile> {
+    const path = ROUTES.goOnline.path;
+    return this.post(path, { batteryPct }, RiderProfileSchema, this.idem(idempotencyKey));
+  }
+
+  /** POST /v1/riders/me/offline (rider) */
+  goOffline(batteryPct: number, idempotencyKey?: string): Promise<RiderProfile> {
+    const path = ROUTES.goOffline.path;
+    return this.post(path, { batteryPct }, RiderProfileSchema, this.idem(idempotencyKey));
+  }
+
+  /** GET /v1/riders/me/trips/current (rider) */
+  getMyCurrentTrip(): Promise<CurrentTrip> {
+    return this.send('GET', ROUTES.getMyCurrentTrip.path, undefined, CurrentTripSchema);
+  }
+
+  /** GET /v1/riders/me/earnings (rider) */
+  getMyRiderEarnings(): Promise<RiderEarnings> {
+    return this.send('GET', ROUTES.getMyRiderEarnings.path, undefined, RiderEarningsSchema);
+  }
+
+  /** POST /v1/dispatch-offers/{id}/accept (rider) */
+  acceptDispatchOffer(id: string, idempotencyKey?: string): Promise<Trip> {
+    const path = withId(ROUTES.acceptDispatchOffer.path, id);
+    return this.post(path, undefined, TripSchema, this.idem(idempotencyKey));
+  }
+
+  /** POST /v1/dispatch-offers/{id}/decline (rider) */
+  declineDispatchOffer(id: string, idempotencyKey?: string): Promise<DispatchOffer> {
+    const path = withId(ROUTES.declineDispatchOffer.path, id);
+    return this.post(path, undefined, DispatchOfferSchema, this.idem(idempotencyKey));
+  }
+
+  /**
+   * POST /v1/trips/{id}/<action> (rider). Queue offline with a stable `idempotencyKey` and
+   * the device `location` captured at the time; replay when back online.
+   */
+  tripAction<S extends TripActionSegment>(
+    tripId: string,
+    action: S,
+    body: TripActionBodies[S],
+    idempotencyKey?: string,
+  ): Promise<Trip> {
+    const path = `/v1/trips/${encodeURIComponent(tripId)}/${action}`;
+    return this.post(path, body, TripSchema, this.idem(idempotencyKey));
+  }
+
+  /** GET /v1/admin/dispatch/riders (ops) */
+  listDispatchRiders(): Promise<AdminDispatchRiderList> {
+    const path = ROUTES.listDispatchRiders.path;
+    return this.send('GET', path, undefined, AdminDispatchRiderListSchema);
+  }
+
+  /** POST /v1/admin/dispatch/orders/{orderId}/assign (ops; reason required) */
+  manuallyAssignOrder(orderId: string, body: ManualAssign, idempotencyKey?: string): Promise<Trip> {
+    const path = pathOf(ROUTES.manuallyAssignOrder.path, { orderId });
+    return this.post(path, body, TripSchema, this.idem(idempotencyKey));
   }
 
   private idem(key?: string): Record<string, string> {

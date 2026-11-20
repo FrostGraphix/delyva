@@ -22,6 +22,10 @@ export const ERROR_CODES = [
   'bank_account_name_mismatch',
   'two_factor_required',
   'upload_rejected',
+  'rider_too_far',
+  'offer_unavailable',
+  'order_already_assigned',
+  'rider_unavailable',
 ] as const;
 
 /** Error code enum. */

@@ -25,6 +25,9 @@ const en: MessageCatalogue = {
     'Order {{orderRef}} was cancelled. Any payment will be refunded.',
   'notifications.order.cancelled.text':
     'Delyva: order {{orderRef}} was cancelled. Any payment will be refunded.',
+  'notifications.rider.dispatch_offer.title': 'New delivery job',
+  'notifications.rider.dispatch_offer.body':
+    'A pickup is waiting near you. Open Delyva to accept within {{seconds}} seconds.',
 };
 
 /**
