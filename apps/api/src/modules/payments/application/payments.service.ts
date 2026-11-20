@@ -3,6 +3,7 @@ import type { Money } from '@delyva/utils';
 import type { OrderBreakdown } from '../domain/order-split.js';
 import type { CaptureOrderSplit, RefundOrder, ReleaseOrderHold } from './order-money.use-cases.js';
 import type { CreateIntentForOrder } from './payment-intents.use-cases.js';
+import type { PaymentProvider } from './ports.js';
 
 /**
  * Public service interface of the payments context for other contexts (ordering).
@@ -16,8 +17,20 @@ export class PaymentsService {
       capture: CaptureOrderSplit;
       release: ReleaseOrderHold;
       refund: RefundOrder;
+      provider: Pick<PaymentProvider, 'resolveBankAccount'>;
     },
   ) {}
+
+  /**
+   * Resolves a NUBAN account to its registered holder name through the provider
+   * (Paystack `GET /bank/resolve`). Used by onboarding to verify payout accounts.
+   */
+  resolveBankAccount(input: {
+    accountNumber: string;
+    bankCode: string;
+  }): Promise<{ accountNumber: string; accountName: string }> {
+    return this.deps.provider.resolveBankAccount(input);
+  }
 
   /** Creates (or returns) the payment intent of an order. Amounts must be server-computed. */
   createIntentForOrder(input: {

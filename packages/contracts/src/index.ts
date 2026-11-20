@@ -13,4 +13,6 @@ export * from './notifications/index.js';
 export * from './realtime/index.js';
 export * from './payments/index.js';
 export * from './ordering/index.js';
+export * from './onboarding/index.js';
+export * from './admin/index.js';
 export * from './dispatch/index.js';

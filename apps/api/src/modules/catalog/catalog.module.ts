@@ -23,6 +23,8 @@ import { ReplaceOpeningHours } from './application/replace-opening-hours.use-cas
 import { SetItemAvailability } from './application/set-item-availability.use-case.js';
 import { SetOptionAvailability } from './application/set-option-availability.use-case.js';
 import { UpdateMenuItem } from './application/update-menu-item.use-case.js';
+import { VendorOnboardingService } from './application/vendor-onboarding.service.js';
+import { DrizzleCatalogOnboardingRepository } from './infrastructure/drizzle-catalog-onboarding.repository.js';
 import { DrizzleCatalogReadRepository } from './infrastructure/drizzle-catalog-read.repository.js';
 import { DrizzleCatalogWriteRepository } from './infrastructure/drizzle-catalog-write.repository.js';
 import { VendorOwnershipChecker } from './infrastructure/vendor-ownership.checker.js';
@@ -108,8 +110,20 @@ type W = DrizzleCatalogWriteRepository;
       useFactory: (reads: R, writes: W) => new ApproveVendor({ reads, writes, clock }),
     },
     { provide: CatalogService, inject: [DB], useFactory: buildCatalogService },
+    {
+      provide: VendorOnboardingService,
+      inject: [DB, DrizzleCatalogWriteRepository, GeoService],
+      useFactory: (db: Db, writes: W, geo: GeoService) =>
+        new VendorOnboardingService({
+          onboarding: new DrizzleCatalogOnboardingRepository(db),
+          writes,
+          geo,
+          clock,
+        }),
+    },
   ],
-  exports: [CatalogService],
+  // Public interface for the onboarding context (ADR 0700).
+  exports: [VendorOnboardingService, ApproveVendor, CatalogService],
 })
 export class CatalogModule {}
 

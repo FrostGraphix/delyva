@@ -55,6 +55,22 @@ export const EnvSchema = z
       .enum(['true', 'false'])
       .default('true')
       .transform((v) => v === 'true'),
+    // onboarding & admin (ADR 0700)
+    PUBLIC_API_URL: z.url().default('http://127.0.0.1:3300'),
+    KYC_PROVIDER: z.enum(['fake', 'smile_id']).default('fake'),
+    STORAGE_PROVIDER: z.enum(['local', 's3']).default('local'),
+    STORAGE_LOCAL_DIR: z.string().min(1).default('.data/uploads'),
+    STORAGE_SIGNING_SECRET: z.string().optional().default(''),
+    S3_BUCKET: z.string().optional().default(''),
+    S3_REGION: z.string().default('eu-west-1'),
+    S3_ACCESS_KEY_ID: z.string().optional().default(''),
+    S3_SECRET_ACCESS_KEY: z.string().optional().default(''),
+    S3_SESSION_TOKEN: z.string().optional().default(''),
+    S3_ENDPOINT: z.string().optional().default(''),
+    FIELD_ENCRYPTION_KEYS: z.string().optional().default(''),
+    FIELD_ENCRYPTION_ACTIVE_KID: z.string().default('dev'),
+    ADMIN_2FA_SESSION_TTL_SECONDS: z.coerce.number().int().min(300).max(86_400).default(43_200),
+    TOTP_ISSUER: z.string().min(1).default('Delyva'),
     // dispatch (ADR 0600)
     DISPATCH_OFFER_TIMEOUT_MS: z.coerce.number().int().min(100).default(20_000),
     DISPATCH_RADII_M: z
@@ -99,6 +115,18 @@ export const EnvSchema = z
     }
     if (env.PAYSTACK_WEBHOOK_IPS.length === 0) {
       ctx.addIssue({ code: 'custom', message: 'production requires PAYSTACK_WEBHOOK_IPS' });
+    }
+    if (env.FIELD_ENCRYPTION_KEYS === '') {
+      ctx.addIssue({ code: 'custom', message: 'production requires FIELD_ENCRYPTION_KEYS' });
+    }
+    if (env.STORAGE_PROVIDER !== 's3' || env.S3_BUCKET === '') {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'production requires STORAGE_PROVIDER=s3 and S3_BUCKET',
+      });
+    }
+    if (env.KYC_PROVIDER === 'fake') {
+      ctx.addIssue({ code: 'custom', message: 'production requires a real KYC_PROVIDER' });
     }
     if (env.INTERNAL_JOBS_TOKEN.length < 32) {
       ctx.addIssue({

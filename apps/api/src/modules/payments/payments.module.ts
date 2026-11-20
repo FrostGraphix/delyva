@@ -193,13 +193,20 @@ function webhookSecret(env: Env): string {
     },
     {
       provide: PaymentsService,
-      inject: [CreateIntentForOrder, CaptureOrderSplit, ReleaseOrderHold, RefundOrder],
+      inject: [
+        CreateIntentForOrder,
+        CaptureOrderSplit,
+        ReleaseOrderHold,
+        RefundOrder,
+        PAYMENT_PROVIDER,
+      ],
       useFactory: (
         createIntent: CreateIntentForOrder,
         capture: CaptureOrderSplit,
         release: ReleaseOrderHold,
         refund: RefundOrder,
-      ) => new PaymentsService({ createIntent, capture, release, refund }),
+        provider: PaymentProvider,
+      ) => new PaymentsService({ createIntent, capture, release, refund, provider }),
     },
   ],
   exports: [PaymentsService],

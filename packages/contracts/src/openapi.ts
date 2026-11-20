@@ -20,6 +20,8 @@ import {
 import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PAYMENT_ROUTES } from './payments/payment-routes.js';
 import { ORDERING_ROUTES } from './ordering/routes.js';
+import { ONBOARDING_ROUTES } from './onboarding/routes.js';
+import { ADMIN_ROUTES } from './admin/routes.js';
 import { DISPATCH_ROUTES } from './dispatch/routes.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 import {
@@ -272,6 +274,8 @@ export const ROUTES = {
   },
   ...PAYMENT_ROUTES,
   ...ORDERING_ROUTES,
+  ...ONBOARDING_ROUTES,
+  ...ADMIN_ROUTES,
   ...DISPATCH_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
 

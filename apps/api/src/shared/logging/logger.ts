@@ -22,6 +22,16 @@ export const REDACT_PATHS = [
   'headers.cookie',
   '*.headers.authorization',
   '*.headers.cookie',
+  'nin',
+  '*.nin',
+  'accountNumber',
+  '*.accountNumber',
+  'ownerIdNumber',
+  '*.ownerIdNumber',
+  'secret',
+  '*.secret',
+  'headers["x-admin-2fa"]',
+  '*.headers["x-admin-2fa"]',
 ];
 
 /** Creates the structured JSON root logger with redaction and trace-id mixin. */
