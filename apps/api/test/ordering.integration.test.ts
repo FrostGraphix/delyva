@@ -11,6 +11,8 @@ import { seedBranchId, seedCatalog, seedVendorId } from '../scripts/seed-catalog
 import { runPricingSeed } from '../scripts/seed-pricing.js';
 import { createApp } from '../src/create-app.js';
 import { JoseAccessTokenSigner } from '../src/modules/identity/infrastructure/jose-access-token.signer.js';
+import { RunDispatchRound } from '../src/modules/dispatch/application/run-dispatch-round.use-case.js';
+import { OutboxDispatchConsumer } from '../src/modules/dispatch/infrastructure/outbox-dispatch.consumer.js';
 import { OutboxPaymentEventsConsumer } from '../src/modules/ordering/infrastructure/adapters.js';
 import type { FakePaymentProvider } from '../src/modules/payments/infrastructure/fake.provider.js';
 import { signWebhook } from '../src/modules/payments/infrastructure/hmac-webhook.verifier.js';
@@ -120,6 +122,7 @@ describe.skipIf(!available)('ordering (integration: Postgres + Redis)', () => {
       PAYMENTS_PROVIDER: 'fake',
       PAYMENTS_FAKE_WEBHOOK_SECRET: SECRET,
       NOTIFICATIONS_CONSUMER_ENABLED: 'false',
+      DISPATCH_CONSUMER_ENABLED: 'false',
       BULLMQ_PREFIX: 'ordering-it',
       ORDERING_AUTO_REJECT_SECONDS: String(AUTO_REJECT_SECONDS),
       ORDERING_VENDOR_COMMISSION_BPS: '1000',
@@ -543,7 +546,9 @@ describe.skipIf(!available)('ordering (integration: Postgres + Redis)', () => {
 
     const o2 = await walletOrder(user, { topUp: 10_000 });
     await vendorAct(vendorA, o2.id as string, 'accept', { prepMinutes: 5 });
-    await vendorAct(vendorA, o2.id as string, 'preparing').then((r) => { expect(r.status).toBe(200); });
+    await vendorAct(vendorA, o2.id as string, 'preparing').then((r) => {
+      expect(r.status).toBe(200);
+    });
     await http
       .post(`/v1/orders/${String(o2.id)}/cancel`)
       .set('authorization', await customer(user))
@@ -652,5 +657,86 @@ describe.skipIf(!available)('ordering (integration: Postgres + Redis)', () => {
     expect(await authz.canJoin({ userId: vendorB, roles: [] }, o.id as string)).toBe(false);
     expect(await authz.canJoin({ userId: user, roles: [] }, randomUUID())).toBe(false);
     await vendorAct(vendorA, o.id as string, 'accept', { prepMinutes: 5 });
+  });
+  it('full journey: vendor_accepted → dispatch offer → rider accepts → RIDER_ASSIGNED → delivered with OTP → ledger split', async () => {
+    // Arrange: a paid order and an online rider next to the pharmacy.
+    const user = randomUUID();
+    const order = await walletOrder(user);
+    const id = order.id as string;
+    const rider = randomUUID();
+    const riderAuth = await token(rider, ['rider']);
+    const locate = async (p: { lat: number; lng: number }) => {
+      await sleep(5);
+      await http
+        .post('/v1/riders/me/locations')
+        .set('authorization', riderAuth)
+        .send({ points: [{ ...p, ts: Date.now() }] })
+        .expect(202);
+    };
+    await http
+      .post('/v1/riders/me/online')
+      .set('authorization', riderAuth)
+      .set('Idempotency-Key', idem())
+      .send({ batteryPct: 90 })
+      .expect(200);
+    await locate({ lat: 6.4301, lng: 3.4101 });
+
+    // Act: vendor accepts → event → dispatch schedules and offers.
+    await (
+      await vendorAct(vendorA, id, 'accept', { prepMinutes: 1 })
+    ).ok;
+    expect(await app.get(OutboxDispatchConsumer).consumeBatch()).toBeGreaterThanOrEqual(1);
+    await app.get(RunDispatchRound).execute(id);
+    const offer = await pool.query<{ id: string; rider_id: string }>(
+      `SELECT id, rider_id FROM dispatch_offers WHERE order_id=$1 AND status='pending'`,
+      [id],
+    );
+    expect(offer.rows[0]?.rider_id).toBe(rider);
+    const trip = await http
+      .post(`/v1/dispatch-offers/${offer.rows[0]?.id ?? ''}/accept`)
+      .set('authorization', riderAuth)
+      .set('Idempotency-Key', idem())
+      .expect(200);
+    const tripId = (trip.body as { id: string }).id;
+    // Rider bound during prep (strict table), RIDER_ASSIGNED once the vendor marks ready.
+    expect(
+      (
+        b(await http.get(`/v1/orders/${id}`).set('authorization', await customer(user)))
+          .rider as Body
+      ).id,
+    ).toBe(rider);
+    expect(await fulfilment.markRiderAssigned(id, rider)).toMatchObject({ orderId: id }); // idempotent replay
+    const ready = b(await vendorAct(vendorA, id, 'ready'));
+    expect(ready.status).toBe('RIDER_ASSIGNED');
+
+    const act = (path: string, body: object) =>
+      http
+        .post(`/v1/trips/${tripId}/${path}`)
+        .set('authorization', riderAuth)
+        .set('Idempotency-Key', idem())
+        .send(body);
+    await locate({ lat: 6.43, lng: 3.41 });
+    await act('arrived-at-vendor', { pickupCode: ready.pickupCode }).expect(200);
+    await act('picked-up', {}).expect(200);
+    await locate(VI_POINT);
+    await act('arrived-at-customer', {}).expect(200);
+    const otp = b(await http.get(`/v1/orders/${id}`).set('authorization', await customer(user)))
+      .deliveryOtp as string;
+    await act('delivered', { deliveryOtp: otp }).expect(200);
+
+    // Assert: ordering is DELIVERED and the capture journal balances.
+    expect(
+      b(await http.get(`/v1/orders/${id}`).set('authorization', await customer(user))).status,
+    ).toBe('DELIVERED');
+    const legs = await pool.query<{ code: string; amount: string }>(
+      `SELECT a.code, sum(e.amount_minor)::text amount FROM ledger_entries e
+       JOIN ledger_transactions t ON t.id = e.transaction_id JOIN ledger_accounts a ON a.id = e.account_id
+       WHERE t.reference=$1 AND t.kind='order_capture' GROUP BY a.code`,
+      [id],
+    );
+    const by = Object.fromEntries(legs.rows.map((r) => [r.code, Number(r.amount)]));
+    expect(Object.values(by).reduce((s, v) => s + v, 0)).toBe(0);
+    expect(by[`rider_payable:${rider}`]).toBeLessThan(0);
+    expect(by[`vendor_payable:${PHARMACY.vendorId}`]).toBe(-90_000);
   });
 });

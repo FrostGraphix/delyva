@@ -43,7 +43,7 @@ export const OrderVendorAcceptedPayloadSchema = OrderStatusChangedPayloadSchema.
   branchId: z.uuid(),
   pickup: GeoPointSchema,
   dropoff: GeoPointSchema,
-  prepMinutes: z.number().int().positive(),
+  prepMinutes: z.number().int().nonnegative(),
   readyAt: z.iso.datetime(),
 });
 /** Payload of `ordering.order.vendor_accepted`. */

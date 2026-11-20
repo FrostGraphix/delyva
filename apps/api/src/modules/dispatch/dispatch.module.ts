@@ -34,10 +34,7 @@ import { RidersController } from './api/riders.controller.js';
 import { TripsController } from './api/trips.controller.js';
 import { HandleOrderingEvent } from './application/handle-ordering-event.use-case.js';
 import { OpsDispatch } from './application/ops-dispatch.use-cases.js';
-import {
-  ORDER_FULFILMENT_PORT,
-  type OrderFulfilmentPort,
-} from '@delyva/contracts';
+import { ORDER_FULFILMENT_PORT, type OrderFulfilmentPort } from '@delyva/contracts';
 import {
   type Clock,
   DISPATCH_CLOCK,

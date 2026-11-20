@@ -1,7 +1,17 @@
 import {
   ORDER_VENDOR_ACCEPTED_EVENT as VENDOR_ACCEPTED_EVENT,
-  OrderVendorAcceptedPayloadSchema as VendorAcceptedPayloadSchema,
+  OrderVendorAcceptedPayloadSchema,
 } from '@delyva/contracts';
+
+/** The fields dispatch reads (extra fields such as customerId are tolerated). */
+const VendorAcceptedPayloadSchema = OrderVendorAcceptedPayloadSchema.pick({
+  orderId: true,
+  branchId: true,
+  pickup: true,
+  dropoff: true,
+  prepMinutes: true,
+  readyAt: true,
+});
 import type { ScheduleDispatch } from './schedule-dispatch.use-case.js';
 
 /** Event types the dispatch consumer reads from the outbox. */

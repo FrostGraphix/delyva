@@ -95,7 +95,11 @@ export class InMemoryOrderFulfilment implements OrderFulfilmentPort {
   }
 
   /** @inheritdoc */
-  async markRiderAtVendor(orderId: string, riderId: string, pickupCode: string): Promise<OrderFulfilmentResult> {
+  async markRiderAtVendor(
+    orderId: string,
+    riderId: string,
+    pickupCode: string,
+  ): Promise<OrderFulfilmentResult> {
     await this.checkCode(orderId, 'pickupCode', pickupCode);
     return this.move(orderId, riderId, 'RIDER_AT_VENDOR', 'markRiderAtVendor');
   }
@@ -111,13 +115,21 @@ export class InMemoryOrderFulfilment implements OrderFulfilmentPort {
   }
 
   /** @inheritdoc */
-  async markDelivered(orderId: string, riderId: string, deliveryOtp: string): Promise<OrderFulfilmentResult> {
+  async markDelivered(
+    orderId: string,
+    riderId: string,
+    deliveryOtp: string,
+  ): Promise<OrderFulfilmentResult> {
     await this.checkCode(orderId, 'deliveryOtp', deliveryOtp);
     return this.move(orderId, riderId, 'DELIVERED', 'markDelivered');
   }
 
   /** @inheritdoc */
-  markUndeliverable(orderId: string, riderId: string, reason: string): Promise<OrderFulfilmentResult> {
+  markUndeliverable(
+    orderId: string,
+    riderId: string,
+    reason: string,
+  ): Promise<OrderFulfilmentResult> {
     return this.move(orderId, riderId, 'UNDELIVERABLE', 'markUndeliverable', reason);
   }
 }
