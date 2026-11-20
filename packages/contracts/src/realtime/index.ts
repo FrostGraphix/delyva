@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { DispatchOffer } from '../dispatch/dispatch.js';
 
 /** Max age of a location fix the server accepts (ms). Older points are stale. */
 export const LOCATION_MAX_AGE_MS = 5 * 60_000;
@@ -70,6 +71,7 @@ export const SOCKET_EVENTS = {
   orderJoin: 'order:join',
   orderLeave: 'order:leave',
   orderStatus: 'order:status',
+  dispatchOffer: 'dispatch:offer',
 } as const;
 
 /** Events the server emits to clients. */
@@ -78,6 +80,8 @@ export interface ServerToClientEvents {
   'rider:location': (payload: RiderLocationBroadcast) => void;
   /** Order status change. */
   'order:status': (payload: OrderStatusBroadcast) => void;
+  /** Job offer to one rider (sent to the `rider:<id>` room only). */
+  'dispatch:offer': (payload: DispatchOffer) => void;
 }
 
 /** Events clients emit to the server (all acknowledged). */
