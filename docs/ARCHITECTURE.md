@@ -555,6 +555,26 @@ See ADR 0300. Module `apps/api/src/modules/payments` (api / application / domain
 - DEBT(payments): reconciliation compares charges only (not refunds, transfers or settlement reports); alerting is log + outbox, no pager.
 - DEBT(payments): no admin refund endpoint with reason, audit log and second approver yet (service method only).
 
+## Onboarding & admin (Phase 1, 2026-11-20)
+
+See ADR 0700. Modules `apps/api/src/modules/onboarding` and `apps/api/src/modules/admin`; shared `src/shared/crypto/field-encryption.ts` and `src/shared/storage/` (StorageProvider, S3 SigV4 adapter, local-disk adapter). Migration `0700_onboarding_admin.sql`. Contracts `packages/contracts/src/{onboarding,admin}/`; SDK methods on `DelyvaClient` + hooks in `packages/sdk/src/onboarding-hooks.ts`.
+
+- **Rider flow** (`/v1/rider-applications/me/...`): personal-details → identity (NIN + selfie via `KycProvider`) → vehicle (+ licence/photo uploads) → guarantor → bank-account (resolved via `PaymentsService.resolveBankAccount`) → quiz (server-scored, 80 % pass) → submit → pending review. `GET /v1/rider-applications/me` shows status, resume step and rejection reason.
+- **Vendor flow** (`/v1/vendor-applications/me/...`): business-details (creates the catalog vendor in `draft` + owner membership) → documents (CAC + owner ID) → location (branch pin, zone via geo, opening hours in catalog) → menu-import (CSV → inactive draft catalog menu; bad rows reported as `line N`) and/or menu-photos → bank-account → test-order checklist → submit (catalog vendor → `in_review`). Template: `GET /v1/vendor-applications/menu-template`.
+- **Uploads:** `POST /v1/uploads` → signed, expiring PUT URL (S3 or dev `PUT /v1/uploads/content`); MIME/size per purpose; magic bytes checked; all private.
+- **Admin** (bearer + `x-admin-2fa`): `GET /v1/admin/{rider,vendor}-applications`, `POST …/{id}/approve|reject` (reason, audited; rider approval grants `rider`, vendor approval activates the draft menu, runs catalog go-live and grants `vendor_owner`), `GET /v1/admin/uploads/{id}/download-url`, `GET/PUT /v1/admin/feature-flags` (super_admin). 2FA: `POST /v1/admin/2fa/enrolment`, `/enrolment/confirm`, `/verify`.
+- **Public services for other modules:** `AuditService.record(entry, tx?)`, `FeatureFlags.isEnabled(key, fallback)`, `AdminTwoFactorGuard` (use after `AuthGuard`), identity `RoleGrantService.grant`, catalog `VendorOnboardingService`.
+- **Events:** `onboarding.step.viewed`, `onboarding.step.completed` (`{ kind, applicationId, step, analyticsEvent: onboarding_step_viewed|onboarding_step_completed }`, no PII), `onboarding.application.{submitted,approved,rejected}` (`{ kind, applicationId, userId, vendorId }`).
+- **New error codes:** `kyc_verification_failed` (422), `bank_account_name_mismatch` (422), `two_factor_required` (403), `upload_rejected` (422).
+- **Env:** `PUBLIC_API_URL`, `KYC_PROVIDER`, `STORAGE_PROVIDER`, `STORAGE_LOCAL_DIR`, `STORAGE_SIGNING_SECRET`, `S3_*`, `FIELD_ENCRYPTION_KEYS`, `FIELD_ENCRYPTION_ACTIVE_KID`, `ADMIN_2FA_SESSION_TTL_SECONDS`, `TOTP_ISSUER`. Production refuses fake KYC, local storage and missing encryption keys.
+- No new dependencies (TOTP and SigV4 use `node:crypto`).
+
+### Known technical debt (onboarding & admin)
+
+- DEBT(kyc): Smile ID / Dojah / Prembly adapter is a stub; vendor not chosen; no async webhook flow.
+- DEBT(storage): images not re-encoded (EXIF/polyglot); S3 presigned PUT cannot cap size (re-checked by HEAD on use; switch to POST policy); S3 adapter verified only against the AWS SigV4 doc vector, not a live bucket; no orphan-upload cleanup.
+- DEBT(admin): pricing `/v1/admin/*` and catalog go-live are not behind `AdminTwoFactorGuard` yet; no 2FA reset/recovery codes; no audit-log read endpoint; feature flags have no targeting/caching.
+- DEBT(onboarding): vendor creation and application save are not atomic (a failure between them can orphan a draft vendor); quiz content English-only and hard-coded; no rejection notifications; no rotation job re-encrypting old key ids; KYC/approval cross-context steps rely on idempotent retries instead of a saga.
 ## Dispatch (Phase 1, 2026-11-20)
 
 See ADR 0600. Module `apps/api/src/modules/dispatch` (api / application / domain / infrastructure), migration `0600_dispatch.sql`, contracts `packages/contracts/src/dispatch/`, SDK methods on `DelyvaClient` + hooks in `packages/sdk/src/dispatch-hooks.ts`.

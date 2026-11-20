@@ -50,6 +50,13 @@
       "when": 1795155093392,
       "tag": "0600_dispatch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795400000000,
+      "tag": "0700_onboarding_admin",
+      "breakpoints": true
     }
   ]
 }

@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import type { UserRegisteredPayload } from '@delyva/contracts';
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import type { Db } from '../../../shared/database/database.js';
 import { appendToOutbox } from '../../../shared/outbox/outbox.writer.js';
-import type { UserRepository } from '../application/ports.js';
+import type { RoleStore, UserRepository } from '../application/ports.js';
 import { users } from './identity.schema.js';
 
 /** Drizzle adapter for {@link UserRepository}. */
-export class DrizzleUserRepository implements UserRepository {
+export class DrizzleUserRepository implements UserRepository, RoleStore {
   /** @param db drizzle db */
   constructor(private readonly db: Db) {}
 
@@ -39,6 +39,21 @@ export class DrizzleUserRepository implements UserRepository {
       if (!existing) throw new Error('user upsert race: row missing after conflict');
       return { userId: existing.id, roles: existing.roles, created: false };
     });
+  }
+
+  /** @inheritdoc */
+  async addRole(userId: string, role: string): Promise<{ roles: string[]; added: boolean } | null> {
+    const updated = await this.db
+      .update(users)
+      .set({ roles: sql`array_append(${users.roles}, ${role})` })
+      .where(and(eq(users.id, userId), sql`NOT (${role} = ANY(${users.roles}))`))
+      .returning({ roles: users.roles });
+    if (updated[0]) return { roles: updated[0].roles, added: true };
+    const [existing] = await this.db
+      .select({ roles: users.roles })
+      .from(users)
+      .where(eq(users.id, userId));
+    return existing ? { roles: existing.roles, added: false } : null;
   }
 
   /** @inheritdoc */

@@ -1,5 +1,6 @@
 /** Stable codes raised by the catalog context (subset of contracts ErrorCode). */
-export type CatalogErrorCode = 'not_found' | 'forbidden' | 'conflict' | 'validation_failed';
+export type CatalogErrorCode =
+  'not_found' | 'forbidden' | 'conflict' | 'validation_failed' | 'zone_not_serviceable';
 
 /** Catalog domain error; mapped to problem+json at the edge. */
 export class CatalogError extends Error {
