@@ -22,6 +22,12 @@ export interface UserRepository {
   rolesOf(userId: string): Promise<string[]>;
 }
 
+/** Role assignment storage (roles live on the user row). */
+export interface RoleStore {
+  /** Adds `role` if missing; null when the user does not exist. */
+  addRole(userId: string, role: string): Promise<{ roles: string[]; added: boolean } | null>;
+}
+
 /** New refresh token row. */
 export interface NewRefreshToken {
   readonly id: string;

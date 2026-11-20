@@ -10,6 +10,7 @@ import { Logout } from './application/logout.use-case.js';
 import type { Clock, SecretHasher, SmsSender } from './application/ports.js';
 import { RefreshSession } from './application/refresh-session.use-case.js';
 import { RequestOtp } from './application/request-otp.use-case.js';
+import { RoleGrantService } from './application/role-grant.service.js';
 import { SessionIssuer } from './application/session-issuer.js';
 import { VerifyOtp } from './application/verify-otp.use-case.js';
 import { CryptoSecretHasher } from './infrastructure/crypto-secret.hasher.js';
@@ -139,7 +140,12 @@ function smsFor(env: Env, redis: Redis): SmsSender {
         clock: Clock,
       ) => new Logout({ refreshTokens, hasher, clock }),
     },
+    {
+      provide: RoleGrantService,
+      inject: [DrizzleUserRepository],
+      useFactory: (users: DrizzleUserRepository) => new RoleGrantService(users),
+    },
   ],
-  exports: [JoseAccessTokenSigner],
+  exports: [JoseAccessTokenSigner, RoleGrantService],
 })
 export class IdentityModule {}
