@@ -18,8 +18,8 @@ import {
   RegisterDeviceSchema,
 } from '@delyva/contracts';
 import { z } from 'zod';
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
-import { AuthGuard, CurrentPrincipal } from '../../../shared/auth/auth.guard.js';
+import { type AuthPrincipal, AuthGuard, Principal } from '../../../shared/auth/auth.guard.js';
+import { AppError } from '../../../shared/errors/app-error.js';
 import { ZodBodyPipe } from '../../../shared/validation/zod-body.pipe.js';
 import {
   GetPreferences,
@@ -49,7 +49,7 @@ export class NotificationsController {
   /** GET /v1/notifications */
   @Get('v1/notifications')
   list(
-    @CurrentPrincipal() me: Principal,
+    @Principal() me: AuthPrincipal,
     @Query(new ZodBodyPipe(ListNotificationsQuerySchema))
     query: z.infer<typeof ListNotificationsQuerySchema>,
   ): Promise<NotificationPage> {
@@ -60,7 +60,7 @@ export class NotificationsController {
   @Post('v1/notifications/:id/read')
   @HttpCode(204)
   async read(
-    @CurrentPrincipal() me: Principal,
+    @Principal() me: AuthPrincipal,
     @Param('id', new ZodBodyPipe(IdParam)) id: string,
   ): Promise<void> {
     await this.markRead.execute(me.userId, id);
@@ -68,14 +68,14 @@ export class NotificationsController {
 
   /** GET /v1/notifications/preferences */
   @Get('v1/notifications/preferences')
-  preferences(@CurrentPrincipal() me: Principal): Promise<NotificationPreferences> {
+  preferences(@Principal() me: AuthPrincipal): Promise<NotificationPreferences> {
     return this.getPrefs.execute(me.userId);
   }
 
   /** PUT /v1/notifications/preferences */
   @Put('v1/notifications/preferences')
   update(
-    @CurrentPrincipal() me: Principal,
+    @Principal() me: AuthPrincipal,
     @Body(new ZodBodyPipe(NotificationPreferencesSchema)) body: NotificationPreferences,
   ): Promise<NotificationPreferences> {
     return this.updatePrefs.execute(me.userId, body.preferences);
@@ -85,9 +85,12 @@ export class NotificationsController {
   @Post('v1/devices')
   @HttpCode(200)
   device(
-    @CurrentPrincipal() me: Principal,
+    @Principal() me: AuthPrincipal,
     @Body(new ZodBodyPipe(RegisterDeviceSchema)) body: z.infer<typeof RegisterDeviceSchema>,
   ): Promise<DeviceRegistration> {
+    if (!me.deviceId) {
+      throw new AppError('unauthorized', 'The access token is not bound to a device.');
+    }
     return this.registerDevice.execute({ userId: me.userId, deviceId: me.deviceId, ...body });
   }
 }

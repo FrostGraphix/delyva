@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError } from './client.js';
-import { NotificationsClient } from './notifications.js';
+import { ApiError, DelyvaClient } from './client.js';
 import { RealtimeClient } from './realtime.js';
 
 const json = (status: number, body: unknown) =>
@@ -9,14 +8,14 @@ const json = (status: number, body: unknown) =>
     headers: { 'content-type': 'application/json' },
   });
 
-describe('NotificationsClient', () => {
+describe('DelyvaClient notifications', () => {
   const calls: { url: string; init: RequestInit | undefined }[] = [];
   const client = (status: number, body: unknown) =>
-    new NotificationsClient({
+    new DelyvaClient({
       baseUrl: 'https://api.example.test',
       accessToken: () => 'tok',
       fetch: (url, init) => {
-        calls.push({ url: String(url), init });
+        calls.push({ url: url instanceof Request ? url.url : url.toString(), init });
         return Promise.resolve(json(status, body));
       },
     });

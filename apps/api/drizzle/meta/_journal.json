@@ -19,7 +19,14 @@
     {
       "idx": 2,
       "version": "7",
-      "when": 1795128226097,
+      "when": 1795127969385,
+      "tag": "0200_pricing",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795150145160,
       "tag": "0400_notifications",
       "breakpoints": true
     }

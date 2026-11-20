@@ -14,8 +14,7 @@ import {
   useQueryClient,
   type UseQueryResult,
 } from '@tanstack/react-query';
-import type { ApiError } from './client.js';
-import type { NotificationsClient } from './notifications.js';
+import type { ApiError, DelyvaClient } from './client.js';
 
 /** Query keys for notifications. */
 export const notificationKeys = {
@@ -26,7 +25,7 @@ export const notificationKeys = {
 
 /** Inbox page (stale after 30 s; cached for offline reads). */
 export function useNotifications(
-  client: NotificationsClient,
+  client: DelyvaClient,
   query: ListNotificationsQuery = {},
 ): UseQueryResult<NotificationPage, ApiError> {
   return useQuery({
@@ -38,7 +37,7 @@ export function useNotifications(
 
 /** Marks a notification read and refreshes the inbox. */
 export function useMarkNotificationRead(
-  client: NotificationsClient,
+  client: DelyvaClient,
 ): UseMutationResult<void, ApiError, string> {
   const qc = useQueryClient();
   return useMutation({
@@ -49,7 +48,7 @@ export function useMarkNotificationRead(
 
 /** Effective notification preferences. */
 export function useNotificationPreferences(
-  client: NotificationsClient,
+  client: DelyvaClient,
 ): UseQueryResult<NotificationPreferences, ApiError> {
   return useQuery({
     queryKey: notificationKeys.preferences(),
@@ -59,7 +58,7 @@ export function useNotificationPreferences(
 
 /** Updates preferences and stores the returned matrix in the cache. */
 export function useUpdateNotificationPreferences(
-  client: NotificationsClient,
+  client: DelyvaClient,
 ): UseMutationResult<NotificationPreferences, ApiError, NotificationPreferences> {
   const qc = useQueryClient();
   return useMutation({
@@ -72,14 +71,14 @@ export function useUpdateNotificationPreferences(
 
 /** Registers the device's Expo push token (call after the OS permission is granted). */
 export function useRegisterDevice(
-  client: NotificationsClient,
+  client: DelyvaClient,
 ): UseMutationResult<DeviceRegistration, ApiError, RegisterDevice> {
   return useMutation({ mutationFn: (body) => client.registerDevice(body) });
 }
 
 /** Sends a batch of queued rider locations over HTTP (socket fallback). */
 export function usePostRiderLocations(
-  client: NotificationsClient,
+  client: DelyvaClient,
 ): UseMutationResult<LocationBatchResult, ApiError, RiderLocationBatch> {
   return useMutation({ mutationFn: (body) => client.postRiderLocations(body) });
 }

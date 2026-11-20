@@ -1,8 +1,7 @@
 import { Body, Controller, HttpCode, Inject, Post, UseGuards } from '@nestjs/common';
 import { type LocationBatchResult, RiderLocationBatchSchema } from '@delyva/contracts';
 import type { z } from 'zod';
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
-import { AuthGuard, CurrentPrincipal } from '../../../shared/auth/auth.guard.js';
+import { type AuthPrincipal, AuthGuard, Principal } from '../../../shared/auth/auth.guard.js';
 import { AppError } from '../../../shared/errors/app-error.js';
 import { ZodBodyPipe } from '../../../shared/validation/zod-body.pipe.js';
 import { LIVE_TRACKING, type LiveTrackingService } from '../application/live-tracking.service.js';
@@ -27,7 +26,7 @@ export class RiderLocationsController {
   @Post('v1/riders/me/locations')
   @HttpCode(202)
   async post(
-    @CurrentPrincipal() me: Principal,
+    @Principal() me: AuthPrincipal,
     @Body(new ZodBodyPipe(RiderLocationBatchSchema)) body: z.infer<typeof RiderLocationBatchSchema>,
   ): Promise<LocationBatchResult> {
     if (!isRider(me.roles)) throw new AppError('forbidden', 'Only riders can report locations.');

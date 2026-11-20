@@ -2,7 +2,6 @@ import {
   LOCATION_MAX_AGE_MS,
   LOCATION_MAX_FUTURE_SKEW_MS,
   type RiderLocation,
-  type Role,
 } from '@delyva/contracts';
 
 /** Socket location rate limit: NFR is one fix every 4–5 s on a trip; allow small bursts. */
@@ -31,10 +30,11 @@ export function partitionFixes(
   return { fresh, rejected: fixes.length - fresh.length };
 }
 
-const STAFF: readonly Role[] = ['ops', 'support', 'super_admin'];
+const STAFF: readonly string[] = ['ops', 'support', 'super_admin'];
 
 /** Ops/support staff may observe any order or rider room. */
-export const isOpsStaff = (roles: readonly Role[]): boolean => roles.some((r) => STAFF.includes(r));
+export const isOpsStaff = (roles: readonly string[]): boolean =>
+  roles.some((r) => STAFF.includes(r));
 
 /** Only riders may publish locations. */
-export const isRider = (roles: readonly Role[]): boolean => roles.includes('rider');
+export const isRider = (roles: readonly string[]): boolean => roles.includes('rider');

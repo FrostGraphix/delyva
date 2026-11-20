@@ -1,5 +1,9 @@
 import { type DynamicModule, Module } from '@nestjs/common';
 import type { Redis } from 'ioredis';
+import { ACCESS_TOKEN_VERIFIER, AuthGuard } from '../../shared/auth/auth.guard.js';
+import { JoseAccessTokenVerifier } from '../../shared/auth/jose-access-token.verifier.js';
+import { JoseAccessTokenSigner } from '../identity/infrastructure/jose-access-token.signer.js';
+import { ENV, type Env } from '../../shared/config/env.js';
 import { REDIS } from '../../shared/redis/redis.js';
 import { IdentityModule } from '../identity/identity.module.js';
 import { RealtimeGateway } from './api/realtime.gateway.js';
@@ -22,6 +26,17 @@ import { SocketRoomBroadcaster } from './infrastructure/socket-io.js';
   imports: [IdentityModule],
   controllers: [RiderLocationsController],
   providers: [
+    {
+      provide: ACCESS_TOKEN_VERIFIER,
+      inject: [JoseAccessTokenSigner, ENV],
+      useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
+        new JoseAccessTokenVerifier({
+          key: signer.verificationKey,
+          issuer: env.JWT_ISSUER,
+          audience: env.JWT_AUDIENCE,
+        }),
+    },
+    AuthGuard,
     RealtimeGateway,
     SocketRoomBroadcaster,
     { provide: ORDER_ROOM_AUTHORIZER, useClass: DenyByDefaultOrderRoomAuthorizer },

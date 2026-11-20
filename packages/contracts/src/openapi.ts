@@ -17,10 +17,26 @@ import {
 } from './notifications/index.js';
 import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
+import {
+  CreateFeeRuleSchema,
+  CreatePromoSchema,
+  CreateSurgeRuleSchema,
+  FeeRuleListSchema,
+  FeeRuleSchema,
+  PromoListSchema,
+  PromoSchema,
+  QuoteRequestSchema,
+  QuoteResponseSchema,
+  SurgeRuleListSchema,
+  SurgeRuleSchema,
+  UpdateFeeRuleSchema,
+  UpdatePromoSchema,
+  UpdateSurgeRuleSchema,
+} from './pricing/index.js';
 
 /** One HTTP operation described from Zod schemas. */
 export interface RouteSpec {
-  readonly method: 'get' | 'post' | 'put';
+  readonly method: 'get' | 'post' | 'put' | 'patch';
   readonly path: string;
   readonly operationId: string;
   readonly summary: string;
@@ -88,6 +104,106 @@ export const ROUTES = {
     body: LogoutRequestSchema,
     success: { status: 204 },
     errors: [400],
+  },
+  createQuote: {
+    method: 'post',
+    path: '/v1/quotes',
+    operationId: 'createQuote',
+    summary: 'Price a cart: itemised fees, surge, promo, VAT and total (server-computed)',
+    body: QuoteRequestSchema,
+    success: { status: 200, schema: QuoteResponseSchema },
+    errors: [400, 401, 422],
+    auth: true,
+  },
+  listFeeRules: {
+    method: 'get',
+    path: '/v1/admin/fee-rules',
+    operationId: 'listFeeRules',
+    summary: 'List delivery fee rules (ops, super_admin)',
+    success: { status: 200, schema: FeeRuleListSchema },
+    errors: [401, 403],
+    auth: true,
+  },
+  createFeeRule: {
+    method: 'post',
+    path: '/v1/admin/fee-rules',
+    operationId: 'createFeeRule',
+    summary: 'Create a zone fee rule (ops, super_admin)',
+    body: CreateFeeRuleSchema,
+    success: { status: 201, schema: FeeRuleSchema },
+    errors: [400, 401, 403, 409],
+    idempotent: true,
+    auth: true,
+  },
+  updateFeeRule: {
+    method: 'patch',
+    path: '/v1/admin/fee-rules/{id}',
+    operationId: 'updateFeeRule',
+    summary: 'Update a zone fee rule (ops, super_admin)',
+    body: UpdateFeeRuleSchema,
+    success: { status: 200, schema: FeeRuleSchema },
+    errors: [400, 401, 403, 404],
+    auth: true,
+  },
+  listSurgeRules: {
+    method: 'get',
+    path: '/v1/admin/surge-rules',
+    operationId: 'listSurgeRules',
+    summary: 'List surge rules (ops, super_admin)',
+    success: { status: 200, schema: SurgeRuleListSchema },
+    errors: [401, 403],
+    auth: true,
+  },
+  createSurgeRule: {
+    method: 'post',
+    path: '/v1/admin/surge-rules',
+    operationId: 'createSurgeRule',
+    summary: 'Create a surge rule (ops, super_admin)',
+    body: CreateSurgeRuleSchema,
+    success: { status: 201, schema: SurgeRuleSchema },
+    errors: [400, 401, 403],
+    idempotent: true,
+    auth: true,
+  },
+  updateSurgeRule: {
+    method: 'patch',
+    path: '/v1/admin/surge-rules/{id}',
+    operationId: 'updateSurgeRule',
+    summary: 'Update a surge rule (ops, super_admin)',
+    body: UpdateSurgeRuleSchema,
+    success: { status: 200, schema: SurgeRuleSchema },
+    errors: [400, 401, 403, 404],
+    auth: true,
+  },
+  listPromos: {
+    method: 'get',
+    path: '/v1/admin/promos',
+    operationId: 'listPromos',
+    summary: 'List promos with usage counters (ops, super_admin)',
+    success: { status: 200, schema: PromoListSchema },
+    errors: [401, 403],
+    auth: true,
+  },
+  createPromo: {
+    method: 'post',
+    path: '/v1/admin/promos',
+    operationId: 'createPromo',
+    summary: 'Create a promo code (ops, super_admin)',
+    body: CreatePromoSchema,
+    success: { status: 201, schema: PromoSchema },
+    errors: [400, 401, 403, 409],
+    idempotent: true,
+    auth: true,
+  },
+  updatePromo: {
+    method: 'patch',
+    path: '/v1/admin/promos/{id}',
+    operationId: 'updatePromo',
+    summary: 'Update a promo code (ops, super_admin)',
+    body: UpdatePromoSchema,
+    success: { status: 200, schema: PromoSchema },
+    errors: [400, 401, 403, 404],
+    auth: true,
   },
   listNotifications: {
     method: 'get',
@@ -160,9 +276,10 @@ function problemResponses(statuses: readonly number[]): Record<string, object> {
   );
 }
 
+/** Declares `{name}` path segments as required UUID path parameters. */
 function pathParameters(path: string): object[] {
-  return [...path.matchAll(/\{(\w+)\}/g)].map((m) => ({
-    name: m[1],
+  return [...path.matchAll(/\{(\w+)\}/g)].map(([, name]) => ({
+    name,
     in: 'path',
     required: true,
     schema: { type: 'string', format: 'uuid' },
@@ -197,12 +314,12 @@ function operation(route: RouteSpec): object {
         },
       ]
     : [];
-  const parameters = [...headers, ...pathParameters(route.path), ...queryParameters(route.query)];
+  const parameters = [...pathParameters(route.path), ...headers, ...queryParameters(route.query)];
   return {
     operationId: route.operationId,
     summary: route.summary,
-    ...(parameters.length > 0 ? { parameters } : {}),
     ...(route.auth ? { security: [{ bearerAuth: [] }] } : {}),
+    ...(parameters.length > 0 ? { parameters } : {}),
     ...(route.body
       ? {
           requestBody: {

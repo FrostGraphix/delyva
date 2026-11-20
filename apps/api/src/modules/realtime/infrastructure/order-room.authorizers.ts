@@ -1,4 +1,4 @@
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
+import type { AuthPrincipal } from '../../../shared/auth/auth.guard.js';
 import type { OrderRoomAuthorizer } from '../application/ports.js';
 
 /**
@@ -7,7 +7,7 @@ import type { OrderRoomAuthorizer } from '../application/ports.js';
  */
 export class DenyByDefaultOrderRoomAuthorizer implements OrderRoomAuthorizer {
   /** @inheritdoc */
-  canJoin(_principal: Principal, _orderId: string): Promise<boolean> {
+  canJoin(_principal: AuthPrincipal, _orderId: string): Promise<boolean> {
     return Promise.resolve(false);
   }
 }
@@ -25,7 +25,7 @@ export class InMemoryOrderRoomAuthorizer implements OrderRoomAuthorizer {
   }
 
   /** @inheritdoc */
-  canJoin(principal: Principal, orderId: string): Promise<boolean> {
+  canJoin(principal: AuthPrincipal, orderId: string): Promise<boolean> {
     return Promise.resolve(this.participants.get(orderId)?.has(principal.userId) ?? false);
   }
 }

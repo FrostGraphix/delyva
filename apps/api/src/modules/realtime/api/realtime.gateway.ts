@@ -19,8 +19,7 @@ import type { Logger } from 'pino';
 import {
   ACCESS_TOKEN_VERIFIER,
   type AccessTokenVerifier,
-  bearerToken,
-} from '../../../shared/auth/access-token.verifier.js';
+} from '../../../shared/auth/auth.guard.js';
 import { LOGGER } from '../../../shared/logging/logger.js';
 import { LIVE_TRACKING, type LiveTrackingService } from '../application/live-tracking.service.js';
 import {
@@ -38,6 +37,11 @@ import {
 
 const fail = (code: Exclude<SocketAck, { ok: true }>['code']): SocketAck => ({ ok: false, code });
 const OK: SocketAck = { ok: true };
+
+function bearerToken(header: string | undefined): string | null {
+  const match = /^Bearer ([\w.-]+)$/i.exec(header?.trim() ?? '');
+  return match?.[1] ?? null;
+}
 
 /**
  * Socket.IO gateway: JWT handshake auth, per-order/per-rider rooms with an authorization hook,

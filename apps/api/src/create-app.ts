@@ -8,6 +8,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import type { OrderRoomAuthorizer } from './modules/realtime/application/ports.js';
 import { RedisIoAdapter } from './modules/realtime/infrastructure/socket-io.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
+import { PricingModule } from './modules/pricing/pricing.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';
@@ -48,7 +49,13 @@ export async function createApp(
     : RealtimeModule;
 
   @Module({
-    imports: [SharedModule.forRoot(env, logger), IdentityModule, NotificationsModule, realtime],
+    imports: [
+      SharedModule.forRoot(env, logger),
+      IdentityModule,
+      PricingModule,
+      NotificationsModule,
+      realtime,
+    ],
   })
   class AppModule {}
 

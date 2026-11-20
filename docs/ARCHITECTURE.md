@@ -436,3 +436,53 @@ All versions are pinned exactly in `package.json` (`.npmrc` has `save-exact=true
 - DEBT(web): CSP/HSTS headers not configured; i18n not set up (hard-coded English in scaffolds).
 - DEBT(test): SDK hooks and RN `Button` lack render tests (need React/RN testing libraries); no Testcontainers yet (integration tests use the docker-compose services and skip with a message when unreachable).
 - DEBT(icons): icons are hand-optimised SVG; SVGO pipeline and Phosphor import not added.
+
+## Pricing (Phase 1, 2026-11-19)
+
+Bounded context `apps/api/src/modules/pricing` (`api/application/domain/infrastructure`). See ADR 0200.
+
+- **Public interface:** `PricingService.quote({ userId, zoneCode, pickup, dropoff, lines, promoCode? })` returns an itemised `PriceQuote` in `Money` (kobo). `RedeemPromo.execute({ code, userId, orderId, itemsSubtotalMinor, discountMinor })` records a redemption once per (promo, order). Both are exported by `PricingModule` for ordering.
+- **Endpoints:** `POST /v1/quotes` (any authenticated user), `GET/POST/PATCH /v1/admin/fee-rules`, `/v1/admin/surge-rules`, `/v1/admin/promos` (roles `ops`, `super_admin`; POSTs need `Idempotency-Key`). New problem codes: `zone_not_serviceable` (422), `promo_ineligible` (422).
+- **Calculation order (pure domain, integer kobo, basis points):**
+  1. Items subtotal = Σ quantity × (unit + Σ modifier deltas); a negative unit price is rejected.
+  2. Delivery fee = base fee (covers `baseDistanceMeters`) + per **started** km beyond it, each km priced by the tier it starts in; clamped to `[minFee, maxFee]`. Distance = straight-line haversine rounded **up** to the metre; beyond `maxDistanceMeters` → `zone_not_serviceable`.
+  3. Surge = highest matching rule for the zone and Lagos-local (UTC+1) weekday/minute window `[start, end)`, never compounding, capped at `maxSurgeBps`; a separate `surgeFee` line on the delivery fee.
+  4. Small-order fee when subtotal < threshold. Service fee = subtotal × bps, capped.
+  5. Promo discount: `free_delivery` = delivery + surge; `percent_off` = floor(subtotal × bps), capped; `fixed_off` = value; item discounts never exceed the subtotal; then clamped to the promo's remaining budget.
+  6. VAT (`vatBps`, 750 for Lagos; 0 disables) on platform fees only (delivery + surge + small-order + service − free-delivery discount); menu prices are VAT-inclusive.
+  7. `total = subtotal + fees + VAT − discount` (never negative).
+- **Rounding:** charges (fees, surge, VAT) round half-up to the kobo; percentage discounts round down. `amount × bps` uses BigInt.
+- **Promo eligibility** (fixed order, server-side only): active → window → weekday → audience (`new_users`) → min order → per-user limit → global limit → budget. A quote returns `promo.applied=false` with a `reason` instead of failing.
+- **Redemption concurrency:** `SELECT … FOR UPDATE` on the promo row, eligibility re-checked under the lock, `UNIQUE(promo_id, order_id)` for idempotency, `CHECK`s `spent_minor <= budget_minor` and `redemption_count <= global_limit`. Emits `pricing.promo.redeemed` (`{ redemptionId, promoId, code, userId, orderId, discountMinor }`) via the outbox in the same transaction.
+- **Storage:** migration `0200_pricing` (`fee_rules` one per zone with JSONB tiers, `surge_rules`, `promos`, `promo_redemptions`). Idempotent seed that never overwrites admin edits: `pnpm --filter @delyva/api db:seed:pricing`. Lagos: ₦300 within 3 km, then ₦100/₦150/₦200 per km (to 8 km / 15 km / beyond), ₦300–₦3,500, max 25 km, small-order ₦200 under ₦2,000, service 5 % cap ₦500, VAT 7.5 %, surge cap 1.5x (weekday 12–14h 1.2x, 18–21h 1.3x). Promos `TUNDE50` (₦500 off, new users, once) and `WEEKEND` (free delivery Sat/Sun, min ₦3,000).
+- **Auth:** generic `src/shared/auth` (`AuthGuard`, `@Roles`, `@Principal`, `JoseAccessTokenVerifier`); a module provides `ACCESS_TOKEN_VERIFIER` (pricing builds it from identity's exported signer key).
+
+### Known technical debt (pricing)
+
+- DEBT(pricing): `/v1/quotes` trusts client unit prices until the catalog context exists; ordering must re-quote with catalog prices before charging.
+- DEBT(pricing): zone is a client-supplied `zoneCode`; resolve from coordinates with PostGIS when geo lands. Distance is straight-line, not road distance.
+- DEBT(pricing): "new customer" = no prior promo redemption; switch to ordering's delivered-order count.
+- DEBT(pricing): quotes are not persisted/signed; checkout should reference a short-lived server-side quote id.
+- DEBT(pricing): no admin audit log for config changes; no weather/demand surge; no SDK methods for surge-rule admin.
+
+## Notifications & realtime (Phase 1, 2026-11-20)
+
+Bounded contexts `apps/api/src/modules/notifications` and `apps/api/src/modules/realtime` (`api/application/domain/infrastructure`), delivery workers in `apps/workers/src/jobs`. See ADR 0400.
+
+- **Contracts:** `packages/contracts/src/notifications` (templates, channels, locales, devices, inbox, preferences, BullMQ job + dead-letter schemas, queue names) and `packages/contracts/src/realtime` (location schemas, socket event names, typed `ServerToClientEvents` / `ClientToServerEvents`, room helpers).
+- **Endpoints (Bearer auth, caller-scoped):** `GET /v1/notifications` (cursor, `unreadOnly`), `POST /v1/notifications/{id}/read` (404 for other users' items), `GET/PUT /v1/notifications/preferences`, `POST /v1/devices` (Expo token bound to the token's `did`), `POST /v1/riders/me/locations` (riders only, batched fallback). Writes are naturally idempotent (upserts / set-once), so they do not require `Idempotency-Key`.
+- **Event → notification mapping:** `identity.user.registered` → `account.welcome`; placeholders `ordering.order.{placed,vendor_accepted,rider_assigned,picked_up,delivered,cancelled_by_customer,cancelled_by_ops,vendor_rejected}` (payload `{ orderId, customerId, orderRef? }`) → `order.*` templates for the customer.
+- **Pipeline:** outbox consumer (receipt-table claim) → `NotifyUser` (preferences → render in device locale → inbox row → BullMQ jobs) → workers (`notifications` queue; Expo push / Termii SMS / WhatsApp stub; 5 attempts, full-jitter backoff; terminal failures → `notifications-dlq`).
+- **Realtime:** Socket.IO on the API HTTP server via `@nestjs/websockets` + `RedisIoAdapter` (`@socket.io/redis-adapter`). JWT handshake auth with the shared `ACCESS_TOKEN_VERIFIER`, rooms `order:<id>` / `rider:<id>`, `OrderRoomAuthorizer` port (deny-by-default; ops/support/super_admin always allowed), `rider:location` → validate → rate limit → `GEOADD riders:locations` → emit to the rider's active order room only. `LiveTrackingService` (`LIVE_TRACKING`) exported for dispatch.
+- **SDK:** `DelyvaClient` methods `listNotifications`, `markNotificationRead`, `getNotificationPreferences`, `updateNotificationPreferences`, `registerDevice`, `postRiderLocations`; hooks in `notification-hooks.ts`; `RealtimeClient` (typed socket helper with ack timeouts).
+- **Storage:** migration `0400_notifications` (`notifications`, `push_devices`, `notification_preferences`, `notification_event_receipts`). Redis: `riders:locations` (GEO), `rider:<id>:last`, `rider:<id>:active_order`, `rl:loc:*`, BullMQ keys under `BULLMQ_PREFIX`.
+- **Config:** API `BULLMQ_PREFIX`, `NOTIFICATIONS_CONSUMER_ENABLED`; workers `PUSH_PROVIDER`, `EXPO_PUSH_URL`, `EXPO_ACCESS_TOKEN`, `SMS_PROVIDER`, `TERMII_*`, `BULLMQ_PREFIX`.
+- **Pinned versions added:** socket.io 4.8.4, socket.io-client 4.8.4, @socket.io/redis-adapter 8.3.0, @nestjs/websockets 12.5.1, @nestjs/platform-socket.io 12.5.1, bullmq 6.7.8 (api), ioredis 6.0.0 (workers dev).
+
+### Known technical debt (notifications & realtime)
+
+- DEBT(notifications): Expo push receipts not polled; `DeviceNotRegistered` tokens not disabled in `push_devices` (workers have no DB access).
+- DEBT(notifications): SMS phone (PII) stored in Redis job data; resolve in the worker or encrypt.
+- DEBT(notifications): phone lookup reads identity's `users` table directly (`SqlRecipientDirectory`) until identity exposes a directory service.
+- DEBT(notifications): outbox consumer polls with `NOT EXISTS`; move to a JetStream durable consumer. No DLQ replay admin tool. WhatsApp provider not chosen. Ordering event payload schema is a local placeholder. English copy only.
+- DEBT(realtime): no downsampled location trail (disputes, 90-day retention); stale GEO members not pruned; in-app notifications not pushed over the socket; no per-IP connection limit.

@@ -7,6 +7,9 @@ import {
 } from '@nestjs/common';
 import type pg from 'pg';
 import type { Logger } from 'pino';
+import { ACCESS_TOKEN_VERIFIER, AuthGuard } from '../../shared/auth/auth.guard.js';
+import { JoseAccessTokenVerifier } from '../../shared/auth/jose-access-token.verifier.js';
+import { JoseAccessTokenSigner } from '../identity/infrastructure/jose-access-token.signer.js';
 import { ENV, type Env } from '../../shared/config/env.js';
 import { DB, type Db, PG_POOL } from '../../shared/database/database.js';
 import { LOGGER } from '../../shared/logging/logger.js';
@@ -38,6 +41,17 @@ const systemClock: Clock = { now: () => new Date(), uuid: () => randomUUID() };
   imports: [IdentityModule],
   controllers: [NotificationsController],
   providers: [
+    {
+      provide: ACCESS_TOKEN_VERIFIER,
+      inject: [JoseAccessTokenSigner, ENV],
+      useFactory: (signer: JoseAccessTokenSigner, env: Env) =>
+        new JoseAccessTokenVerifier({
+          key: signer.verificationKey,
+          issuer: env.JWT_ISSUER,
+          audience: env.JWT_AUDIENCE,
+        }),
+    },
+    AuthGuard,
     { provide: CLOCK, useValue: systemClock },
     {
       provide: DrizzleInboxRepository,

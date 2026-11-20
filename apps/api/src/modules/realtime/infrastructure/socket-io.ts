@@ -1,3 +1,4 @@
+import type { AuthPrincipal } from '../../../shared/auth/auth.guard.js';
 import type { INestApplicationContext } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import {
@@ -11,12 +12,11 @@ import {
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Redis } from 'ioredis';
 import type { Server, ServerOptions, Socket } from 'socket.io';
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
 import type { RoomBroadcaster } from '../application/ports.js';
 
 /** Per-socket data set by the auth middleware. */
 export interface SocketData {
-  principal: Principal;
+  principal: AuthPrincipal;
 }
 
 /** Typed server. */

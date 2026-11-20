@@ -1,9 +1,9 @@
+import type { AuthPrincipal } from '../../../shared/auth/auth.guard.js';
 import type {
   OrderStatusBroadcast,
   RiderLocation,
   RiderLocationBroadcast,
 } from '@delyva/contracts';
-import type { Principal } from '../../../shared/auth/access-token.verifier.js';
 
 /**
  * Decides whether a principal may join `order:<id>`. The ordering context implements this
@@ -12,7 +12,7 @@ import type { Principal } from '../../../shared/auth/access-token.verifier.js';
  */
 export interface OrderRoomAuthorizer {
   /** True only for participants of the order. */
-  canJoin(principal: Principal, orderId: string): Promise<boolean>;
+  canJoin(principal: AuthPrincipal, orderId: string): Promise<boolean>;
 }
 
 /** DI token for the {@link OrderRoomAuthorizer}. */
