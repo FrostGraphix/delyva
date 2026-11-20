@@ -4,6 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from 'pino';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import type { OrderFulfilmentPort } from './modules/dispatch/application/ordering-contract.temp.js';
+import { DispatchModule } from './modules/dispatch/dispatch.module.js';
 import { GeoModule } from './modules/geo/geo.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
@@ -38,6 +40,8 @@ function requestContext(logger: Logger) {
 /** Optional overrides (integration tests; the ordering module will supply its authorizer). */
 export interface CreateAppOptions {
   readonly orderRoomAuthorizer?: OrderRoomAuthorizer;
+  /** TEMP(ordering-contract): ordering's fulfilment port (tests inject a double). */
+  readonly orderFulfilment?: OrderFulfilmentPort;
 }
 
 /** Builds the Nest application (used by main and integration tests). */
@@ -61,6 +65,10 @@ export async function createApp(
       NotificationsModule,
       realtime,
       PaymentsModule,
+      DispatchModule.forRoot({
+        realtime,
+        ...(options.orderFulfilment ? { orderFulfilment: options.orderFulfilment } : {}),
+      }),
     ],
   })
   class AppModule {}
