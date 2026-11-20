@@ -3,7 +3,6 @@
 Tags: **MVP** (launch) · **V2** (first 3–6 months) · **V3** (later).
 
 ## 1. Customer app (iOS + Android, + light web)
-
 **Account** — phone OTP login MVP · guest browse MVP · profile/avatar MVP · saved addresses (home/work/other, pin + landmark) MVP · referral code MVP · language switch V2 · biometric lock V3.
 **Discovery** — location-based home MVP · service tabs (Food/Groceries/Parcels/More) MVP · categories + cuisines MVP · search (stores+dishes, recent, trending) MVP · filters (rating, price, delivery time, open now, free-delivery) MVP · promos/banners MVP · "Early partners" featured MVP · favourites V2 · reorder MVP · collections/curation V2.
 **Merchant page** — hero, rating, ETA, fee, hours · menu with sticky categories · item sheet with modifiers/notes · group order V3.
@@ -17,7 +16,6 @@ Tags: **MVP** (launch) · **V2** (first 3–6 months) · **V3** (later).
 **Offline/edge** — low-data mode (smaller images) V2 · skeleton loaders, retry states MVP.
 
 ## 2. Merchant app (RN) + Merchant web dashboard (Next.js)
-
 **Onboarding** — self-registration (link/QR) MVP · KYC upload MVP · bank verification MVP · assisted menu upload via WhatsApp/photo/sheet (back-office) MVP · test order MVP · onboarding checklist + support contact MVP.
 **Orders** — live order inbox with sound/vibration MVP · accept (with prep time) / reject (reason) MVP · status buttons preparing/ready MVP · rider ETA + pickup code MVP · order history/search MVP · auto-print / Bluetooth printer V2 · kitchen display V3.
 **Store control** — open/closed toggle + schedule MVP · busy mode (add prep time) MVP · item availability toggle MVP · pause store V2.
@@ -29,7 +27,6 @@ Tags: **MVP** (launch) · **V2** (first 3–6 months) · **V3** (later).
 **Support** — help centre, chat, dispute order MVP.
 
 ## 3. Rider app (RN, Android-first)
-
 **Onboarding** — sign-up, selfie liveness, NIN/BVN, licence, guarantor, bank, training quiz MVP · status tracker + missing-docs prompts MVP.
 **Shift** — go online/offline MVP · check-in at hub, bike scan (QR) MVP · break mode V2 · shift schedule/zone heatmap V2.
 **Offers** — full-screen offer card with pickup, drop, distance, fee, ETA, 30 s countdown MVP · accept/decline MVP · batched offers V2.
@@ -40,7 +37,6 @@ Tags: **MVP** (launch) · **V2** (first 3–6 months) · **V3** (later).
 **Resilience** — offline queue, low-data maps, background location with battery optimisation MVP · anti-spoofing MVP.
 
 ## 4. Admin / Operations dashboard (web)
-
 **Live ops** — live map (riders, orders, hubs), order board by status, late/at-risk highlighting, search by order/phone MVP · manual assign/reassign/cancel/refund MVP · call/chat from console MVP · zone heatmap & demand V2.
 **Merchants** — pipeline (leads → onboarding → live), review KYC, approve/suspend, commission overrides, catalogue editor (assisted upload tool) MVP · outreach CRM for Bashir's team V2.
 **Riders** — applications, KYC review, training status, performance, suspend, cash reconciliation MVP.
@@ -55,10 +51,8 @@ Tags: **MVP** (launch) · **V2** (first 3–6 months) · **V3** (later).
 **Analytics** — GMV, orders, cost/order, contribution margin, cohorts, merchant & rider leaderboards, exports V2.
 
 ## 5. Cross-cutting
-
 Notifications service · Search · Media pipeline · i18n · Accessibility · Feature flags · A/B testing (V2) · Help centre CMS · Legal (T&Cs, privacy, permitted-items policy) · App-version gating.
 
 ## 6. MVP definition (from proposal: "Build first")
-
 Reliable **ordering, payments, merchant management and dispatch**:
 Customer (OTP, discover, cart, pay, track, rate) · Merchant (register, menu, orders, payouts) · Rider (onboard, offers, navigate, POD, earnings) · Admin (live board, approvals, pricing, settlements, basic fleet).

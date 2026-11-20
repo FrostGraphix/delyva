@@ -54,12 +54,12 @@ Delyva delivers food, groceries, pharmacy items and parcels in under 35 minutes.
 
 **The four surfaces**
 
-| Surface                     | Users                  | Must-have capabilities                                                                                                                                                                                         |
-| --------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Customer app (iOS, Android) | Shoppers               | Browse by location, search, vendor menus with modifiers, cart, checkout, wallet, promos, live order tracking, chat or call the rider through masked numbers, ratings, reorder, support, send-a-package errands |
-| Rider app (iOS, Android)    | Dispatch riders        | KYC onboarding, go online or offline, accept or decline jobs, turn-by-turn handoff to Maps, pickup and drop-off proof (OTP, photo), earnings, cash-out, background location, offline tolerance                 |
-| Vendor app + web portal     | Restaurants and stores | Accept or reject orders with prep time, mark items unavailable, menu and modifier management, opening hours, payouts, sales analytics, multi-branch, staff roles                                               |
-| Admin console (web)         | Ops, support, finance  | Live order map, manual dispatch override, zones and delivery-fee rules, promos, refunds, vendor and rider approval, fraud review, audit log, feature flags                                                     |
+| Surface | Users | Must-have capabilities |
+| --- | --- | --- |
+| Customer app (iOS, Android) | Shoppers | Browse by location, search, vendor menus with modifiers, cart, checkout, wallet, promos, live order tracking, chat or call the rider through masked numbers, ratings, reorder, support, send-a-package errands |
+| Rider app (iOS, Android) | Dispatch riders | KYC onboarding, go online or offline, accept or decline jobs, turn-by-turn handoff to Maps, pickup and drop-off proof (OTP, photo), earnings, cash-out, background location, offline tolerance |
+| Vendor app + web portal | Restaurants and stores | Accept or reject orders with prep time, mark items unavailable, menu and modifier management, opening hours, payouts, sales analytics, multi-branch, staff roles |
+| Admin console (web) | Ops, support, finance | Live order map, manual dispatch override, zones and delivery-fee rules, promos, refunds, vendor and rider approval, fraud review, audit log, feature flags |
 
 **Core flows to get right**
 
@@ -88,29 +88,29 @@ Delyva delivers food, groceries, pharmacy items and parcels in under 35 minutes.
 
 One language, TypeScript, end to end, in a single monorepo. This lets one small team share types, validation and the API client across all four surfaces. Swap any item only through an ADR.
 
-| Layer                       | Choice                                                                                                                                                       | Why                                                  |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| Monorepo                    | pnpm workspaces + Turborepo                                                                                                                                  | Shared packages, cached builds                       |
-| Mobile apps                 | React Native with Expo (managed workflow, EAS Build and EAS Update), Expo Router, TypeScript                                                                 | One codebase for iOS and Android; over-the-air fixes |
-| Mobile state and data       | TanStack Query (server state), Zustand (UI state), MMKV (fast local storage)                                                                                 | Caching, offline reads, simple stores                |
-| Mobile UI                   | Design-system package on React Native primitives, Reanimated, Gesture Handler, FlashList, react-native-svg, Expo Image                                       | 60 fps lists and animation; SVG icons                |
-| Maps                        | Google Maps Platform (Places, Directions, Distance Matrix) via react-native-maps; Mapbox as an alternative                                                   | Address quality in Nigerian cities; ETA              |
-| Web (vendor portal, admin)  | Next.js (App Router), React, Tailwind CSS mapped to the same design tokens, TanStack Table                                                                   | Shared tokens and SDK with mobile                    |
-| Backend                     | NestJS on Node.js LTS, a modular monolith (one deployable, strict module boundaries)                                                                         | Ship fast now; split hot modules into services later |
-| API                         | REST + OpenAPI 3.1 for public endpoints; generated typed SDK in `packages/sdk`; WebSockets (Socket.IO with Redis adapter) for live tracking and order status | Contract-first; real-time                            |
-| Validation                  | Zod schemas in `packages/contracts`, used by both client and server                                                                                          | One source of truth                                  |
-| Database                    | PostgreSQL 16+ with PostGIS; Prisma or Drizzle for access; raw SQL for geo and ledger queries                                                                | Relational integrity, geospatial queries             |
-| Cache and realtime state    | Redis (rider locations with GEO commands, sessions, rate limits, locks)                                                                                      | Sub-millisecond lookups                              |
-| Async jobs and events       | BullMQ on Redis for jobs; transactional outbox → NATS JetStream (or Kafka at scale) for domain events                                                        | Reliable events and retries                          |
-| Search                      | Meilisearch (or OpenSearch at scale) for vendors and dishes                                                                                                  | Typo-tolerant, fast                                  |
-| Payments                    | Paystack (primary), Flutterwave (fallback), Stripe for international cards later                                                                             | Local cards, transfers, USSD                         |
-| Messaging                   | FCM/APNs through Expo Notifications; Termii for SMS OTP; WhatsApp OTP as a fallback; masked calling via a voice provider                                     | Reach on poor data                                   |
-| Storage and media           | S3 + CloudFront, with images resized on upload (WebP/AVIF)                                                                                                   | Fast menus                                           |
-| Infra                       | AWS (af-south-1 or eu-west-1) on ECS Fargate or EKS; Terraform; Cloudflare in front (WAF, DDoS, CDN)                                                         | Reproducible, protected                              |
-| CI/CD                       | GitHub Actions; EAS for mobile builds; preview environments per PR                                                                                           | Fast, safe releases                                  |
-| Observability               | OpenTelemetry → Grafana (Tempo, Loki, Prometheus) or Datadog; Sentry for crash and error tracking                                                            | Traces across apps and API                           |
-| Product analytics and flags | PostHog (events, funnels, feature flags, experiments)                                                                                                        | Measure onboarding and conversion                    |
-| Testing                     | Vitest, React Native Testing Library, Playwright (web), Maestro (mobile end-to-end), Supertest + Testcontainers (API), k6 (load)                             | Full test pyramid                                    |
+| Layer | Choice | Why |
+| --- | --- | --- |
+| Monorepo | pnpm workspaces + Turborepo | Shared packages, cached builds |
+| Mobile apps | React Native with Expo (managed workflow, EAS Build and EAS Update), Expo Router, TypeScript | One codebase for iOS and Android; over-the-air fixes |
+| Mobile state and data | TanStack Query (server state), Zustand (UI state), MMKV (fast local storage) | Caching, offline reads, simple stores |
+| Mobile UI | Design-system package on React Native primitives, Reanimated, Gesture Handler, FlashList, react-native-svg, Expo Image | 60 fps lists and animation; SVG icons |
+| Maps | Google Maps Platform (Places, Directions, Distance Matrix) via react-native-maps; Mapbox as an alternative | Address quality in Nigerian cities; ETA |
+| Web (vendor portal, admin) | Next.js (App Router), React, Tailwind CSS mapped to the same design tokens, TanStack Table | Shared tokens and SDK with mobile |
+| Backend | NestJS on Node.js LTS, a modular monolith (one deployable, strict module boundaries) | Ship fast now; split hot modules into services later |
+| API | REST + OpenAPI 3.1 for public endpoints; generated typed SDK in `packages/sdk`; WebSockets (Socket.IO with Redis adapter) for live tracking and order status | Contract-first; real-time |
+| Validation | Zod schemas in `packages/contracts`, used by both client and server | One source of truth |
+| Database | PostgreSQL 16+ with PostGIS; Prisma or Drizzle for access; raw SQL for geo and ledger queries | Relational integrity, geospatial queries |
+| Cache and realtime state | Redis (rider locations with GEO commands, sessions, rate limits, locks) | Sub-millisecond lookups |
+| Async jobs and events | BullMQ on Redis for jobs; transactional outbox → NATS JetStream (or Kafka at scale) for domain events | Reliable events and retries |
+| Search | Meilisearch (or OpenSearch at scale) for vendors and dishes | Typo-tolerant, fast |
+| Payments | Paystack (primary), Flutterwave (fallback), Stripe for international cards later | Local cards, transfers, USSD |
+| Messaging | FCM/APNs through Expo Notifications; Termii for SMS OTP; WhatsApp OTP as a fallback; masked calling via a voice provider | Reach on poor data |
+| Storage and media | S3 + CloudFront, with images resized on upload (WebP/AVIF) | Fast menus |
+| Infra | AWS (af-south-1 or eu-west-1) on ECS Fargate or EKS; Terraform; Cloudflare in front (WAF, DDoS, CDN) | Reproducible, protected |
+| CI/CD | GitHub Actions; EAS for mobile builds; preview environments per PR | Fast, safe releases |
+| Observability | OpenTelemetry → Grafana (Tempo, Loki, Prometheus) or Datadog; Sentry for crash and error tracking | Traces across apps and API |
+| Product analytics and flags | PostHog (events, funnels, feature flags, experiments) | Measure onboarding and conversion |
+| Testing | Vitest, React Native Testing Library, Playwright (web), Maestro (mobile end-to-end), Supertest + Testcontainers (API), k6 (load) | Full test pyramid |
 
 Pin exact versions in `package.json` and record them in `/docs/ARCHITECTURE.md`. Check current stable versions before the first install rather than relying on memory.
 
@@ -154,18 +154,18 @@ Unit tests sit beside the file they test (`*.test.ts`). Cross-app end-to-end tes
 
 **Bounded contexts**
 
-| Context       | Owns                                                                              |
-| ------------- | --------------------------------------------------------------------------------- |
-| identity      | Users, roles, devices, sessions, OTP, KYC status                                  |
-| geo           | Addresses, delivery zones (PostGIS polygons), ETA and distance                    |
-| catalog       | Vendors, branches, menus, items, modifiers, availability, opening hours           |
-| ordering      | Carts, orders, the order state machine, scheduled orders                          |
-| pricing       | Delivery fees, surge, service fees, taxes, promos, referrals                      |
-| dispatch      | Rider availability, job offers, assignment, batching, live trips                  |
-| payments      | Payment intents, provider webhooks, refunds, wallet, double-entry ledger, payouts |
-| notifications | Push, SMS, WhatsApp, email, in-app inbox, templates                               |
-| engagement    | Ratings, reviews, favourites, support tickets, chat                               |
-| admin         | Audit log, feature flags, ops tooling, reporting views                            |
+| Context | Owns |
+| --- | --- |
+| identity | Users, roles, devices, sessions, OTP, KYC status |
+| geo | Addresses, delivery zones (PostGIS polygons), ETA and distance |
+| catalog | Vendors, branches, menus, items, modifiers, availability, opening hours |
+| ordering | Carts, orders, the order state machine, scheduled orders |
+| pricing | Delivery fees, surge, service fees, taxes, promos, referrals |
+| dispatch | Rider availability, job offers, assignment, batching, live trips |
+| payments | Payment intents, provider webhooks, refunds, wallet, double-entry ledger, payouts |
+| notifications | Push, SMS, WhatsApp, email, in-app inbox, templates |
+| engagement | Ratings, reviews, favourites, support tickets, chat |
+| admin | Audit log, feature flags, ops tooling, reporting views |
 
 **Order state machine** (implement as an explicit transition table in `ordering/domain`; reject any other transition)
 
@@ -311,15 +311,15 @@ Track each step as a PostHog funnel event (`onboarding_step_viewed`, `onboarding
 
 **Naming**
 
-| Thing                            | Convention                         | Example                                          |
-| -------------------------------- | ---------------------------------- | ------------------------------------------------ |
-| Files and folders                | kebab-case                         | `restaurant-card.tsx`, `place-order.use-case.ts` |
-| React components, classes, types | PascalCase                         | `RestaurantCard`, `OrderStatus`                  |
-| Functions, variables, hooks      | camelCase (hooks start with `use`) | `calculateDeliveryFee`, `useCart`                |
-| Constants and env vars           | SCREAMING\_SNAKE\_CASE             | `MAX_OTP_ATTEMPTS`                               |
-| Database tables and columns      | snake\_case, plural tables         | `order_items.unit_price_minor`                   |
-| Domain events                    | `context.entity.past_tense`        | `ordering.order.placed`                          |
-| API routes                       | `/v1/` + plural kebab-case nouns   | `POST /v1/orders/{id}/cancel`                    |
+| Thing | Convention | Example |
+| --- | --- | --- |
+| Files and folders | kebab-case | `restaurant-card.tsx`, `place-order.use-case.ts` |
+| React components, classes, types | PascalCase | `RestaurantCard`, `OrderStatus` |
+| Functions, variables, hooks | camelCase (hooks start with `use`) | `calculateDeliveryFee`, `useCart` |
+| Constants and env vars | SCREAMING\_SNAKE\_CASE | `MAX_OTP_ATTEMPTS` |
+| Database tables and columns | snake\_case, plural tables | `order_items.unit_price_minor` |
+| Domain events | `context.entity.past_tense` | `ordering.order.placed` |
+| API routes | `/v1/` + plural kebab-case nouns | `POST /v1/orders/{id}/cancel` |
 
 **Code**
 
@@ -389,27 +389,27 @@ End every task with: a summary of what changed, the commands to run (migrate, te
 
 All versions are pinned exactly in `package.json` (`.npmrc` has `save-exact=true`) and were checked with `npm view <pkg> version` before install.
 
-| Area         | Package                                                              | Version                                                                           |
-| ------------ | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Runtime      | Node.js                                                              | 24.13.1 (engines `>=24`)                                                          |
-| Monorepo     | pnpm / turbo                                                         | 11.1.2 / 2.11.13                                                                  |
-| Language     | typescript                                                           | 6.0.3 (TS 7.0.2 is `latest`, but typescript-eslint supports `<6.1`; see ADR 0002) |
-| Lint/format  | eslint / @eslint/js / typescript-eslint / globals / prettier         | 10.15.0 / 10.0.1 / 8.73.0 / 17.14.0 / 3.10.1                                      |
-| Test         | vitest / @vitest/coverage-v8 / supertest / unplugin-swc / @swc/core  | 5.1.1 / 5.1.1 / 7.3.2 / 2.0.0 / 1.16.22                                           |
-| Validation   | zod                                                                  | 4.6.7                                                                             |
-| Backend      | @nestjs/common, core, platform-express, testing                      | 12.5.1                                                                            |
-| Backend      | reflect-metadata / rxjs                                              | 0.2.2 / 7.8.2                                                                     |
-| Data         | drizzle-orm / drizzle-kit / pg                                       | 0.45.4 / 0.31.11 / 8.23.1                                                         |
-| Cache, jobs  | ioredis / bullmq                                                     | 6.0.0 / 6.7.8                                                                     |
-| Auth         | jose                                                                 | 6.2.18                                                                            |
-| Logging      | pino                                                                 | 10.4.0                                                                            |
-| Web          | next / tailwindcss / @tailwindcss/postcss / postcss                  | 16.4.6 / 4.3.5 / 4.3.5 / 8.5.33                                                   |
-| React        | react / react-dom / @types/react                                     | 19.3.0 / 19.3.0 / 19.3.0 (matches Expo SDK 58 bundledNativeModules)               |
-| Mobile       | expo / expo-router / expo-status-bar / expo-constants / expo-linking | 58.0.26 / 58.0.32 / 58.0.5 / 58.0.16 / 58.0.17                                    |
-| Mobile       | react-native / react-native-svg / safe-area-context / screens        | 0.88.1 / 15.16.0 / 5.11.1 / 4.30.1                                                |
-| SDK          | @tanstack/react-query                                                | 5.108.1                                                                           |
-| Infra images | postgis/postgis / redis                                              | 16-3.5 / 7.4-alpine                                                               |
-| CI           | actions/checkout / actions/setup-node / pnpm/action-setup / gitleaks | v7.0.1 / v7.1.0 / v6.1.1 / v8.30.1                                                |
+| Area | Package | Version |
+| --- | --- | --- |
+| Runtime | Node.js | 24.13.1 (engines `>=24`) |
+| Monorepo | pnpm / turbo | 11.1.2 / 2.11.13 |
+| Language | typescript | 6.0.3 (TS 7.0.2 is `latest`, but typescript-eslint supports `<6.1`; see ADR 0002) |
+| Lint/format | eslint / @eslint/js / typescript-eslint / globals / prettier | 10.15.0 / 10.0.1 / 8.73.0 / 17.14.0 / 3.10.1 |
+| Test | vitest / @vitest/coverage-v8 / supertest / unplugin-swc / @swc/core | 5.1.1 / 5.1.1 / 7.3.2 / 2.0.0 / 1.16.22 |
+| Validation | zod | 4.6.7 |
+| Backend | @nestjs/common, core, platform-express, testing | 12.5.1 |
+| Backend | reflect-metadata / rxjs | 0.2.2 / 7.8.2 |
+| Data | drizzle-orm / drizzle-kit / pg | 0.45.4 / 0.31.11 / 8.23.1 |
+| Cache, jobs | ioredis / bullmq | 6.0.0 / 6.7.8 |
+| Auth | jose | 6.2.18 |
+| Logging | pino | 10.4.0 |
+| Web | next / tailwindcss / @tailwindcss/postcss / postcss | 16.4.6 / 4.3.5 / 4.3.5 / 8.5.33 |
+| React | react / react-dom / @types/react | 19.3.0 / 19.3.0 / 19.3.0 (matches Expo SDK 58 bundledNativeModules) |
+| Mobile | expo / expo-router / expo-status-bar / expo-constants / expo-linking | 58.0.26 / 58.0.32 / 58.0.5 / 58.0.16 / 58.0.17 |
+| Mobile | react-native / react-native-svg / safe-area-context / screens | 0.88.1 / 15.16.0 / 5.11.1 / 4.30.1 |
+| SDK | @tanstack/react-query | 5.108.1 |
+| Infra images | postgis/postgis / redis | 16-3.5 / 7.4-alpine |
+| CI | actions/checkout / actions/setup-node / pnpm/action-setup / gitleaks | v7.0.1 / v7.1.0 / v6.1.1 / v8.30.1 |
 
 ### Decisions
 
@@ -436,52 +436,6 @@ All versions are pinned exactly in `package.json` (`.npmrc` has `save-exact=true
 - DEBT(web): CSP/HSTS headers not configured; i18n not set up (hard-coded English in scaffolds).
 - DEBT(test): SDK hooks and RN `Button` lack render tests (need React/RN testing libraries); no Testcontainers yet (integration tests use the docker-compose services and skip with a message when unreachable).
 - DEBT(icons): icons are hand-optimised SVG; SVGO pipeline and Phosphor import not added.
-
-## Phase 1 — catalog & geo (2026-11-20)
-
-### What exists
-
-- `apps/api/src/modules/geo`: customer addresses (`addresses`, PostGIS `geometry(Point,4326)`), Lagos delivery zones (`delivery_zones`, `geometry(Polygon,4326)` + GiST), `GeoService` public interface (`zonesContaining`, `travel`, `deliveryEstimate`), `EtaProvider` (haversine × road factor default; Google Distance Matrix adapter stub behind `ETA_PROVIDER=google`).
-- `apps/api/src/modules/catalog`: vendors (category restaurant/grocery/pharmacy/bakery/shop; status draft → in_review → live ↔ suspended, explicit transition table), `vendor_members` (owner/staff), branches (point + `zone_id`, prep minutes), weekly opening hours in Africa/Lagos (overnight intervals supported, overlaps rejected), menus → categories → items (integer kobo, validated through `Money`), modifier groups (min/max) and options (kobo deltas), availability toggles. `validateSelection` (modifier min/max/unknown/unavailable + kobo delta sum) is ready for ordering's cart re-pricing.
-- `apps/api/src/shared/auth/ownership.guard.ts` (new): `OwnershipGuard` + `@OwnsResource` + `OwnershipChecker` port, used after the shared `AuthGuard`/`@Roles`/`@Principal` from ADR 0200 (geo and catalog provide `ACCESS_TOKEN_VERIFIER` from identity's signer key, like pricing). `src/shared/validation/zod-query.pipe.ts` for strict query validation.
-- Migration `apps/api/drizzle/0100_catalog_geo.sql`; dev seed `pnpm --filter @delyva/api db:seed:catalog` (after build + migrate): 4 approximate Lagos zones (VI, Ikoyi, Lekki, Yaba), 8 vendors with Nigerian menus (one `in_review`), demo vendor owner `+2348000000001` (sign in via dev OTP).
-
-### Endpoints (v1)
-
-| Method        | Path                                                              | Auth                                                                                                                                            |
-| ------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET           | `/v1/vendors?lat=&lng=&category=`                                 | public; only live + open-now vendors with a branch whose zone covers the point; `distanceMeters`, `etaMinutes`, `deliveryFee: null` placeholder |
-| GET           | `/v1/vendors/{vendorId}`                                          | public; live vendors only, branches with `isOpenNow`, full menu                                                                                 |
-| POST          | `/v1/vendors/{vendorId}/items`                                    | vendor_owner (member owner)                                                                                                                     |
-| PATCH         | `/v1/vendors/{vendorId}/items/{itemId}`                           | vendor_owner                                                                                                                                    |
-| PUT           | `/v1/vendors/{vendorId}/items/{itemId}/availability`              | vendor_owner / vendor_staff                                                                                                                     |
-| PUT           | `/v1/vendors/{vendorId}/modifier-options/{optionId}/availability` | vendor_owner / vendor_staff                                                                                                                     |
-| POST          | `/v1/vendors/{vendorId}/items/{itemId}/modifier-groups`           | vendor_owner                                                                                                                                    |
-| PUT           | `/v1/vendors/{vendorId}/branches/{branchId}/opening-hours`        | vendor_owner                                                                                                                                    |
-| POST          | `/v1/vendors/{vendorId}/go-live`                                  | ops / super_admin                                                                                                                               |
-| GET, POST     | `/v1/addresses`                                                   | customer                                                                                                                                        |
-| PATCH, DELETE | `/v1/addresses/{addressId}`                                       | customer (own only; foreign ids 404)                                                                                                            |
-
-All writes require `Idempotency-Key`. Contracts: `packages/contracts/src/{geo,catalog}/`; SDK methods in `packages/sdk/src/client.ts`, hooks in `packages/sdk/src/catalog-hooks.ts`.
-
-### Events
-
-- `catalog.vendor.went_live` `{ vendorId }` — on transition to live.
-- `catalog.item.availability_changed` `{ vendorId, itemId, optionId | null, available }` — item or modifier option toggle.
-
-### Decisions
-
-- ADR 0100 — shared RBAC/ownership guards, geo ↔ catalog boundary via `GeoService`, ETA provider, 0100 migration naming.
-
-### Known technical debt (catalog & geo)
-
-- DEBT(pricing): `deliveryFee` is `null` until discovery calls pricing; pricing keys fee rules by `zoneCode` (`lagos`) while geo zones are uuids with `city = Lagos` — agree a mapping (zone code column on `delivery_zones`) before wiring.
-- DEBT(catalog): discovery not cached in Redis/CDN; no pagination beyond a 50-vendor cap; no search (Meilisearch).
-- DEBT(security): address `line1`/`landmark` stored plaintext (field-level encryption required); idempotency keys are scoped per path, not per user.
-- DEBT(admin): vendor approval has no reason/audit-log entry yet.
-- DEBT(geo): ETA heuristic constants uncalibrated; Google adapter untested, no breaker/cache, one call per branch.
-- DEBT(data): zone polygons are rough rectangles; drizzle snapshot for 0100 records SRID-less point type (SQL hand-corrected to 4326).
-- DEBT(sdk): catalog hooks have no render tests (same as Phase 0 hooks).
 
 ## Pricing (Phase 1, 2026-11-19)
 
@@ -532,3 +486,49 @@ Bounded contexts `apps/api/src/modules/notifications` and `apps/api/src/modules/
 - DEBT(notifications): phone lookup reads identity's `users` table directly (`SqlRecipientDirectory`) until identity exposes a directory service.
 - DEBT(notifications): outbox consumer polls with `NOT EXISTS`; move to a JetStream durable consumer. No DLQ replay admin tool. WhatsApp provider not chosen. Ordering event payload schema is a local placeholder. English copy only.
 - DEBT(realtime): no downsampled location trail (disputes, 90-day retention); stale GEO members not pruned; in-app notifications not pushed over the socket; no per-IP connection limit.
+
+## Phase 1 — catalog & geo (2026-11-20)
+
+### What exists
+
+- `apps/api/src/modules/geo`: customer addresses (`addresses`, PostGIS `geometry(Point,4326)`), Lagos delivery zones (`delivery_zones`, `geometry(Polygon,4326)` + GiST), `GeoService` public interface (`zonesContaining`, `travel`, `deliveryEstimate`), `EtaProvider` (haversine × road factor default; Google Distance Matrix adapter stub behind `ETA_PROVIDER=google`).
+- `apps/api/src/modules/catalog`: vendors (category restaurant/grocery/pharmacy/bakery/shop; status draft → in_review → live ↔ suspended, explicit transition table), `vendor_members` (owner/staff), branches (point + `zone_id`, prep minutes), weekly opening hours in Africa/Lagos (overnight intervals supported, overlaps rejected), menus → categories → items (integer kobo, validated through `Money`), modifier groups (min/max) and options (kobo deltas), availability toggles. `validateSelection` (modifier min/max/unknown/unavailable + kobo delta sum) is ready for ordering's cart re-pricing.
+- `apps/api/src/shared/auth/ownership.guard.ts` (new): `OwnershipGuard` + `@OwnsResource` + `OwnershipChecker` port, used after the shared `AuthGuard`/`@Roles`/`@Principal` from ADR 0200 (geo and catalog provide `ACCESS_TOKEN_VERIFIER` from identity's signer key, like pricing). `src/shared/validation/zod-query.pipe.ts` for strict query validation.
+- Migration `apps/api/drizzle/0100_catalog_geo.sql`; dev seed `pnpm --filter @delyva/api db:seed:catalog` (after build + migrate): 4 approximate Lagos zones (VI, Ikoyi, Lekki, Yaba), 8 vendors with Nigerian menus (one `in_review`), demo vendor owner `+2348000000001` (sign in via dev OTP).
+
+### Endpoints (v1)
+
+| Method        | Path                                                              | Auth                                                                                                                                            |
+| ------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET           | `/v1/vendors?lat=&lng=&category=`                                 | public; only live + open-now vendors with a branch whose zone covers the point; `distanceMeters`, `etaMinutes`, `deliveryFee: null` placeholder |
+| GET           | `/v1/vendors/{vendorId}`                                          | public; live vendors only, branches with `isOpenNow`, full menu                                                                                 |
+| POST          | `/v1/vendors/{vendorId}/items`                                    | vendor_owner (member owner)                                                                                                                     |
+| PATCH         | `/v1/vendors/{vendorId}/items/{itemId}`                           | vendor_owner                                                                                                                                    |
+| PUT           | `/v1/vendors/{vendorId}/items/{itemId}/availability`              | vendor_owner / vendor_staff                                                                                                                     |
+| PUT           | `/v1/vendors/{vendorId}/modifier-options/{optionId}/availability` | vendor_owner / vendor_staff                                                                                                                     |
+| POST          | `/v1/vendors/{vendorId}/items/{itemId}/modifier-groups`           | vendor_owner                                                                                                                                    |
+| PUT           | `/v1/vendors/{vendorId}/branches/{branchId}/opening-hours`        | vendor_owner                                                                                                                                    |
+| POST          | `/v1/vendors/{vendorId}/go-live`                                  | ops / super_admin                                                                                                                               |
+| GET, POST     | `/v1/addresses`                                                   | customer                                                                                                                                        |
+| PATCH, DELETE | `/v1/addresses/{addressId}`                                       | customer (own only; foreign ids 404)                                                                                                            |
+
+All writes require `Idempotency-Key`. Contracts: `packages/contracts/src/{geo,catalog}/`; SDK methods in `packages/sdk/src/client.ts`, hooks in `packages/sdk/src/catalog-hooks.ts`.
+
+### Events
+
+- `catalog.vendor.went_live` `{ vendorId }` — on transition to live.
+- `catalog.item.availability_changed` `{ vendorId, itemId, optionId | null, available }` — item or modifier option toggle.
+
+### Decisions
+
+- ADR 0100 — shared RBAC/ownership guards, geo ↔ catalog boundary via `GeoService`, ETA provider, 0100 migration naming.
+
+### Known technical debt (catalog & geo)
+
+- DEBT(pricing): `deliveryFee` is `null` until discovery calls pricing; pricing keys fee rules by `zoneCode` (`lagos`) while geo zones are uuids with `city = Lagos` — agree a mapping (zone code column on `delivery_zones`) before wiring.
+- DEBT(catalog): discovery not cached in Redis/CDN; no pagination beyond a 50-vendor cap; no search (Meilisearch).
+- DEBT(security): address `line1`/`landmark` stored plaintext (field-level encryption required); idempotency keys are scoped per path, not per user.
+- DEBT(admin): vendor approval has no reason/audit-log entry yet.
+- DEBT(geo): ETA heuristic constants uncalibrated; Google adapter untested, no breaker/cache, one call per branch.
+- DEBT(data): zone polygons are rough rectangles; drizzle snapshot for 0100 records SRID-less point type (SQL hand-corrected to 4326).
+- DEBT(sdk): catalog hooks have no render tests (same as Phase 0 hooks).
