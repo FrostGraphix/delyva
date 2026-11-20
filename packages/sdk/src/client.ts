@@ -182,6 +182,8 @@ export class DelyvaClient {
   /** POST /v1/riders/me/locations — HTTP fallback when the socket is down. */
   postRiderLocations(body: RiderLocationBatch): Promise<LocationBatchResult> {
     return this.send('POST', ROUTES.postRiderLocations.path, body, LocationBatchResultSchema);
+  }
+
   /** GET /v1/wallet (bearer) */
   getWallet(): Promise<Wallet> {
     return this.send('GET', ROUTES.getWallet.path, undefined, WalletSchema);
