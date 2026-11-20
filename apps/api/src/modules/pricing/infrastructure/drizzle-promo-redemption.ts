@@ -65,10 +65,14 @@ async function record(tx: Tx, code: string, r: RedemptionRecord): Promise<void> 
   });
 }
 
-/** Transactional redemption: `SELECT … FOR UPDATE` on the promo row serialises concurrent redeemers. */
+/**
+ * Transactional redemption: `SELECT … FOR UPDATE` on the promo row serialises concurrent redeemers.
+ * Built on a caller's transaction (ordering checkout) it runs in a SAVEPOINT of that transaction,
+ * so the redemption commits or rolls back together with the order.
+ */
 export class DrizzlePromoRedemptionUnitOfWork implements PromoRedemptionUnitOfWork {
-  /** @param db drizzle handle */
-  constructor(private readonly db: Db) {}
+  /** @param db drizzle handle or an enclosing transaction */
+  constructor(private readonly db: Queryable) {}
 
   /** @inheritdoc */
   withLockedPromo<T>(

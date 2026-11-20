@@ -43,6 +43,18 @@ export const EnvSchema = z
     PAYMENTS_CUSTOMER_EMAIL_DOMAIN: z.string().min(3).default('customers.delyva.invalid'),
     PAYOUT_MIN_MINOR: z.coerce.number().int().min(1).default(100_000),
     INTERNAL_JOBS_TOKEN: z.string().optional().default(''),
+    // ordering (ADR 0500)
+    /** Seconds a PLACED order waits for the vendor before it is auto-rejected. */
+    ORDERING_AUTO_REJECT_SECONDS: z.coerce.number().int().min(1).max(3_600).default(300),
+    /** Platform commission on the items subtotal, basis points (introductory 0 %). */
+    ORDERING_VENDOR_COMMISSION_BPS: z.coerce.number().int().min(0).max(10_000).default(0),
+    /** Rider share of delivery + surge fees, basis points. */
+    ORDERING_RIDER_DELIVERY_SHARE_BPS: z.coerce.number().int().min(0).max(10_000).default(8_000),
+    /** Runs the in-process auto-reject worker and payment-event consumer. */
+    ORDERING_JOBS_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
   })
   .superRefine((env, ctx) => {
     if (env.ETA_PROVIDER === 'google' && env.GOOGLE_MAPS_API_KEY === '') {

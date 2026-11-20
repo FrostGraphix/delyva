@@ -33,6 +33,9 @@ class FakeAddresses implements AddressRepository {
     this.rows = this.rows.filter((r) => !(r.id === id && r.userId === userId));
     return Promise.resolve(this.rows.length < before);
   }
+  findForUser(userId: string, id: string) {
+    return Promise.resolve(this.rows.find((r) => r.id === id && r.userId === userId) ?? null);
+  }
 }
 
 let n = 0;
@@ -78,13 +81,22 @@ describe('address use cases', () => {
 
 describe('GeoService', () => {
   it('delegates zone lookup and builds delivery estimates', async () => {
+    const addresses = new FakeAddresses();
+    const saved = await new CreateAddress({ addresses, clock }).execute('u1', input);
     const geo = new GeoService({
-      zones: { zoneIdsContaining: () => Promise.resolve(['z1']) },
+      zones: {
+        zoneIdsContaining: () => Promise.resolve(['z1']),
+        zonesContaining: () => Promise.resolve([{ id: 'z1', city: 'Lagos', name: 'VI' }]),
+      },
+      addresses,
       eta: { estimate: () => Promise.resolve({ distanceMeters: 3000, travelMinutes: 14 }) },
       policy: LAGOS_ETA_POLICY,
     });
     const a = { lat: 6.43, lng: 3.42 };
     expect(await geo.zonesContaining(a)).toEqual(['z1']);
+    expect(await geo.zonesAt(a)).toEqual([{ id: 'z1', city: 'Lagos', name: 'VI' }]);
+    expect(await geo.addressOf('u1', saved.id)).toMatchObject({ lat: 6.44, lng: 3.47 });
+    expect(await geo.addressOf('u2', saved.id)).toBeNull();
     expect(await geo.travel(a, a)).toEqual({ distanceMeters: 3000, travelMinutes: 14 });
     expect(await geo.deliveryEstimate(a, a, 20)).toEqual({ distanceMeters: 3000, etaMinutes: 39 });
   });

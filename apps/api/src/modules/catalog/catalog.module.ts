@@ -13,6 +13,7 @@ import { VendorApprovalsController } from './api/vendor-approvals.controller.js'
 import { VendorMenuController } from './api/vendor-menu.controller.js';
 import { VendorsController } from './api/vendors.controller.js';
 import { ApproveVendor } from './application/approve-vendor.use-case.js';
+import { CatalogService } from './application/catalog.service.js';
 import { CreateMenuItem } from './application/create-menu-item.use-case.js';
 import { CreateModifierGroup } from './application/create-modifier-group.use-case.js';
 import { DiscoverVendors } from './application/discover-vendors.query.js';
@@ -106,6 +107,17 @@ type W = DrizzleCatalogWriteRepository;
       inject: [DrizzleCatalogReadRepository, DrizzleCatalogWriteRepository],
       useFactory: (reads: R, writes: W) => new ApproveVendor({ reads, writes, clock }),
     },
+    { provide: CatalogService, inject: [DB], useFactory: buildCatalogService },
   ],
+  exports: [CatalogService],
 })
 export class CatalogModule {}
+
+/**
+ * Builds the public {@link CatalogService} on a database handle. Exposed for the composition
+ * root (the realtime order-room authorizer is wired outside this module's injector).
+ */
+export function buildCatalogService(db: Db): CatalogService {
+  const writes = new DrizzleCatalogWriteRepository(db);
+  return new CatalogService({ reads: new DrizzleCatalogReadRepository(db), members: writes, clock });
+}

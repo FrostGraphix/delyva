@@ -87,4 +87,13 @@ export class DrizzleAddressRepository implements AddressRepository {
       .returning({ id: addresses.id });
     return rows.length > 0;
   }
+
+  /** @inheritdoc */
+  async findForUser(userId: string, id: string): Promise<AddressRecord | null> {
+    const [row] = await this.db
+      .select(columns)
+      .from(addresses)
+      .where(and(eq(addresses.id, id), eq(addresses.userId, userId)));
+    return row ? toRecord(row) : null;
+  }
 }

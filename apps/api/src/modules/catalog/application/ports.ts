@@ -39,6 +39,28 @@ export interface CatalogReadRepository {
   vendorAggregate(vendorId: string): Promise<VendorAggregate | null>;
 }
 
+/** A branch with its vendor, as needed to take an order (any status; callers decide). */
+export interface BranchSummary {
+  readonly branchId: string;
+  readonly branchName: string;
+  readonly vendorId: string;
+  readonly vendorName: string;
+  readonly vendorStatus: VendorStatus;
+  readonly active: boolean;
+  readonly zoneId: string;
+  readonly location: LatLng;
+  readonly prepMinutes: number;
+  readonly hours: readonly WeeklyInterval[];
+}
+
+/** Reads used by the ordering-facing {@link CatalogService}. */
+export interface OrderingCatalogReads {
+  /** One branch with its vendor; null when unknown. */
+  branchSummary(branchId: string): Promise<BranchSummary | null>;
+  /** All items of a vendor with modifier groups and options (current prices). */
+  vendorItems(vendorId: string): Promise<MenuItem[]>;
+}
+
 /** New menu item. */
 export interface NewMenuItem {
   readonly id: string;
