@@ -305,6 +305,8 @@ export class DelyvaClient {
   /** Carts, checkout, orders, vendor and ops order actions. */
   get ordering(): OrderingClient {
     return new OrderingClient(this);
+  }
+
   /** GET /v1/riders/me (rider) */
   getMyRiderProfile(): Promise<RiderProfile> {
     return this.send('GET', ROUTES.getMyRiderProfile.path, undefined, RiderProfileSchema);
