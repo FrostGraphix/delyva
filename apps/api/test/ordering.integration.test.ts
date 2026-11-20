@@ -233,6 +233,8 @@ describe.skipIf(!available)('ordering (integration: Postgres + Redis)', () => {
       optionIds: [SHAWARMA.cheese],
     });
     expect(c.itemsSubtotal).toEqual({ amountMinor: 940_000, currency: 'NGN' });
+    expect(c.checkoutReady).toBe(true);
+    expect((c.lines as Body[])[0]?.problem).toBeNull();
     const again = await cart(user, {
       branchId: SHAWARMA.branchId,
       itemId: SHAWARMA.item,

@@ -30,7 +30,7 @@ function lineDto(line: CartLineState, priced: PricedLine | undefined): Cart['lin
     })),
     unitPrice: ngn(unit),
     lineTotal: ngn(unit * line.quantity),
-    problem: priced?.problem ?? 'Item no longer exists',
+    problem: priced ? priced.problem : 'Item no longer exists',
   };
 }
 
