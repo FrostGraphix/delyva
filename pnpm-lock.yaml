@@ -313,6 +313,9 @@ importers:
 
   apps/workers:
     dependencies:
+      '@delyva/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       bullmq:
         specifier: 6.7.8
         version: 6.7.8(ioredis@6.0.0)(pg@8.23.1)

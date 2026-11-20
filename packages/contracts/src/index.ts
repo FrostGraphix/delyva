@@ -4,3 +4,4 @@ export * from './problem.js';
 export * from './events.js';
 export * from './health.js';
 export * from './openapi.js';
+export * from './payments/index.js';

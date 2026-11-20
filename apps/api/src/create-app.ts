@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from 'pino';
 import { IdentityModule } from './modules/identity/identity.module.js';
+import { PaymentsModule } from './modules/payments/payments.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
 import { SharedModule } from './shared/shared.module.js';
@@ -31,12 +32,14 @@ function requestContext(logger: Logger) {
 export async function createApp(env: Env): Promise<{ app: INestApplication; logger: Logger }> {
   const logger = createRootLogger(env.LOG_LEVEL);
 
-  @Module({ imports: [SharedModule.forRoot(env, logger), IdentityModule] })
+  @Module({ imports: [SharedModule.forRoot(env, logger), IdentityModule, PaymentsModule] })
   class AppModule {}
 
   const app = await NestFactory.create(AppModule, {
     logger: new PinoNestLogger(logger),
     bodyParser: true,
+    // Keeps req.rawBody (Buffer) next to the parsed JSON for webhook HMAC checks; other routes unaffected.
+    rawBody: true,
   });
   app.use(requestContext(logger));
   app.enableShutdownHooks();

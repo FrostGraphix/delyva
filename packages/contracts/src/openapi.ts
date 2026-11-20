@@ -8,6 +8,7 @@ import {
   TokenPairSchema,
 } from './auth.js';
 import { HealthSchema } from './health.js';
+import { PAYMENT_ROUTES } from './payments/payment-routes.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 
 /** One HTTP operation described from Zod schemas. */
@@ -77,6 +78,7 @@ export const ROUTES = {
     success: { status: 204 },
     errors: [400],
   },
+  ...PAYMENT_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
 
 const json = (schema: z.ZodType): object => z.toJSONSchema(schema, { target: 'draft-2020-12' });
@@ -97,6 +99,12 @@ function operation(route: RouteSpec): object {
         content: { 'application/json': { schema: json(route.success.schema) } },
       }
     : { description: 'No content' };
+  const pathParams = [...route.path.matchAll(/\{(\w+)\}/g)].map((m) => ({
+    name: m[1],
+    in: 'path',
+    required: true,
+    schema: { type: 'string' },
+  }));
   const headers = route.idempotent
     ? [
         {
@@ -110,7 +118,7 @@ function operation(route: RouteSpec): object {
   return {
     operationId: route.operationId,
     summary: route.summary,
-    ...(headers.length > 0 ? { parameters: headers } : {}),
+    ...(pathParams.length + headers.length > 0 ? { parameters: [...pathParams, ...headers] } : {}),
     ...(route.body
       ? {
           requestBody: {
