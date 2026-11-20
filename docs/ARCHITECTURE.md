@@ -486,3 +486,49 @@ Bounded contexts `apps/api/src/modules/notifications` and `apps/api/src/modules/
 - DEBT(notifications): phone lookup reads identity's `users` table directly (`SqlRecipientDirectory`) until identity exposes a directory service.
 - DEBT(notifications): outbox consumer polls with `NOT EXISTS`; move to a JetStream durable consumer. No DLQ replay admin tool. WhatsApp provider not chosen. Ordering event payload schema is a local placeholder. English copy only.
 - DEBT(realtime): no downsampled location trail (disputes, 90-day retention); stale GEO members not pruned; in-app notifications not pushed over the socket; no per-IP connection limit.
+
+## Phase 1 — catalog & geo (2026-11-20)
+
+### What exists
+
+- `apps/api/src/modules/geo`: customer addresses (`addresses`, PostGIS `geometry(Point,4326)`), Lagos delivery zones (`delivery_zones`, `geometry(Polygon,4326)` + GiST), `GeoService` public interface (`zonesContaining`, `travel`, `deliveryEstimate`), `EtaProvider` (haversine × road factor default; Google Distance Matrix adapter stub behind `ETA_PROVIDER=google`).
+- `apps/api/src/modules/catalog`: vendors (category restaurant/grocery/pharmacy/bakery/shop; status draft → in_review → live ↔ suspended, explicit transition table), `vendor_members` (owner/staff), branches (point + `zone_id`, prep minutes), weekly opening hours in Africa/Lagos (overnight intervals supported, overlaps rejected), menus → categories → items (integer kobo, validated through `Money`), modifier groups (min/max) and options (kobo deltas), availability toggles. `validateSelection` (modifier min/max/unknown/unavailable + kobo delta sum) is ready for ordering's cart re-pricing.
+- `apps/api/src/shared/auth/ownership.guard.ts` (new): `OwnershipGuard` + `@OwnsResource` + `OwnershipChecker` port, used after the shared `AuthGuard`/`@Roles`/`@Principal` from ADR 0200 (geo and catalog provide `ACCESS_TOKEN_VERIFIER` from identity's signer key, like pricing). `src/shared/validation/zod-query.pipe.ts` for strict query validation.
+- Migration `apps/api/drizzle/0100_catalog_geo.sql`; dev seed `pnpm --filter @delyva/api db:seed:catalog` (after build + migrate): 4 approximate Lagos zones (VI, Ikoyi, Lekki, Yaba), 8 vendors with Nigerian menus (one `in_review`), demo vendor owner `+2348000000001` (sign in via dev OTP).
+
+### Endpoints (v1)
+
+| Method        | Path                                                              | Auth                                                                                                                                            |
+| ------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET           | `/v1/vendors?lat=&lng=&category=`                                 | public; only live + open-now vendors with a branch whose zone covers the point; `distanceMeters`, `etaMinutes`, `deliveryFee: null` placeholder |
+| GET           | `/v1/vendors/{vendorId}`                                          | public; live vendors only, branches with `isOpenNow`, full menu                                                                                 |
+| POST          | `/v1/vendors/{vendorId}/items`                                    | vendor_owner (member owner)                                                                                                                     |
+| PATCH         | `/v1/vendors/{vendorId}/items/{itemId}`                           | vendor_owner                                                                                                                                    |
+| PUT           | `/v1/vendors/{vendorId}/items/{itemId}/availability`              | vendor_owner / vendor_staff                                                                                                                     |
+| PUT           | `/v1/vendors/{vendorId}/modifier-options/{optionId}/availability` | vendor_owner / vendor_staff                                                                                                                     |
+| POST          | `/v1/vendors/{vendorId}/items/{itemId}/modifier-groups`           | vendor_owner                                                                                                                                    |
+| PUT           | `/v1/vendors/{vendorId}/branches/{branchId}/opening-hours`        | vendor_owner                                                                                                                                    |
+| POST          | `/v1/vendors/{vendorId}/go-live`                                  | ops / super_admin                                                                                                                               |
+| GET, POST     | `/v1/addresses`                                                   | customer                                                                                                                                        |
+| PATCH, DELETE | `/v1/addresses/{addressId}`                                       | customer (own only; foreign ids 404)                                                                                                            |
+
+All writes require `Idempotency-Key`. Contracts: `packages/contracts/src/{geo,catalog}/`; SDK methods in `packages/sdk/src/client.ts`, hooks in `packages/sdk/src/catalog-hooks.ts`.
+
+### Events
+
+- `catalog.vendor.went_live` `{ vendorId }` — on transition to live.
+- `catalog.item.availability_changed` `{ vendorId, itemId, optionId | null, available }` — item or modifier option toggle.
+
+### Decisions
+
+- ADR 0100 — shared RBAC/ownership guards, geo ↔ catalog boundary via `GeoService`, ETA provider, 0100 migration naming.
+
+### Known technical debt (catalog & geo)
+
+- DEBT(pricing): `deliveryFee` is `null` until discovery calls pricing; pricing keys fee rules by `zoneCode` (`lagos`) while geo zones are uuids with `city = Lagos` — agree a mapping (zone code column on `delivery_zones`) before wiring.
+- DEBT(catalog): discovery not cached in Redis/CDN; no pagination beyond a 50-vendor cap; no search (Meilisearch).
+- DEBT(security): address `line1`/`landmark` stored plaintext (field-level encryption required); idempotency keys are scoped per path, not per user.
+- DEBT(admin): vendor approval has no reason/audit-log entry yet.
+- DEBT(geo): ETA heuristic constants uncalibrated; Google adapter untested, no breaker/cache, one call per branch.
+- DEBT(data): zone polygons are rough rectangles; drizzle snapshot for 0100 records SRID-less point type (SQL hand-corrected to 4326).
+- DEBT(sdk): catalog hooks have no render tests (same as Phase 0 hooks).
