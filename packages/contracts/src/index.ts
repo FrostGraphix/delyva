@@ -4,3 +4,7 @@ export * from './problem.js';
 export * from './events.js';
 export * from './health.js';
 export * from './openapi.js';
+export * from './geo/geo.js';
+export * from './geo/routes.js';
+export * from './catalog/catalog.js';
+export * from './catalog/routes.js';

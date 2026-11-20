@@ -10,6 +10,7 @@
     "dev": "tsc -p tsconfig.build.json && node --env-file-if-exists=.env dist/src/main.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file-if-exists=.env dist/scripts/migrate.js",
+    "db:seed": "node --env-file-if-exists=.env dist/scripts/seed-catalog.js",
     "openapi": "node dist/scripts/write-openapi.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",

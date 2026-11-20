@@ -7,16 +7,22 @@ import {
   RefreshRequestSchema,
   TokenPairSchema,
 } from './auth.js';
+import { CATALOG_ROUTES } from './catalog/routes.js';
+import { GEO_ROUTES } from './geo/routes.js';
 import { HealthSchema } from './health.js';
 import { PROBLEM_CONTENT_TYPE, ProblemSchema } from './problem.js';
 
-/** One HTTP operation described from Zod schemas. */
+/** One HTTP operation described from Zod schemas. Path params are taken from `{name}` segments. */
 export interface RouteSpec {
-  readonly method: 'get' | 'post';
+  readonly method: 'get' | 'post' | 'put' | 'patch' | 'delete';
   readonly path: string;
   readonly operationId: string;
   readonly summary: string;
   readonly body?: z.ZodType;
+  /** Query-string schema (object). */
+  readonly query?: z.ZodObject;
+  /** Requires a Bearer access token. */
+  readonly auth?: boolean;
   readonly success: { readonly status: number; readonly schema?: z.ZodType };
   readonly errors: readonly number[];
   readonly idempotent?: boolean;
@@ -77,6 +83,8 @@ export const ROUTES = {
     success: { status: 204 },
     errors: [400],
   },
+  ...GEO_ROUTES,
+  ...CATALOG_ROUTES,
 } as const satisfies Record<string, RouteSpec>;
 
 const json = (schema: z.ZodType): object => z.toJSONSchema(schema, { target: 'draft-2020-12' });
@@ -88,6 +96,30 @@ function problemResponses(statuses: readonly number[]): Record<string, object> {
   return Object.fromEntries(
     statuses.map((s) => [String(s), { description: 'Problem', ...problem }]),
   );
+}
+
+function pathParameters(path: string): object[] {
+  return [...path.matchAll(/\{(\w+)\}/g)].map((m) => ({
+    name: m[1],
+    in: 'path',
+    required: true,
+    schema: { type: 'string', format: 'uuid' },
+  }));
+}
+
+function queryParameters(query: z.ZodObject | undefined): object[] {
+  if (!query) return [];
+  const shape: Record<string, z.ZodType> = query.shape;
+  return Object.entries(shape).map(([name, schema]) => ({
+    name,
+    in: 'query',
+    required: !schema.safeParse(undefined).success,
+    schema: z.toJSONSchema(schema, {
+      target: 'draft-2020-12',
+      io: 'input',
+      unrepresentable: 'any',
+    }),
+  }));
 }
 
 function operation(route: RouteSpec): object {
@@ -107,10 +139,12 @@ function operation(route: RouteSpec): object {
         },
       ]
     : [];
+  const parameters = [...pathParameters(route.path), ...queryParameters(route.query), ...headers];
   return {
     operationId: route.operationId,
     summary: route.summary,
-    ...(headers.length > 0 ? { parameters: headers } : {}),
+    ...(route.auth ? { security: [{ bearerAuth: [] }] } : {}),
+    ...(parameters.length > 0 ? { parameters } : {}),
     ...(route.body
       ? {
           requestBody: {
@@ -134,6 +168,9 @@ export function buildOpenApiDocument(version: string): Record<string, unknown> {
     info: { title: 'Delyva API', version },
     jsonSchemaDialect: 'https://json-schema.org/draft/2020-12/schema',
     paths,
-    components: { schemas: { Problem: json(ProblemSchema) } },
+    components: {
+      schemas: { Problem: json(ProblemSchema) },
+      securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } },
+    },
   };
 }

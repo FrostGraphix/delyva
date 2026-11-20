@@ -3,6 +3,8 @@ import { type INestApplication, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from 'pino';
+import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { GeoModule } from './modules/geo/geo.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
 import type { Env } from './shared/config/env.js';
 import { createRootLogger, PinoNestLogger } from './shared/logging/logger.js';
@@ -31,7 +33,9 @@ function requestContext(logger: Logger) {
 export async function createApp(env: Env): Promise<{ app: INestApplication; logger: Logger }> {
   const logger = createRootLogger(env.LOG_LEVEL);
 
-  @Module({ imports: [SharedModule.forRoot(env, logger), IdentityModule] })
+  @Module({
+    imports: [SharedModule.forRoot(env, logger), IdentityModule, GeoModule, CatalogModule],
+  })
   class AppModule {}
 
   const app = await NestFactory.create(AppModule, {

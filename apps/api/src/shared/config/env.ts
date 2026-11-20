@@ -19,8 +19,13 @@ export const EnvSchema = z
     TERMII_API_KEY: z.string().optional().default(''),
     TERMII_SENDER_ID: z.string().default('Delyva'),
     TERMII_BASE_URL: z.url().default('https://api.ng.termii.com'),
+    ETA_PROVIDER: z.enum(['haversine', 'google']).default('haversine'),
+    GOOGLE_MAPS_API_KEY: z.string().optional().default(''),
   })
   .superRefine((env, ctx) => {
+    if (env.ETA_PROVIDER === 'google' && env.GOOGLE_MAPS_API_KEY === '') {
+      ctx.addIssue({ code: 'custom', message: 'ETA_PROVIDER=google requires GOOGLE_MAPS_API_KEY' });
+    }
     if (env.NODE_ENV !== 'production') return;
     if (env.SMS_PROVIDER !== 'termii' || env.TERMII_API_KEY === '') {
       ctx.addIssue({

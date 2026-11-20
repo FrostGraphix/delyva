@@ -15,6 +15,13 @@
       "when": 1795125487840,
       "tag": "0001_postgis",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795128231196,
+      "tag": "0100_catalog_geo",
+      "breakpoints": true
     }
   ]
 }
