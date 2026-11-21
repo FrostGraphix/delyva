@@ -22,6 +22,7 @@ import {
 } from '../../../shared/auth/auth.guard.js';
 import { LOGGER } from '../../../shared/logging/logger.js';
 import { LIVE_TRACKING, type LiveTrackingService } from '../application/live-tracking.service.js';
+import { SocketTickets } from '../application/socket-tickets.js';
 import {
   type LocationRateLimiter,
   ORDER_ROOM_AUTHORIZER,
@@ -56,14 +57,30 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection {
     @Inject(LIVE_TRACKING) private readonly tracking: LiveTrackingService,
     @Inject(RedisLocationRateLimiter) private readonly limiter: LocationRateLimiter,
     private readonly broadcaster: SocketRoomBroadcaster,
+    @Inject(SocketTickets) private readonly tickets: SocketTickets,
     @Inject(LOGGER) private readonly logger: Logger,
   ) {}
 
-  /** Installs the auth middleware: every connection needs a valid access JWT. */
+  /**
+   * Installs the auth middleware: every connection needs a valid access JWT, or a single-use
+   * handshake ticket from POST /v1/realtime/tickets (cookie-session web clients, ADR 0820).
+   */
   afterInit(server: RealtimeServer): void {
     this.broadcaster.attach(server);
     server.use((socket, next) => {
-      const auth = socket.handshake.auth as { token?: unknown };
+      const auth = socket.handshake.auth as { token?: unknown; ticket?: unknown };
+      if (typeof auth.ticket === 'string') {
+        this.tickets.redeem(auth.ticket).then(
+          (principal) => {
+            if (principal) socket.data.principal = principal;
+            next(principal ? undefined : new Error('unauthorized'));
+          },
+          () => {
+            next(new Error('unauthorized'));
+          },
+        );
+        return;
+      }
       const token =
         typeof auth.token === 'string'
           ? auth.token
