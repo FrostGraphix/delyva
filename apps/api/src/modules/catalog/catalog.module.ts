@@ -39,7 +39,12 @@ type W = DrizzleCatalogWriteRepository;
 /** Catalog bounded context: vendors, branches, hours, menus, items, modifiers, availability. */
 @Module({
   imports: [IdentityModule, GeoModule],
-  controllers: [MyVendorsController, VendorsController, VendorMenuController, VendorApprovalsController],
+  controllers: [
+    MyVendorsController,
+    VendorsController,
+    VendorMenuController,
+    VendorApprovalsController,
+  ],
   providers: [
     {
       provide: ACCESS_TOKEN_VERIFIER,
