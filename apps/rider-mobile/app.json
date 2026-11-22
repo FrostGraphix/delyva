@@ -6,9 +6,19 @@
     "version": "0.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "ios": { "bundleIdentifier": "ng.delyva.rider" },
-    "android": { "package": "ng.delyva.rider" },
-    "plugins": ["expo-router"],
-    "experiments": { "typedRoutes": true }
+    "ios": {
+      "bundleIdentifier": "ng.delyva.rider"
+    },
+    "android": {
+      "package": "ng.delyva.rider"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-audio"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
