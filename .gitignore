@@ -21,3 +21,4 @@ tests/e2e/customer/playwright-report/
 
 tests/e2e/admin/screenshots/
 tests/e2e/admin/test-results/
+.demo-*.log
