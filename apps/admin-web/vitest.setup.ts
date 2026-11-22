@@ -1,12 +1,17 @@
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
-// jsdom does not implement <dialog>.showModal/close yet.
+// jsdom does not implement <dialog>.showModal/close yet; polyfill with the `open` attribute.
+// (Skipped in node-environment test files, where there is no DOM.)
 if (typeof HTMLDialogElement !== 'undefined') {
-  HTMLDialogElement.prototype.showModal ??= function showModal(this: HTMLDialogElement) {
+  const proto = HTMLDialogElement.prototype as {
+    showModal: (this: HTMLDialogElement) => void;
+    close: (this: HTMLDialogElement) => void;
+  };
+  proto.showModal = function showModal(this: HTMLDialogElement): void {
     this.setAttribute('open', '');
   };
-  HTMLDialogElement.prototype.close ??= function close(this: HTMLDialogElement) {
+  proto.close = function close(this: HTMLDialogElement): void {
     this.removeAttribute('open');
   };
 }

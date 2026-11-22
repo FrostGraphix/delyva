@@ -2,14 +2,34 @@ import { ApiError, DelyvaClient, parseProblem } from '@delyva/sdk';
 import type { z } from 'zod';
 
 let csrfToken = '';
+let csrfLoading: Promise<void> | null = null;
 
 /** Stores the CSRF token returned by `GET /bff/auth/session` (memory only, never storage). */
 export function setCsrfToken(token: string): void {
   csrfToken = token;
 }
 
+/**
+ * Makes sure a CSRF token is armed before any BFF call. A first-time visitor has no CSRF cookie
+ * until `/bff/auth/session` answers, so a fast click must wait for it instead of being refused.
+ */
+async function ensureCsrf(): Promise<void> {
+  if (csrfToken) return;
+  csrfLoading ??= fetch('/bff/auth/session', { credentials: 'same-origin', cache: 'no-store' })
+    .then(async (res) => {
+      if (!res.ok) return;
+      const body = (await res.json()) as { csrf?: unknown };
+      if (typeof body.csrf === 'string') csrfToken = body.csrf;
+    })
+    .finally(() => {
+      csrfLoading = null;
+    });
+  await csrfLoading;
+}
+
 /** fetch that targets the same-origin BFF with the CSRF header; cookies travel automatically. */
-export const bffFetch: typeof fetch = (input, init) => {
+export const bffFetch: typeof fetch = async (input, init) => {
+  await ensureCsrf();
   const headers = new Headers(init?.headers);
   if (csrfToken) headers.set('x-csrf-token', csrfToken);
   return fetch(input, { ...init, headers, credentials: 'same-origin' });

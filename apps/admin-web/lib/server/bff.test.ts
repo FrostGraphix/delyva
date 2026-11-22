@@ -21,6 +21,8 @@ function session(over: Partial<BffSession> = {}): BffSession {
 }
 
 const fetchMock = vi.fn<typeof fetch>();
+const urlOf = (input: unknown): string =>
+  typeof input === 'string' ? input : input instanceof URL ? input.href : '';
 
 beforeEach(() => {
   process.env.ADMIN_API_BASE_URL = 'http://api.test';
@@ -71,14 +73,14 @@ describe('callAsAdmin', () => {
 
   it('shares one rotation between concurrent requests (no refresh-token replay)', async () => {
     fetchMock.mockImplementation((url) =>
-      Promise.resolve(String(url).endsWith('/v1/auth/refresh') ? json(200, PAIR) : json(200, {})),
+      Promise.resolve(urlOf(url).endsWith('/v1/auth/refresh') ? json(200, PAIR) : json(200, {})),
     );
     const s = session({ accessToken: undefined });
     await Promise.all([
       callAsAdmin(s, '/v1/admin/a', { method: 'GET' }),
       callAsAdmin(s, '/v1/admin/b', { method: 'GET' }),
     ]);
-    const refreshes = fetchMock.mock.calls.filter(([u]) => String(u).endsWith('/v1/auth/refresh'));
+    const refreshes = fetchMock.mock.calls.filter(([u]) => urlOf(u).endsWith('/v1/auth/refresh'));
     expect(refreshes).toHaveLength(1);
   });
 
