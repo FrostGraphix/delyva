@@ -99,3 +99,18 @@
   }
 })();
 if(location.hash==='#embed')document.documentElement.classList.add('embed');
+
+/* accent theme: green (default) | orange. Persisted; follows #accent=orange and parent postMessage (index previews). */
+(function(){
+  const KEY='delyva-accent', OK=['green','orange'];
+  const root=document.documentElement;
+  const read=()=>{try{const h=/accent=(\w+)/.exec(location.hash);if(h&&OK.includes(h[1]))return h[1];const s=localStorage.getItem(KEY);return OK.includes(s)?s:'green'}catch(e){return 'green'}};
+  const apply=(a,persist)=>{root.setAttribute('data-accent',a);document.querySelectorAll('.accent-switch button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.accent===a)));if(persist){try{localStorage.setItem(KEY,a)}catch(e){}document.querySelectorAll('iframe').forEach(f=>{try{f.contentWindow.postMessage({delyvaAccent:a},'*')}catch(e){}})}};
+  apply(read(),false);
+  window.addEventListener('message',e=>{if(e.data&&OK.includes(e.data.delyvaAccent))apply(e.data.delyvaAccent,false)});
+  if(root.classList.contains('embed')||location.hash.includes('embed'))return;
+  const el=document.createElement('div');el.className='accent-switch';el.setAttribute('role','group');el.setAttribute('aria-label','Colour theme');
+  el.innerHTML='<span>Theme</span>'+OK.map(a=>`<button type="button" data-accent="${a}" aria-pressed="false" aria-label="${a} theme"><i style="background:${a==='green'?'#8CC63F':'#FF7A1A'}"></i>${a[0].toUpperCase()+a.slice(1)}</button>`).join('');
+  el.addEventListener('click',e=>{const b=e.target.closest('button');if(b)apply(b.dataset.accent,true)});
+  document.body.appendChild(el);apply(read(),false);
+})();

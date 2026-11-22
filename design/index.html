@@ -17,7 +17,7 @@ body{background:var(--stage)}
 .hero h1 b{color:var(--lime-600)}
 .hero p{font-size:17px;line-height:1.55;color:var(--ink-500);max-width:520px}
 .cta{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
-.hero-art{height:380px;border-radius:40px;background:radial-gradient(420px 320px at 90% 0,rgba(140,198,63,.6),transparent 65%),radial-gradient(460px 380px at 20% 110%,rgba(150,215,150,.5),transparent 70%),linear-gradient(160deg,#E7ECE6,#D7EAD9);position:relative;overflow:hidden;box-shadow:var(--flat-sh)}
+.hero-art{height:380px;border-radius:40px;background:radial-gradient(420px 320px at 90% 0,rgba(var(--ac-rgb),.6),transparent 65%),radial-gradient(460px 380px at 20% 110%,rgba(var(--ac-tint-rgb),.5),transparent 70%),linear-gradient(160deg,#E7ECE6,#D7EAD9);position:relative;overflow:hidden;box-shadow:var(--flat-sh)}
 .hero-art iframe{position:absolute;border:0;width:390px;height:844px;border-radius:44px;transform:scale(.52);transform-origin:top left;box-shadow:0 24px 50px rgba(11,15,10,.25);pointer-events:none;background:#fff}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0 56px}
 .stats div{background:var(--paper);border-radius:24px;padding:20px;box-shadow:var(--flat-sh)}
@@ -108,8 +108,8 @@ h2.sec{font-size:30px;letter-spacing:-.03em;margin:0 0 6px}
 
 <section id="system" class="ds">
   <div class="panel"><h2 class="sec" style="font-size:24px">Design system</h2>
-    <p class="sub" style="margin-bottom:0">Lime and ink, flat content, glass only on floating controls.</p>
-    <div class="sw"><i style="background:#0B0F0A"></i><i style="background:#8CC63F"></i><i style="background:#EAF5CF"></i><i style="background:#CFEBD3"></i><i style="background:#F1F2F0"></i><i style="background:#FFB020"></i></div>
+    <p class="sub" style="margin-bottom:0">Two accent themes, green and orange, switchable from the Theme control. Ink, flat content, glass only on floating controls.</p>
+    <div class="sw"><i style="background:#0B0F0A"></i><i style="background:var(--lime-500)"></i><i style="background:var(--lime-100)"></i><i style="background:var(--mint)"></i><i style="background:#F1F2F0"></i><i style="background:#FFB020"></i></div>
     <div class="sw-l"><span>Ink</span><span>Lime</span><span>Lime 100</span><span>Mint</span><span>Stage</span><span>Sun</span></div>
     <p class="mt16"><b>Type</b> Plus Jakarta Sans for headings, Inter for interface text.</p>
     <a class="btn btn-soft s mt16" href="design-system.html">Open design system →</a></div>
