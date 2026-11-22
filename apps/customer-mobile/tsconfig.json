@@ -1,5 +1,14 @@
 {
   "extends": "@delyva/config/tsconfig.bundler.json",
-  "compilerOptions": { "lib": ["ES2023"], "types": [] },
-  "include": ["app", "types"]
+  "compilerOptions": {
+    "lib": [
+      "ES2023"
+    ],
+    "types": []
+  },
+  "include": [
+    "app",
+    "src",
+    "types"
+  ]
 }

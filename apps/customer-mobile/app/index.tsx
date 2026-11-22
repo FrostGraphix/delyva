@@ -1,36 +1,35 @@
-import { themeColors, tokens } from '@delyva/design-tokens';
-import { MapPinIcon } from '@delyva/icons/native';
-import { Button } from '@delyva/ui-native';
+import { tokens } from '@delyva/design-tokens';
+import { AppText, usePalette } from '@delyva/ui-native';
+import { Redirect } from 'expo-router';
 import type { ReactElement } from 'react';
-import { Text, useColorScheme, View } from 'react-native';
+import { View } from 'react-native';
+import { useSession } from '../src/auth/session-store';
+import { t } from '../src/i18n';
+import { usePrefs } from '../src/state/prefs-store';
 
-/** First screen scaffold: tokens, a design-system button and a native icon. */
-export default function HomeScreen(): ReactElement {
-  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
-  const colors = themeColors(scheme);
-  // DEBT(i18n): hard-coded English copy — i18n setup lands with onboarding — move to message catalogues.
+/** Splash: brand mark while stores hydrate, then onboarding → address → home. */
+export default function Splash(): ReactElement {
+  const c = usePalette();
+  const prefsReady = usePrefs((s) => s.hydrated);
+  const onboarded = usePrefs((s) => s.onboarded);
+  const address = usePrefs((s) => s.address);
+  const sessionReady = useSession((s) => s.status !== 'loading');
+  if (prefsReady && sessionReady) {
+    if (!onboarded) return <Redirect href="/welcome" />;
+    if (!address) return <Redirect href="/location" />;
+    return <Redirect href="/home" />;
+  }
   return (
     <View
-      style={{
-        flex: 1,
-        justifyContent: 'flex-end',
-        padding: tokens.space[4],
-        gap: tokens.space[6],
-      }}
+      testID="splash"
+      style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: c.primary }}
     >
-      <MapPinIcon size={32} color={colors.accentText} accessibilityLabel="Delyva" />
-      <Text
-        accessibilityRole="header"
-        style={{
-          color: colors.text,
-          fontSize: tokens.type.h1.size,
-          lineHeight: tokens.type.h1.line,
-          fontWeight: '800',
-        }}
-      >
-        Hungry? We deliver in 35 minutes.
-      </Text>
-      <Button label="Set delivery address" variant="brand" size="lg" onPress={() => undefined} />
+      <AppText variant="display" tone="onPrimary">
+        {t('app.name')}
+      </AppText>
+      <AppText tone="onPrimary" style={{ marginTop: tokens.space[2] }}>
+        {t('app.tagline')}
+      </AppText>
     </View>
   );
 }

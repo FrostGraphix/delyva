@@ -14,3 +14,7 @@ packages/design-tokens/src/generated/
 packages/icons/src/generated/
 .claude/worktrees/
 .data/
+dist-web/
+tests/e2e/customer/screenshots/
+tests/e2e/customer/test-results/
+tests/e2e/customer/playwright-report/
