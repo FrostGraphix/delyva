@@ -46,23 +46,22 @@ export function OrderCard({
   const o = detail.data;
   const isNew = summary.status === 'PLACED';
 
+  // mutateAsync (not mutate's per-call callbacks): the card unmounts when the order moves column,
+  // and TanStack Query skips per-call callbacks for an unmounted observer, which dropped the toast.
   function act(a: OrderAction, done: string): void {
-    action.mutate(
-      { id: summary.id, action: a, key: `${intent}-${a.kind}` },
-      {
-        onSuccess: () => {
-          setOpen(null);
-          setIntent(crypto.randomUUID());
-          toast.show(done);
-        },
-        onError: (err) => {
-          toast.show(
-            err instanceof ApiError ? (err.problem.detail ?? err.problem.title) : t('common.error'),
-            'danger',
-          );
-        },
-      },
-    );
+    action
+      .mutateAsync({ id: summary.id, action: a, key: `${intent}-${a.kind}` })
+      .then(() => {
+        setOpen(null);
+        setIntent(crypto.randomUUID());
+        toast.show(done);
+      })
+      .catch((err: unknown) => {
+        toast.show(
+          err instanceof ApiError ? (err.problem.detail ?? err.problem.title) : t('common.error'),
+          'danger',
+        );
+      });
   }
 
   return (

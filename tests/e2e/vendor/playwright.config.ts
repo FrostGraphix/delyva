@@ -25,11 +25,11 @@ export default defineConfig({
       timeout: 180_000,
     },
     {
-      command: `pnpm exec next dev --port ${String(WEB_PORT)}`,
+      command: `pnpm exec next build && pnpm exec next start --port ${String(WEB_PORT)}`,
       cwd: '../../../apps/vendor-web',
       url: `${WEB_URL}/login`,
       reuseExistingServer: false,
-      timeout: 180_000,
+      timeout: 420_000,
       env: {
         DELYVA_API_URL: API_URL,
         NEXT_PUBLIC_REALTIME_URL: API_URL,

@@ -515,6 +515,22 @@ describe.skipIf(!available)('ordering (integration: Postgres + Redis)', () => {
       .get(`/v1/vendors/${PHARMACY.vendorId}/orders`)
       .set('authorization', await token(vendorB, ['vendor_owner']))
       .expect(403);
+    await http
+      .get(`/v1/vendor-orders/${id}`)
+      .set('authorization', await token(vendorB, ['vendor_owner']))
+      .expect(404);
+    await http
+      .get(`/v1/vendor-orders/${id}`)
+      .set('authorization', await customer(user))
+      .expect(403);
+    const vendorView = b(
+      await http
+        .get(`/v1/vendor-orders/${id}`)
+        .set('authorization', await token(vendorA, ['vendor_owner']))
+        .expect(200),
+    );
+    expect(vendorView.id).toBe(id);
+    expect((vendorView.items as Body[]).length).toBeGreaterThan(0);
     const list = b(
       await http
         .get(`/v1/vendors/${PHARMACY.vendorId}/orders?status=PLACED`)

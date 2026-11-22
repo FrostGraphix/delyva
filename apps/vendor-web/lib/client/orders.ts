@@ -76,7 +76,7 @@ export function useBoard(vendorId: string, live: boolean): BoardData {
 export function useOrder(id: string): UseQueryResult<Order> {
   return useQuery({
     queryKey: orderKeys.order(id),
-    queryFn: () => browserClient().ordering.getOrder(id),
+    queryFn: () => browserClient().ordering.getVendorOrder(id),
   });
 }
 

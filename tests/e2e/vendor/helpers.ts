@@ -24,6 +24,9 @@ export async function loginViaUi(page: Page, phone: string, landing: RegExp): Pr
   await page.waitForLoadState('networkidle');
   const redis = new Redis(REDIS_URL);
   await redis.del(`dev:otp:${phone}`);
+  // Clear this suite's own OTP send cooldown/IP limits (Redis db 5 only) so repeated logins are not throttled.
+  const limits = await redis.keys('*rl:otp-send:*');
+  if (limits.length > 0) await redis.del(...limits);
   redis.disconnect();
   await page.getByLabel('Phone number').fill(phone);
   await page.getByRole('button', { name: 'Send code' }).click();

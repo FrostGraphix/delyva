@@ -10,8 +10,12 @@ mkdirSync(SHOTS, { recursive: true });
 function watchConsole(page: Page): string[] {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+  page.on('response', (r) => {
+    if (r.status() >= 400) errors.push(`http ${String(r.status())} ${r.request().method()} ${new URL(r.url()).pathname}`);
+  });
   page.on('console', (m) => {
-    if (m.type() === 'error') errors.push(`console: ${m.text()}`);
+    // Failed network loads are recorded precisely (method, path, status) by the response listener above.
+    if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`console: ${m.text()}`);
   });
   return errors;
 }
@@ -230,5 +234,10 @@ test('fresh vendor completes the onboarding wizard to submission', async ({ page
   await expect(page).toHaveURL(/\/onboarding\/status$/);
   await expect(page.getByText('Under review')).toBeVisible();
   await shot(page, '26-onboarding-status');
-  expect(errors).toEqual([]);
+  // Only the failures this test provokes on purpose (plus the shell's vendor lookup, which is 403 for a user with no store yet).
+  expect(errors).toEqual([
+    'http 403 GET /api/v1/me/vendors',
+    'http 400 POST /api/v1/vendor-applications/me/menu-import',
+    'http 422 PUT /api/v1/vendor-applications/me/bank-account',
+  ]);
 });

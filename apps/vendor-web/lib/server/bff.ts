@@ -10,8 +10,7 @@ import { refreshOnce } from './refresh';
 export const PROXY_ALLOWLIST: readonly RegExp[] = [
   /^\/v1\/me\/vendors$/,
   /^\/v1\/vendors\/[0-9a-f-]{36}(\/.*)?$/,
-  /^\/v1\/vendor-orders\/[0-9a-f-]{36}\/(accept|reject|preparing|ready)$/,
-  /^\/v1\/orders\/[0-9a-f-]{36}$/,
+  /^\/v1\/vendor-orders\/[0-9a-f-]{36}(\/(accept|reject|preparing|ready))?$/,
   /^\/v1\/vendor-applications\/(me(\/[a-z-]+)?|menu-template)$/,
   /^\/v1\/realtime\/tickets$/,
 ];

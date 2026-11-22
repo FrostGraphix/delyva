@@ -65,7 +65,7 @@ const order = (status: Order['status']): Order => ({
 });
 
 const ordering = {
-  getOrder: vi.fn(),
+  getVendorOrder: vi.fn(),
   acceptVendorOrder: vi.fn(),
   rejectVendorOrder: vi.fn(),
   markVendorOrderPreparing: vi.fn(),
@@ -91,7 +91,7 @@ describe('OrderCard', () => {
   it('accepts a new order with the chosen prep time and an idempotency key', async () => {
     // Arrange
     vi.stubEnv('NEXT_PUBLIC_AUTO_REJECT_SECONDS', '300');
-    ordering.getOrder.mockResolvedValue(order('PLACED'));
+    ordering.getVendorOrder.mockResolvedValue(order('PLACED'));
     ordering.acceptVendorOrder.mockResolvedValue(order('VENDOR_ACCEPTED'));
     wrap(<OrderCard summary={summary('PLACED')} vendorId={V} />);
     // Act
@@ -113,7 +113,7 @@ describe('OrderCard', () => {
   });
 
   it('moves an accepted order to preparing and a preparing one to ready, showing the pickup code', async () => {
-    ordering.getOrder.mockResolvedValue(order('PREPARING'));
+    ordering.getVendorOrder.mockResolvedValue(order('PREPARING'));
     ordering.markVendorOrderReady.mockResolvedValue(order('READY_FOR_PICKUP'));
     wrap(<OrderCard summary={summary('PREPARING')} vendorId={V} />);
     expect(await screen.findByText('3816')).toBeTruthy();
@@ -124,7 +124,7 @@ describe('OrderCard', () => {
   });
 
   it('starts preparing from VENDOR_ACCEPTED', async () => {
-    ordering.getOrder.mockResolvedValue(order('VENDOR_ACCEPTED'));
+    ordering.getVendorOrder.mockResolvedValue(order('VENDOR_ACCEPTED'));
     ordering.markVendorOrderPreparing.mockResolvedValue(order('PREPARING'));
     wrap(<OrderCard summary={summary('VENDOR_ACCEPTED')} vendorId={V} />);
     await userEvent.click(await screen.findByRole('button', { name: 'Start preparing' }));
@@ -134,7 +134,7 @@ describe('OrderCard', () => {
   });
 
   it('rejects with a reason and surfaces API errors as a toast', async () => {
-    ordering.getOrder.mockResolvedValue(order('PLACED'));
+    ordering.getVendorOrder.mockResolvedValue(order('PLACED'));
     ordering.rejectVendorOrder.mockRejectedValue(new Error('boom'));
     wrap(<OrderCard summary={summary('PLACED')} vendorId={V} />);
     await userEvent.click(await screen.findByRole('button', { name: 'Reject' }));
@@ -148,7 +148,7 @@ describe('OrderCard', () => {
   });
 
   it('shows a waiting note once the order is ready', async () => {
-    ordering.getOrder.mockResolvedValue(order('READY_FOR_PICKUP'));
+    ordering.getVendorOrder.mockResolvedValue(order('READY_FOR_PICKUP'));
     wrap(<OrderCard summary={summary('READY_FOR_PICKUP')} vendorId={V} />);
     expect(await screen.findByText('Waiting for rider')).toBeTruthy();
   });

@@ -57,7 +57,7 @@ export default function LoginPage(): ReactNode {
       const res = await postJson<OtpRequestResponse>(
         '/api/auth/otp/request',
         { phone: e164 },
-        `${intent}-${String(attempt)}-${e164}`,
+        `${intent}-${String(attempt)}`,
       );
       setSentTo(e164);
       setAttempt((n) => n + 1);
