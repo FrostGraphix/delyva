@@ -15,9 +15,12 @@ export default defineConfig({
     permissions: ['geolocation'],
     geolocation: { latitude: 6.4301, longitude: 3.4101, accuracy: 10 },
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
     launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] },
   },
-  webServer: {
+  webServer: process.env.RIDER_E2E_EXTERNAL === '1' ? undefined : {
     command: 'node stack.mjs',
     cwd: import.meta.dirname,
     url: `${E2E.webOrigin}/healthz`,

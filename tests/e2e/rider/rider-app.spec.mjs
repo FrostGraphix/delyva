@@ -42,9 +42,13 @@ test('rider: onboarding → approval → offer → delivery → earnings → pro
   const resourceErrors = [];
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
+    process.stdout.write(`[browser-error] ${m.text().slice(0, 600)}\n`);
     (m.text().startsWith('Failed to load resource') ? resourceErrors : consoleErrors).push(m.text());
   });
-  page.on('pageerror', (e) => consoleErrors.push(`pageerror: ${e.message}`));
+  page.on('pageerror', (e) => {
+    process.stdout.write(`[pageerror] ${e.message.slice(0, 600)}\n`);
+    consoleErrors.push(`pageerror: ${e.message}`);
+  });
 
   // ---------------------------------------------------------------- OTP sign-in
   const riderPhone = phone('803');
@@ -151,11 +155,16 @@ test('rider: onboarding → approval → offer → delivery → earnings → pro
   // ---------------------------------------------------------------- trip: store
   await expect(page.getByTestId('trip-stage')).toHaveText('Head to the store');
   const ready = await vendorAct(vendor, order.id, 'ready');
-  const popup = context.waitForEvent('page');
+  // Maps hand-off: capture the URL the app opens instead of loading google.com in CI.
+  await page.evaluate(() => {
+    window.__opened = [];
+    window.open = (url) => {
+      window.__opened.push(String(url));
+      return null;
+    };
+  });
   await button(page, 'Open in Maps').click();
-  const maps = await popup;
-  expect(maps.url()).toContain('google.com/maps/dir/');
-  await maps.close();
+  await expect.poll(() => page.evaluate(() => window.__opened[0] ?? '')).toContain('google.com/maps/dir/?api=1&destination=6.43');
   await page.getByTestId('handoff-code').fill(ready.pickupCode);
   await shot(page, '15-trip-to-store-pickup-code');
   await button(page, 'I have arrived — confirm code').click();

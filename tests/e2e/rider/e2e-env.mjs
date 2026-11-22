@@ -1,7 +1,7 @@
 // Shared, local-only configuration for the rider E2E suite. Every value here is a throwaway test
 // value for the docker-compose `delyva` services; nothing is a real secret.
 const apiPort = 3321;
-const webPort = 3322;
+const webPort = 3421;
 const dbName = 'delyva_riderapp_e2e';
 const adminDbUrl = 'postgres://delyva:delyva_local_only@127.0.0.1:55432/delyva';
 const dbUrl = adminDbUrl.replace(/\/[^/]+$/, `/${dbName}`);

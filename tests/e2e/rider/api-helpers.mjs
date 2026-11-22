@@ -29,7 +29,13 @@ export async function call(method, path, { body, token, headers = {}, raw } = {}
 export async function devOtp(phone) {
   const redis = new Redis(E2E.redisUrl);
   try {
-    return await redis.get(`dev:otp:${phone}`);
+    // The SMS adapter stores the code asynchronously; poll briefly instead of racing it.
+    for (let i = 0; i < 40; i += 1) {
+      const code = await redis.get(`dev:otp:${phone}`);
+      if (code) return code;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    return null;
   } finally {
     redis.disconnect();
   }
