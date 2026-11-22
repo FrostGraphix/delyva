@@ -51,7 +51,7 @@ export default function OrderDetailPage(): ReactNode {
       {o.pickupCode ? (
         <section
           aria-label={t('board.pickupCode')}
-          className="rounded-2xl bg-lime-100 p-6 text-center text-ink-900"
+          className="rounded-2xl bg-accent-100 p-6 text-center text-ink-900"
         >
           <p className="text-caption font-semibold">{t('board.pickupCode')}</p>
           <p

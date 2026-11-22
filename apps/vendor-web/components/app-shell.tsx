@@ -112,7 +112,7 @@ function SideNav({
             key={href}
             href={href}
             aria-current={active ? 'page' : undefined}
-            className={`flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-lg px-3 text-micro font-semibold focus-visible:outline-2 focus-visible:outline-primary md:flex-none md:flex-row md:justify-start md:gap-3 md:text-body ${active ? 'bg-lime-100 text-ink-900' : 'text-text-muted'}`}
+            className={`flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-lg px-3 text-micro font-semibold focus-visible:outline-2 focus-visible:outline-primary md:flex-none md:flex-row md:justify-start md:gap-3 md:text-body ${active ? 'bg-accent-100 text-ink-900' : 'text-text-muted'}`}
           >
             <Icon size={24} />
             <span>{t(label)}</span>

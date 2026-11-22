@@ -38,6 +38,7 @@ export const en = {
   'nav.pricing': 'Pricing & promos',
   'nav.flags': 'Feature flags',
   'nav.audit': 'Audit log',
+  'nav.settings': 'Appearance',
   'nav.signOut': 'Sign out',
   'nav.signedInAs': 'Signed in · {roles}',
   'nav.skip': 'Skip to content',
@@ -300,4 +301,10 @@ export const en = {
   'order.status.UNDELIVERABLE': 'Undeliverable',
   'order.status.REFUND_PENDING': 'Refund pending',
   'order.status.REFUNDED': 'Refunded',
+  'settings.title': 'Appearance',
+  'settings.subtitle': 'Personalise how the console looks on this browser.',
+  'settings.accent': 'Accent colour',
+  'settings.accent.green': 'Green',
+  'settings.accent.orange': 'Orange',
+  'settings.accent.selected': 'Selected',
 } as const;
