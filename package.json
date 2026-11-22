@@ -14,7 +14,7 @@
     "dev": "turbo run dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "e2e:rider": "playwright test -c tests/e2e/rider/playwright.config.mjs"
+    "e2e:rider": "node tests/e2e/rider/run.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.1",
