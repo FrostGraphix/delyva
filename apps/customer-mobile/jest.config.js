@@ -1,6 +1,8 @@
 /** @type {import('jest').Config} */
 module.exports = {
   preset: 'jest-expo',
+  // Cold Babel transforms of the workspace ESM packages are slow under parallel CI load.
+  testTimeout: 60_000,
   // Regex (not glob): globs skip dot-directories such as .claude/worktrees.
   testRegex: '[\/]src[\/].*\.test\.tsx?$',
   // Workspace packages ship ESM; transform them (and RN/Expo libs) with Babel.
