@@ -1,7 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { Badge, EmptyState, ErrorState, OfflineBanner, SkeletonList } from './feedback.js';
-import { Switch, TextField } from './form-controls.js';
+import { EmptyPanel, ErrorState, OfflineBanner, SkeletonList } from './feedback.js';
+import { Badge } from './badge.js';
+import { Switch, FormTextField } from './form-controls.js';
 import { Dialog, ToastProvider } from './overlays.js';
 
 describe('feedback components', () => {
@@ -21,7 +22,7 @@ describe('feedback components', () => {
   });
 
   it('renders an empty panel without alert semantics', () => {
-    const html = renderToStaticMarkup(<EmptyState title="No orders yet" />);
+    const html = renderToStaticMarkup(<EmptyPanel title="No orders yet" />);
     expect(html).not.toContain('role="alert"');
     expect(html).toContain('No orders yet');
   });
@@ -32,13 +33,13 @@ describe('feedback components', () => {
   });
 
   it('maps badge tones to token classes', () => {
-    expect(renderToStaticMarkup(<Badge tone="danger">Late</Badge>)).toContain('bg-danger');
+    expect(renderToStaticMarkup(<Badge tone="danger">Late</Badge>)).toContain('border-danger');
   });
 });
 
 describe('form controls', () => {
   it('wires the error message to the input', () => {
-    const html = renderToStaticMarkup(<TextField id="p" label="Phone" error="Invalid" />);
+    const html = renderToStaticMarkup(<FormTextField id="p" label="Phone" error="Invalid" />);
     expect(html).toContain('for="p"');
     expect(html).toContain('aria-invalid="true"');
     expect(html).toContain('aria-describedby="p-error"');

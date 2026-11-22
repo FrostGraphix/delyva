@@ -633,3 +633,18 @@ Next.js 16 portal that works as a tablet kitchen screen and desktop console. See
 - DEBT(catalog): no busy-mode endpoint (disabled placeholder), no category CRUD, no member-scoped menu read (non-live vendors cannot manage menus via the public read).
 - DEBT(realtime): no vendor-wide order room; new orders are polled every 5 s.
 - DEBT(web): CSP allows `'unsafe-inline'` scripts; refresh-rotation dedupe is per process; single locale (English).
+## Admin web (Phase 1, 2026-11-22)
+
+See ADR 0830. App `apps/admin-web` (Next.js 16 App Router, Tailwind on design tokens, TanStack Query + Table v9). New shared UI in `packages/ui-web` (Card, Skeleton, Badge, Alert, EmptyState, TextField/TextAreaField/SelectField, Checkbox, StatCard, Modal, ToastViewport) and icons in `packages/icons` (chart-bar, map-trifold, storefront, moped, tag, flag, list-checks, sign-out, arrow-clockwise, wifi-slash, warning, shield-check, scroll). SDK gained `listSurgeRules`, `createSurgeRule`, `updateSurgeRule` (additive).
+
+- **Session:** cookie-only BFF (`app/bff/**`): OTP login, TOTP enrol/verify, CSRF (Origin + `x-csrf-token`), refresh-rotation de-duplication, `/bff/v1/admin/*` proxy adding bearer + `x-admin-2fa` server-side. Env: `ADMIN_API_BASE_URL` (server only), `ADMIN_API_TIMEOUT_MS`.
+- **Pages:** `/login` (A01), `/overview` (A02), `/live` (A03: orders table with status/date filters + online-rider plot), `/orders/[id]` (A04: ops cancel and manual assign, both with an audit reason), `/riders` (A07) and `/merchants` (A05/A06) application review with signed-URL documents and approve/reject reasons, `/pricing` (A08/A09: fee rules edit, surge windows, promos), `/flags` (super_admin), `/audit` (DEBT state). Every data view has skeleton, empty, error + retry, no-access, offline banner and toasts; copy lives in `lib/i18n` (English only).
+- **Roles:** `lib/roles.ts` mirrors the API `@Roles` per section; the API stays authoritative.
+- **Tests:** Vitest + Testing Library (`pnpm --filter @delyva/admin-web test`); Playwright click-through in `tests/e2e/admin/` against a real API (`node tests/e2e/admin/start-api.mjs`: DB `delyva_adminweb_e2e` recreated from `template_postgis`, migrate + catalog/pricing seeds, API on 3323, admin-web on 3332, Redis db 6 with `BULLMQ_PREFIX=adminweb-e2e`, fake payments/KYC, dev OTP). Run: `pnpm --filter @delyva/admin-web test:e2e` (needs the API built: `pnpm --filter @delyva/api build`). Screenshots go to `tests/e2e/admin/screenshots/` (gitignored).
+
+### Known technical debt (admin web)
+
+- DEBT(admin): Overview GMV, average delivery time and cancellation rate need a reporting endpoint (shown as "Needs reporting endpoint", never faked); order counts come from the latest list page ("n+" when more pages exist).
+- DEBT(admin): no `GET /v1/admin/orders/{id}`, so order detail shows the list summary only (no items/timeline/rider) and scans up to 500 recent orders; no audit-log read endpoint (page shows the debt state); no 2FA reset flow.
+- DEBT(admin-web): schematic SVG rider plot instead of Google Maps (needs a restricted browser key + CSP update); CSP uses `'unsafe-inline'` scripts; refresh de-duplication is in-process; English-only i18n; unit coverage targets logic modules, pages are covered by Playwright only.
+- DEBT(admin): pricing admin and catalog go-live are not behind `AdminTwoFactorGuard` (ADR 0700).

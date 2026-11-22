@@ -2,7 +2,7 @@
 
 import type { MenuImportResult, VendorApplication, VendorStep } from '@delyva/contracts';
 import { ApiError, type VendorStepBodies } from '@delyva/sdk';
-import { Button, TextField } from '@delyva/ui-web';
+import { Button, FormTextField } from '@delyva/ui-web';
 import { type ReactNode, type SyntheticEvent, useState } from 'react';
 import { browserClient, uploadFile } from '../../lib/client/api';
 import { type MessageKey, t } from '../../lib/i18n';
@@ -125,7 +125,7 @@ export function BusinessStep({ app, onSaved }: StepProps): ReactNode {
         });
       }}
     >
-      <TextField
+      <FormTextField
         label={t('onboarding.businessName')}
         value={name}
         onChange={(e) => {
@@ -144,7 +144,7 @@ export function BusinessStep({ app, onSaved }: StepProps): ReactNode {
           setCategory(v as (typeof CATEGORIES)[number]);
         }}
       />
-      <TextField
+      <FormTextField
         label={t('onboarding.description')}
         value={description}
         onChange={(e) => {
@@ -232,7 +232,7 @@ export function DocumentsStep({ onSaved }: StepProps): ReactNode {
         });
       }}
     >
-      <TextField
+      <FormTextField
         label={t('onboarding.cacNumber')}
         value={cac}
         onChange={(e) => {
@@ -256,7 +256,7 @@ export function DocumentsStep({ onSaved }: StepProps): ReactNode {
           setIdType(v as (typeof ID_TYPES)[number]);
         }}
       />
-      <TextField
+      <FormTextField
         label={t('onboarding.ownerIdNumber')}
         value={idNumber}
         onChange={(e) => {
@@ -302,14 +302,14 @@ export function LocationStep({ app, onSaved }: StepProps): ReactNode {
   }
   return (
     <form className="flex flex-col gap-4" onSubmit={submit}>
-      <TextField
+      <FormTextField
         label={t('onboarding.branchName')}
         value={branchName}
         onChange={(e) => {
           setBranchName(e.target.value);
         }}
       />
-      <TextField
+      <FormTextField
         label={t('onboarding.address')}
         value={address}
         onChange={(e) => {
@@ -318,7 +318,7 @@ export function LocationStep({ app, onSaved }: StepProps): ReactNode {
       />
       <p className="text-caption text-text-muted">{t('onboarding.pinHint')}</p>
       <div className="grid grid-cols-2 gap-3">
-        <TextField
+        <FormTextField
           label={t('onboarding.lat')}
           inputMode="decimal"
           value={lat}
@@ -326,7 +326,7 @@ export function LocationStep({ app, onSaved }: StepProps): ReactNode {
             setLat(e.target.value);
           }}
         />
-        <TextField
+        <FormTextField
           label={t('onboarding.lng')}
           inputMode="decimal"
           value={lng}
@@ -335,7 +335,7 @@ export function LocationStep({ app, onSaved }: StepProps): ReactNode {
           }}
         />
       </div>
-      <TextField
+      <FormTextField
         label={t('onboarding.prepMinutes')}
         inputMode="numeric"
         value={prep}
@@ -344,7 +344,7 @@ export function LocationStep({ app, onSaved }: StepProps): ReactNode {
         }}
       />
       <div className="grid grid-cols-2 gap-3">
-        <TextField
+        <FormTextField
           label={t('hours.opens')}
           type="time"
           value={opens}
@@ -352,7 +352,7 @@ export function LocationStep({ app, onSaved }: StepProps): ReactNode {
             setOpens(e.target.value);
           }}
         />
-        <TextField
+        <FormTextField
           label={t('hours.closes')}
           type="time"
           value={closes}
@@ -437,7 +437,7 @@ export function BankStep({ onSaved }: StepProps): ReactNode {
         void save(body(false));
       }}
     >
-      <TextField
+      <FormTextField
         label={t('onboarding.bankCode')}
         inputMode="numeric"
         value={bankCode}
@@ -445,7 +445,7 @@ export function BankStep({ onSaved }: StepProps): ReactNode {
           setBankCode(e.target.value);
         }}
       />
-      <TextField
+      <FormTextField
         label={t('onboarding.accountNumber')}
         inputMode="numeric"
         maxLength={10}

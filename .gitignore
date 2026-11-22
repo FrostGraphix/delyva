@@ -17,3 +17,6 @@ packages/icons/src/generated/
 tests/e2e/vendor/screenshots/
 tests/e2e/vendor/test-results/
 .data/
+
+tests/e2e/admin/screenshots/
+tests/e2e/admin/test-results/

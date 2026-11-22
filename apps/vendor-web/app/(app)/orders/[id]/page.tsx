@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiError } from '@delyva/sdk';
-import { Badge, EmptyState, ErrorState, SkeletonList } from '@delyva/ui-web';
+import { Badge, EmptyPanel, ErrorState, SkeletonList } from '@delyva/ui-web';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -30,7 +30,7 @@ export default function OrderDetailPage(): ReactNode {
       <div className="flex flex-col gap-4">
         {back}
         {missing ? (
-          <EmptyState title={t('order.notFound')} />
+          <EmptyPanel title={t('order.notFound')} />
         ) : (
           <ErrorState
             title={t('common.error')}

@@ -1,7 +1,7 @@
 'use client';
 
 import type { MenuCategory, MenuItem } from '@delyva/contracts';
-import { Button, Dialog, TextField } from '@delyva/ui-web';
+import { Button, Dialog, FormTextField } from '@delyva/ui-web';
 import { type ReactNode, type SyntheticEvent, useState } from 'react';
 import { t } from '../../lib/i18n';
 import { minorToNairaInput, parseNairaToMinor } from '../../lib/money';
@@ -49,7 +49,7 @@ export function ItemDialog({
   return (
     <Dialog open={open} title={item ? t('menu.edit') : t('menu.addItem')} onClose={onClose}>
       <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-        <TextField
+        <FormTextField
           label={t('menu.itemName')}
           value={name}
           required
@@ -59,7 +59,7 @@ export function ItemDialog({
             setName(e.target.value);
           }}
         />
-        <TextField
+        <FormTextField
           label={t('menu.description')}
           value={description}
           maxLength={500}
@@ -67,7 +67,7 @@ export function ItemDialog({
             setDescription(e.target.value);
           }}
         />
-        <TextField
+        <FormTextField
           label={t('menu.price')}
           value={price}
           inputMode="decimal"
@@ -173,7 +173,7 @@ export function GroupDialog({
   return (
     <Dialog open={open} title={t('menu.addModifierGroup')} onClose={onClose}>
       <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-        <TextField
+        <FormTextField
           label={t('menu.groupName')}
           value={name}
           onChange={(e) => {
@@ -181,7 +181,7 @@ export function GroupDialog({
           }}
         />
         <div className="grid grid-cols-2 gap-3">
-          <TextField
+          <FormTextField
             label={t('menu.groupMin')}
             inputMode="numeric"
             value={min}
@@ -189,7 +189,7 @@ export function GroupDialog({
               setMin(e.target.value);
             }}
           />
-          <TextField
+          <FormTextField
             label={t('menu.groupMax')}
             inputMode="numeric"
             value={max}

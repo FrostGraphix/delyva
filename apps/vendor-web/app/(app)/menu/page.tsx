@@ -6,7 +6,7 @@ import { ApiError } from '@delyva/sdk';
 import {
   Badge,
   Button,
-  EmptyState,
+  EmptyPanel,
   ErrorState,
   SkeletonList,
   Switch,
@@ -125,7 +125,7 @@ export default function MenuPage(): ReactNode {
       </header>
       <p className="text-caption text-text-muted">{t('menu.categoriesDebt')}</p>
       {count === 0 ? (
-        <EmptyState
+        <EmptyPanel
           title={t('menu.empty')}
           message={t('menu.emptyHint')}
           icon={<ListIcon size={32} />}

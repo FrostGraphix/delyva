@@ -2,7 +2,7 @@
 
 import type { OrderSummary } from '@delyva/contracts';
 import { WalletIcon } from '@delyva/icons/web';
-import { EmptyState, ErrorState, SkeletonList } from '@delyva/ui-web';
+import { EmptyPanel, ErrorState, SkeletonList } from '@delyva/ui-web';
 import { useQuery } from '@tanstack/react-query';
 import {
   type ColumnDef,
@@ -89,7 +89,7 @@ export default function EarningsPage(): ReactNode {
       </p>
       <h2 className="font-heading text-h2 font-bold">{t('earnings.recent')}</h2>
       {orders.length === 0 ? (
-        <EmptyState title={t('earnings.empty')} icon={<WalletIcon size={32} />} />
+        <EmptyPanel title={t('earnings.empty')} icon={<WalletIcon size={32} />} />
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
           <table className="w-full text-left text-body">

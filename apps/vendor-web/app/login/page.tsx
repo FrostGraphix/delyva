@@ -3,7 +3,7 @@
 import type { OtpRequestResponse } from '@delyva/contracts';
 import { StorefrontIcon, WifiSlashIcon } from '@delyva/icons/web';
 import { ApiError } from '@delyva/sdk';
-import { Button, OfflineBanner, TextField } from '@delyva/ui-web';
+import { Button, OfflineBanner, FormTextField } from '@delyva/ui-web';
 import { type SyntheticEvent, type ReactNode, useEffect, useState } from 'react';
 import { postJson } from '../../lib/client/api';
 import { useOnline } from '../../lib/client/providers';
@@ -100,7 +100,7 @@ export default function LoginPage(): ReactNode {
         </header>
         {sentTo === null ? (
           <form onSubmit={(e) => void send(e)} className="flex flex-col gap-4" noValidate>
-            <TextField
+            <FormTextField
               label={t('login.phone')}
               hint={t('login.phoneHint')}
               type="tel"
@@ -118,7 +118,7 @@ export default function LoginPage(): ReactNode {
           </form>
         ) : (
           <form onSubmit={(e) => void verify(e)} className="flex flex-col gap-4" noValidate>
-            <TextField
+            <FormTextField
               label={t('login.code')}
               hint={t('login.codeHint', { phone: sentTo })}
               inputMode="numeric"

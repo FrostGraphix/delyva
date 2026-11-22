@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Dialog, TextField } from '@delyva/ui-web';
+import { Button, Dialog, FormTextField } from '@delyva/ui-web';
 import { type ReactNode, useState } from 'react';
 import { type MessageKey, t } from '../../lib/i18n';
 
@@ -106,7 +106,7 @@ export function RejectDialog({
         ))}
       </fieldset>
       <div className="mt-3">
-        <TextField
+        <FormTextField
           label={t('reject.details')}
           value={details}
           maxLength={200}

@@ -178,6 +178,9 @@ describe('DelyvaClient', () => {
       reject.listFeeRules(),
       reject.createFeeRule({} as never, 'k-12345678'),
       reject.updateFeeRule('abc', {}),
+      reject.listSurgeRules(),
+      reject.createSurgeRule({} as never, 'k-12345678'),
+      reject.updateSurgeRule('s1', {}),
     ];
     for (const call of calls) await expect(call).rejects.toBeInstanceOf(ApiError);
     expect(captured.map((c) => `${String(c.init?.method)} ${c.url}`)).toEqual([
@@ -185,6 +188,9 @@ describe('DelyvaClient', () => {
       'GET https://api.test/v1/admin/fee-rules',
       'POST https://api.test/v1/admin/fee-rules',
       'PATCH https://api.test/v1/admin/fee-rules/abc',
+      'GET https://api.test/v1/admin/surge-rules',
+      'POST https://api.test/v1/admin/surge-rules',
+      'PATCH https://api.test/v1/admin/surge-rules/s1',
     ]);
   });
 

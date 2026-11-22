@@ -1,7 +1,7 @@
 import { type InputHTMLAttributes, type ReactElement, useId } from 'react';
 
 /** Text field props. */
-export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
+export interface FormTextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
   readonly label: string;
   /** Helper text below the field. */
   readonly hint?: string;
@@ -10,7 +10,7 @@ export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElemen
 }
 
 /** Labelled input with hint and error wired through aria-describedby. 48 px tall. */
-export function TextField({ label, hint, error, id, ...rest }: TextFieldProps): ReactElement {
+export function FormTextField({ label, hint, error, id, ...rest }: FormTextFieldProps): ReactElement {
   const auto = useId();
   const inputId = id ?? auto;
   const hintId = `${inputId}-hint`;

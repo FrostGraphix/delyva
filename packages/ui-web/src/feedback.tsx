@@ -1,14 +1,14 @@
 import type { ReactElement, ReactNode } from 'react';
 import { Button } from './button.js';
 
-/** Skeleton block props. */
-export interface SkeletonProps {
+/** SkeletonBlock block props. */
+export interface SkeletonBlockProps {
   /** Token-based size classes, e.g. `h-6 w-40`. */
   readonly className?: string;
 }
 
 /** Loading placeholder (skeletons, not spinners). Hidden from assistive tech. */
-export function Skeleton({ className = 'h-4 w-full' }: SkeletonProps): ReactElement {
+export function SkeletonBlock({ className = 'h-4 w-full' }: SkeletonBlockProps): ReactElement {
   return (
     <span
       aria-hidden="true"
@@ -28,7 +28,7 @@ export function SkeletonList({
   return (
     <div role="status" aria-label={label} className="flex flex-col gap-3">
       {Array.from({ length: rows }, (_, i) => (
-        <Skeleton key={i} className="h-16 w-full" />
+        <SkeletonBlock key={i} className="h-16 w-full" />
       ))}
     </div>
   );
@@ -69,7 +69,7 @@ function Panel({
 }
 
 /** Empty state: illustration + one action. */
-export function EmptyState(props: StatePanelProps): ReactElement {
+export function EmptyPanel(props: StatePanelProps): ReactElement {
   return <Panel {...props} />;
 }
 
@@ -96,34 +96,5 @@ export function OfflineBanner({ visible, message, icon }: OfflineBannerProps): R
       {icon}
       {message}
     </div>
-  );
-}
-
-/** Status badge tones. */
-export type BadgeTone = 'neutral' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
-
-const TONE: Record<BadgeTone, string> = {
-  neutral: 'bg-line text-text',
-  brand: 'bg-primary text-on-primary',
-  success: 'bg-success text-on-button-ink',
-  warning: 'bg-warning text-ink-900',
-  danger: 'bg-danger text-on-button-ink',
-  info: 'bg-info text-on-button-ink',
-};
-
-/** Small pill label. Pair colour with text so state never relies on colour alone. */
-export function Badge({
-  tone = 'neutral',
-  children,
-}: {
-  readonly tone?: BadgeTone;
-  readonly children: ReactNode;
-}): ReactElement {
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-pill px-3 py-1 text-micro font-bold ${TONE[tone]}`}
-    >
-      {children}
-    </span>
   );
 }

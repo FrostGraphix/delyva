@@ -2,7 +2,7 @@
 
 import type { OrderSummary } from '@delyva/contracts';
 import { ApiError } from '@delyva/sdk';
-import { Badge, Button, Skeleton, useToast } from '@delyva/ui-web';
+import { Badge, Button, SkeletonBlock, useToast } from '@delyva/ui-web';
 import Link from 'next/link';
 import { type ReactNode, useState } from 'react';
 import {
@@ -95,7 +95,7 @@ export function OrderCard({
           ))}
         </ul>
       ) : (
-        <Skeleton className="h-10 w-full" />
+        <SkeletonBlock className="h-10 w-full" />
       )}
       <p className="flex flex-wrap items-center gap-2 text-caption text-text-muted">
         <span>{t('board.items', { count: summary.itemCount })}</span>

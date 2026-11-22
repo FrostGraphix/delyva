@@ -2,7 +2,7 @@
 
 import type { OrderSummary } from '@delyva/contracts';
 import { ReceiptIcon } from '@delyva/icons/web';
-import { Badge, EmptyState, ErrorState, SkeletonList } from '@delyva/ui-web';
+import { Badge, EmptyPanel, ErrorState, SkeletonList } from '@delyva/ui-web';
 import { useQueryClient } from '@tanstack/react-query';
 import { type ReactNode, useCallback, useMemo } from 'react';
 import { NewOrderAlert } from '../../../components/board/new-order-alert';
@@ -56,7 +56,7 @@ export default function OrdersBoardPage(): ReactNode {
           action={{ label: t('common.retry'), onClick: board.refetch }}
         />
       ) : all.length === 0 ? (
-        <EmptyState
+        <EmptyPanel
           title={t('board.empty')}
           message={t('board.emptyHint')}
           icon={<ReceiptIcon size={32} />}
