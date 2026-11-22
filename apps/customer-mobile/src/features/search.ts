@@ -2,11 +2,7 @@ import type { VendorSummary } from '@delyva/contracts';
 
 /** Lower-cases and strips accents so "Café" matches "cafe". */
 function fold(s: string): string {
-  return s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim();
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
 /**

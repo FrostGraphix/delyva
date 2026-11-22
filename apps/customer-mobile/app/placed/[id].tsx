@@ -53,7 +53,9 @@ function NotifyCard(): ReactElement | null {
         <BellIcon size={24} color={c.accentText} />
         <View style={{ flex: 1 }}>
           <AppText variant="h3">{t('placed.notifyTitle')}</AppText>
-          <AppText tone="muted">{outcome === 'granted' ? t('placed.notifyDone') : t('placed.notifyBody')}</AppText>
+          <AppText tone="muted">
+            {outcome === 'granted' ? t('placed.notifyDone') : t('placed.notifyBody')}
+          </AppText>
         </View>
       </View>
       {outcome === null ? (

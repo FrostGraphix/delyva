@@ -2,7 +2,14 @@ import { tokens } from '@delyva/design-tokens';
 import { ClockIcon, CreditCardIcon, ScooterIcon } from '@delyva/icons/native';
 import { AppText, Button, usePalette } from '@delyva/ui-native';
 import { router } from 'expo-router';
-import { type ComponentRef, type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react';
+import {
+  type ComponentRef,
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { track } from '../src/device/analytics';
@@ -16,9 +23,21 @@ interface Slide {
 }
 
 const SLIDES: readonly Slide[] = [
-  { title: 'welcome.slide1.title', body: 'welcome.slide1.body', icon: (c) => <ScooterIcon size={32} color={c} /> },
-  { title: 'welcome.slide2.title', body: 'welcome.slide2.body', icon: (c) => <ClockIcon size={32} color={c} /> },
-  { title: 'welcome.slide3.title', body: 'welcome.slide3.body', icon: (c) => <CreditCardIcon size={32} color={c} /> },
+  {
+    title: 'welcome.slide1.title',
+    body: 'welcome.slide1.body',
+    icon: (c) => <ScooterIcon size={32} color={c} />,
+  },
+  {
+    title: 'welcome.slide2.title',
+    body: 'welcome.slide2.body',
+    icon: (c) => <ClockIcon size={32} color={c} />,
+  },
+  {
+    title: 'welcome.slide3.title',
+    body: 'welcome.slide3.body',
+    icon: (c) => <CreditCardIcon size={32} color={c} />,
+  },
 ];
 
 /** C02: up to 3 swipeable, skippable value screens. */
@@ -44,7 +63,11 @@ export default function Welcome(): ReactElement {
           accessibilityRole="button"
           onPress={finish}
           testID="welcome-skip"
-          style={{ minHeight: tokens.touchTarget, justifyContent: 'center', paddingHorizontal: tokens.space[2] }}
+          style={{
+            minHeight: tokens.touchTarget,
+            justifyContent: 'center',
+            paddingHorizontal: tokens.space[2],
+          }}
         >
           <AppText tone="accent" style={{ fontWeight: '700' }}>
             {t('welcome.skip')}
@@ -64,7 +87,12 @@ export default function Welcome(): ReactElement {
           <View
             key={s.title}
             accessibilityLabel={t('welcome.slideLabel', { index: i + 1, total: SLIDES.length })}
-            style={{ width, padding: tokens.space[6], justifyContent: 'center', gap: tokens.space[4] }}
+            style={{
+              width,
+              padding: tokens.space[6],
+              justifyContent: 'center',
+              gap: tokens.space[4],
+            }}
           >
             <View
               style={{

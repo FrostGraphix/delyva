@@ -11,13 +11,31 @@ import { QueryBoundary } from '../src/components/query-boundary';
 import { Screen } from '../src/components/screen';
 import { t } from '../src/i18n';
 
-function Item({ n, onOpen }: { readonly n: InboxNotification; readonly onOpen: () => void }): ReactElement {
+function Item({
+  n,
+  onOpen,
+}: {
+  readonly n: InboxNotification;
+  readonly onOpen: () => void;
+}): ReactElement {
   const c = usePalette();
   const unread = n.readAt === null;
   return (
-    <Card onPress={onOpen} accessibilityLabel={`${unread ? `${t('inbox.unread')}. ` : ''}${n.title}. ${n.body}`} testID="inbox-item">
+    <Card
+      onPress={onOpen}
+      accessibilityLabel={`${unread ? `${t('inbox.unread')}. ` : ''}${n.title}. ${n.body}`}
+      testID="inbox-item"
+    >
       <View style={{ flexDirection: 'row', gap: tokens.space[3] }}>
-        <View style={{ width: 10, height: 10, marginTop: 6, borderRadius: tokens.radius.pill, backgroundColor: unread ? c.primary : 'transparent' }} />
+        <View
+          style={{
+            width: 10,
+            height: 10,
+            marginTop: 6,
+            borderRadius: tokens.radius.pill,
+            backgroundColor: unread ? c.primary : 'transparent',
+          }}
+        />
         <View style={{ flex: 1, gap: tokens.space[1] }}>
           <AppText style={{ fontWeight: unread ? '800' : '600' }}>{n.title}</AppText>
           <AppText tone="muted">{n.body}</AppText>
@@ -35,11 +53,24 @@ export default function Inbox(): ReactElement {
   const list = useNotifications(api);
   const markRead = useMarkNotificationRead(api);
   return (
-    <Screen title={t('inbox.title')} back testID="inbox" onRefresh={() => { void list.refetch(); }} refreshing={list.isRefetching}>
+    <Screen
+      title={t('inbox.title')}
+      back
+      testID="inbox"
+      onRefresh={() => {
+        void list.refetch();
+      }}
+      refreshing={list.isRefetching}
+    >
       <QueryBoundary query={list}>
         {(page) =>
           page.items.length === 0 ? (
-            <StateView testID="inbox-empty" illustration={<BellIcon size={32} color={tokens.color.ink[900]} />} title={t('inbox.emptyTitle')} message={t('inbox.emptyBody')} />
+            <StateView
+              testID="inbox-empty"
+              illustration={<BellIcon size={32} color={tokens.color.ink[900]} />}
+              title={t('inbox.emptyTitle')}
+              message={t('inbox.emptyBody')}
+            />
           ) : (
             <View style={{ gap: tokens.space[3] }}>
               {page.items.map((n) => (

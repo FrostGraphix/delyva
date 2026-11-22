@@ -1,6 +1,6 @@
 import { tokens } from '@delyva/design-tokens';
 import type { ReactElement, ReactNode } from 'react';
-import { Text, type TextProps, type TextStyle } from 'react-native';
+import { Platform, Text, type TextProps, type TextStyle } from 'react-native';
 import { type Palette, usePalette } from './theme.js';
 
 /** Type-scale variant from design tokens. */
@@ -20,6 +20,12 @@ export interface AppTextProps extends Omit<TextProps, 'style'> {
 }
 
 const HEADINGS: ReadonlySet<TextVariant> = new Set<TextVariant>(['display', 'h1', 'h2', 'h3']);
+
+/** Token font family; on web add generic fallbacks so unloaded brand fonts never fall back to serif. */
+function family(heading: boolean): string {
+  const f = heading ? tokens.font.family.heading : tokens.font.family.body;
+  return Platform.OS === 'web' ? `"${f}", Inter, system-ui, sans-serif` : f;
+}
 
 function toneColor(tone: TextTone, c: Palette): string {
   const map: Record<TextTone, string> = {
@@ -55,7 +61,7 @@ export function AppText({
         fontSize: t.size,
         lineHeight: t.line,
         fontWeight: String(t.weight) as TextStyle['fontWeight'],
-        fontFamily: heading ? tokens.font.family.heading : tokens.font.family.body,
+        fontFamily: family(heading),
         textAlign: align,
         fontVariant: numeric ? ['tabular-nums'] : undefined,
         ...style,

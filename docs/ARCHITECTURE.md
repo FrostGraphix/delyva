@@ -616,3 +616,15 @@ See ADR 0600. Module `apps/api/src/modules/dispatch` (api / application / domain
 - DEBT(dispatch): single-instance Redis lock (not Redlock); unique indexes are the fence.
 - DEBT(dispatch): device location trusted for offline replays (mock-location detection pending); straight-line ETA; no writer yet for plate/hub/rating (onboarding, ratings); no batching.
 - DEBT(dispatch): outbox consumer polls the shared table (as notifications); manual override has no admin audit-log entry (reason on trip row + event only).
+
+## Customer app (Phase 1, 2026-11-21)
+
+`apps/customer-mobile` — Expo SDK 58 (managed), Expo Router, TanStack Query + Zustand, all server calls through `@delyva/sdk`. ADR: `adr/0800-customer-app-state-and-navigation.md`.
+
+- **Layers.** `app/` (routes, thin) → `src/components` (feature components built from `@delyva/ui-native`) → `src/features` (pure, unit-tested logic: modifier min/max, tracking steps, breakdown rows, phone, search) → `src/api` (SDK client with refresh-on-401, query client, realtime) → `src/auth`/`src/state` (Zustand). No screen holds raw hex values or copy: tokens from `@delyva/design-tokens`, strings from `src/i18n/en.ts`.
+- **Navigation.** Splash → welcome (≤3, skippable) → location priming → address → floating glass tab bar (Home, Search, Cart, Orders, Profile). Guests browse and add to a local cart; sign-in (phone + OTP) is requested only at checkout/inbox/orders/wallet and then syncs the guest cart to the server cart. Tab routes are opened with `router.navigate` (never `push`, which duplicates the tab navigator).
+- **Money safety.** Totals, fees, promo eligibility and order state are server values: the pay screen renders the `POST /v1/quotes` breakdown, checkout re-prices on the server, and card/transfer orders stay `PENDING_PAYMENT` until the verified webhook (the app only polls the order / calls `verify`).
+- **Tracking.** Socket.IO (`RealtimeClient`) joins the order room and invalidates the order query on `order:status`; while the socket is down the order polls every 10 s. Native uses `react-native-maps`; web renders a static panel.
+- **Secrets.** Refresh token + device id in `expo-secure-store` (Keychain/Keystore); access token in memory only; preferences/guest cart in AsyncStorage (no tokens, no PII beyond first name).
+- **E2E.** `tests/e2e/customer` (Playwright) builds the web target and runs it against the real API on port 3320 with its own database `delyva_custapp_e2e` and Redis db 7 (fake payment provider, dev OTP read from Redis).
+- **DEBT** is tracked in code as `DEBT(...)` markers: MMKV, Places autocomplete, search endpoint (Meilisearch), rider summary in `Order`, masked call/chat, PostHog, push token registration without an EAS project id, web tokens in memory only, API CORS.

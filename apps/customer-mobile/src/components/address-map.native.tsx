@@ -19,7 +19,10 @@ export function AddressMap({ point, onMove }: AddressMapProps): ReactElement {
         draggable
         coordinate={{ latitude: p.lat, longitude: p.lng }}
         onDragEnd={(e) => {
-          onMove({ lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude });
+          onMove({
+            lat: e.nativeEvent.coordinate.latitude,
+            lng: e.nativeEvent.coordinate.longitude,
+          });
         }}
         pinColor={tokens.color.brand.primary}
       />

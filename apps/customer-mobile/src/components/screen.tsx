@@ -51,7 +51,11 @@ export function Screen({
   const bottom = tabBarInset && !footer ? 120 : tokens.space[6];
   const body = { padding: tokens.space[4], gap: tokens.space[4], paddingBottom: bottom };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top', 'left', 'right']} testID={testID}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: c.bg }}
+      edges={['top', 'left', 'right']}
+      testID={testID}
+    >
       <OfflineBanner
         visible={!online}
         message={t('common.offline')}

@@ -92,7 +92,12 @@ export interface LineEdit {
 }
 
 /** Optimistic quantity change / removal on a server cart; rolls back on failure. */
-export function useEditServerLine(): UseMutationResult<Cart, ApiError, LineEdit, { prev?: CartList }> {
+export function useEditServerLine(): UseMutationResult<
+  Cart,
+  ApiError,
+  LineEdit,
+  { prev?: CartList }
+> {
   const qc = useQueryClient();
   return useMutation<Cart, ApiError, LineEdit, { prev?: CartList }>({
     mutationFn: ({ cartId, lineId, quantity }) =>

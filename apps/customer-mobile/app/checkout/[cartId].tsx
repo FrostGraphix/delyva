@@ -83,7 +83,13 @@ function quoteRequest(
   };
 }
 
-function Checkout({ cart, address }: { readonly cart: Cart; readonly address: DeliveryAddress }): ReactElement {
+function Checkout({
+  cart,
+  address,
+}: {
+  readonly cart: Cart;
+  readonly address: DeliveryAddress;
+}): ReactElement {
   const c = usePalette();
   const vendor = useVendor(api, cart.vendorId);
   const wallet = useWallet(api);
@@ -126,7 +132,9 @@ function Checkout({ cart, address }: { readonly cart: Cart; readonly address: De
           track({ name: 'order_placed', method });
           void (async () => {
             if (order.status === 'PENDING_PAYMENT' && order.payment.authorizationUrl) {
-              await WebBrowser.openBrowserAsync(order.payment.authorizationUrl).catch(() => undefined);
+              await WebBrowser.openBrowserAsync(order.payment.authorizationUrl).catch(
+                () => undefined,
+              );
               router.replace({ pathname: '/payment/[orderId]', params: { orderId: order.id } });
               return;
             }
@@ -145,11 +153,15 @@ function Checkout({ cart, address }: { readonly cart: Cart; readonly address: De
         <View style={{ gap: tokens.space[2] }}>
           {checkout.isError ? (
             <AppText tone="danger" accessibilityLiveRegion="polite" testID="checkout-error">
-              {t('checkout.orderError', { message: errorMessage(checkout.error, t('common.errorBody')) })}
+              {t('checkout.orderError', {
+                message: errorMessage(checkout.error, t('common.errorBody')),
+              })}
             </AppText>
           ) : null}
           <Button
-            label={quote.data ? t('checkout.pay', { amount: formatMinor(total) }) : t('common.loading')}
+            label={
+              quote.data ? t('checkout.pay', { amount: formatMinor(total) }) : t('common.loading')
+            }
             size="lg"
             variant="ink"
             loading={checkout.isPending}
@@ -163,7 +175,14 @@ function Checkout({ cart, address }: { readonly cart: Cart; readonly address: De
         <AppText variant="caption" tone="muted">
           {t('checkout.deliverTo')}
         </AppText>
-        <View style={{ flexDirection: 'row', gap: tokens.space[2], alignItems: 'center', marginTop: tokens.space[1] }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            gap: tokens.space[2],
+            alignItems: 'center',
+            marginTop: tokens.space[1],
+          }}
+        >
           <MapPinIcon size={20} color={c.accentText} />
           <View style={{ flex: 1 }}>
             <AppText style={{ fontWeight: '700' }}>{address.line1}</AppText>
@@ -247,7 +266,11 @@ function Checkout({ cart, address }: { readonly cart: Cart; readonly address: De
           />
         </View>
         {promoState ? (
-          <AppText tone={promoState.applied ? 'accent' : 'danger'} accessibilityLiveRegion="polite" testID="promo-status">
+          <AppText
+            tone={promoState.applied ? 'accent' : 'danger'}
+            accessibilityLiveRegion="polite"
+            testID="promo-status"
+          >
             {promoState.applied
               ? t('checkout.promoApplied', { code: promoState.code })
               : t('checkout.promoRejected', {
@@ -277,7 +300,11 @@ export default function CheckoutScreen(): ReactElement {
   if (error) {
     return (
       <Screen title={t('checkout.title')} back>
-        <StateView tone="error" title={t('common.errorTitle')} message={errorMessage(error, t('address.saveError'))} />
+        <StateView
+          tone="error"
+          title={t('common.errorTitle')}
+          message={errorMessage(error, t('address.saveError'))}
+        />
       </Screen>
     );
   }

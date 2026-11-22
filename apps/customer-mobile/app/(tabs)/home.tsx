@@ -105,7 +105,7 @@ export default function Home(): ReactElement {
         accessibilityRole="search"
         accessibilityLabel={t('home.searchPlaceholder')}
         onPress={() => {
-          router.push('/search');
+          router.navigate('/search');
         }}
         style={{
           flexDirection: 'row',

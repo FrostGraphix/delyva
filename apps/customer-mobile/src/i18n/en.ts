@@ -36,8 +36,7 @@ export const en = {
     'We use your location to show vendors that deliver to you and give an honest delivery time. We never share it.',
   'location.allow': 'Use my current location',
   'location.manual': 'Enter address manually',
-  'location.denied':
-    'Location is off. No problem: pick your area and type your address instead.',
+  'location.denied': 'Location is off. No problem: pick your area and type your address instead.',
   'location.locating': 'Finding you',
 
   'address.title': 'Confirm delivery address',
@@ -81,7 +80,8 @@ export const en = {
   'home.emptyBody': 'Vendors may be closed, or your address is outside our delivery zones.',
   'home.emptyAction': 'Change address',
   'home.parcelsTitle': 'Send a package is coming soon',
-  'home.parcelsBody': "We're launching errands in Lagos shortly. Food, groceries and pharmacy are live.",
+  'home.parcelsBody':
+    "We're launching errands in Lagos shortly. Food, groceries and pharmacy are live.",
   'vendor.eta': '{min} min',
   'vendor.fee': '{fee} delivery',
   'vendor.feeAtCheckout': 'Fee at checkout',
@@ -199,7 +199,8 @@ export const en = {
   'price.total': 'Total',
 
   'payment.title': 'Complete your payment',
-  'payment.body': 'Finish paying in the secure Paystack window. We confirm with the bank, not the redirect.',
+  'payment.body':
+    'Finish paying in the secure Paystack window. We confirm with the bank, not the redirect.',
   'payment.reopen': 'Open payment page again',
   'payment.check': "I've paid",
   'payment.waiting': 'Waiting for confirmation',
@@ -212,7 +213,7 @@ export const en = {
   'placed.ref': 'Order {ref}',
   'placed.track': 'Track order',
   'placed.notifyTitle': 'Get live updates',
-  'placed.notifyBody': "Turn on notifications so you know when your rider is close.",
+  'placed.notifyBody': 'Turn on notifications so you know when your rider is close.',
   'placed.notifyAction': 'Turn on notifications',
   'placed.notifyDone': "Notifications are on. We'll keep you posted.",
 

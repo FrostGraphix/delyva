@@ -23,12 +23,24 @@ export default function Addresses(): ReactElement {
       title={t('addresses.title')}
       back
       testID="addresses"
-      footer={<Button label={t('addresses.add')} size="lg" onPress={() => { router.push({ pathname: '/address', params: { mode: 'add' } }); }} />}
+      footer={
+        <Button
+          label={t('addresses.add')}
+          size="lg"
+          onPress={() => {
+            router.push({ pathname: '/address', params: { mode: 'add' } });
+          }}
+        />
+      }
     >
       <QueryBoundary query={list}>
         {(page) =>
           page.items.length === 0 ? (
-            <StateView illustration={<MapPinIcon size={32} color={tokens.color.ink[900]} />} title={t('addresses.emptyTitle')} message={t('addresses.emptyBody')} />
+            <StateView
+              illustration={<MapPinIcon size={32} color={tokens.color.ink[900]} />}
+              title={t('addresses.emptyTitle')}
+              message={t('addresses.emptyBody')}
+            />
           ) : (
             <View style={{ gap: tokens.space[3] }}>
               {page.items.map((a) => {
@@ -39,21 +51,39 @@ export default function Addresses(): ReactElement {
                     testID="address-row"
                     accessibilityLabel={t('addresses.use', { label: a.label })}
                     onPress={() => {
-                      setAddress({ label: a.label, line1: a.line1, landmark: a.landmark, lat: a.lat, lng: a.lng, savedId: a.id });
+                      setAddress({
+                        label: a.label,
+                        line1: a.line1,
+                        landmark: a.landmark,
+                        lat: a.lat,
+                        lng: a.lng,
+                        savedId: a.id,
+                      });
                       goBack();
                     }}
-                    style={{ flexDirection: 'row', alignItems: 'center', gap: tokens.space[3], borderColor: isCurrent ? c.primary : c.line }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: tokens.space[3],
+                      borderColor: isCurrent ? c.primary : c.line,
+                    }}
                   >
                     <MapPinIcon color={isCurrent ? c.accentText : c.text} />
                     <View style={{ flex: 1 }}>
-                      <AppText style={{ fontWeight: '700' }}>{isCurrent ? `${a.label} · ${t('addresses.current')}` : a.label}</AppText>
-                      <AppText variant="caption" tone="muted">{a.line1}</AppText>
+                      <AppText style={{ fontWeight: '700' }}>
+                        {isCurrent ? `${a.label} · ${t('addresses.current')}` : a.label}
+                      </AppText>
+                      <AppText variant="caption" tone="muted">
+                        {a.line1}
+                      </AppText>
                     </View>
                     {isCurrent ? null : (
                       <IconButton
                         icon={<TrashIcon size={20} color={c.danger} />}
                         accessibilityLabel={t('addresses.delete', { label: a.label })}
-                        onPress={() => { del.mutate({ addressId: a.id }); }}
+                        onPress={() => {
+                          del.mutate({ addressId: a.id });
+                        }}
                       />
                     )}
                   </Card>

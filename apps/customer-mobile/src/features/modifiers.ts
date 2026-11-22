@@ -60,7 +60,9 @@ export function selectedOptionIds(item: MenuItem, s: Selections): string[] {
 export function previewMinor(item: MenuItem, s: Selections, quantity: number): number {
   const deltas = item.modifierGroups.reduce((sum, g) => {
     const ids = new Set(s[g.id] ?? []);
-    return sum + g.options.filter((o) => ids.has(o.id)).reduce((a, o) => a + o.priceDelta.amountMinor, 0);
+    return (
+      sum + g.options.filter((o) => ids.has(o.id)).reduce((a, o) => a + o.priceDelta.amountMinor, 0)
+    );
   }, 0);
   return (item.price.amountMinor + deltas) * quantity;
 }

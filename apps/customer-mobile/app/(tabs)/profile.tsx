@@ -1,5 +1,12 @@
 import { tokens } from '@delyva/design-tokens';
-import { BellIcon, CaretRightIcon, type IconProps, MapPinIcon, UserIcon, WalletIcon } from '@delyva/icons/native';
+import {
+  BellIcon,
+  CaretRightIcon,
+  type IconProps,
+  MapPinIcon,
+  UserIcon,
+  WalletIcon,
+} from '@delyva/icons/native';
 import { AppText, Button, Card, usePalette } from '@delyva/ui-native';
 import { useMutation } from '@tanstack/react-query';
 import { type Href, router } from 'expo-router';
@@ -38,12 +45,25 @@ export default function Profile(): ReactElement {
   return (
     <Screen title={t('profile.title')} tabBarInset testID="profile">
       <Card style={{ flexDirection: 'row', alignItems: 'center', gap: tokens.space[3] }}>
-        <View style={{ width: 56, height: 56, borderRadius: tokens.radius.pill, backgroundColor: c.primary, alignItems: 'center', justifyContent: 'center' }}>
+        <View
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: tokens.radius.pill,
+            backgroundColor: c.primary,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <UserIcon color={c.onPrimary} />
         </View>
         <View style={{ flex: 1 }}>
-          <AppText variant="h2" testID="profile-name">{firstName ?? t('profile.guest')}</AppText>
-          <AppText variant="caption" tone="muted">{authed ? t('profile.signedIn') : t('profile.signedOut')}</AppText>
+          <AppText variant="h2" testID="profile-name">
+            {firstName ?? t('profile.guest')}
+          </AppText>
+          <AppText variant="caption" tone="muted">
+            {authed ? t('profile.signedIn') : t('profile.signedOut')}
+          </AppText>
         </View>
       </Card>
       {authed ? (
@@ -54,8 +74,18 @@ export default function Profile(): ReactElement {
                 key={l.label}
                 accessibilityRole="button"
                 testID={`profile-${l.label}`}
-                onPress={() => { router.push(l.href); }}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: tokens.space[3], minHeight: 56, paddingHorizontal: tokens.space[4], borderTopWidth: i === 0 ? 0 : 1, borderTopColor: c.line }}
+                onPress={() => {
+                  router.push(l.href);
+                }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: tokens.space[3],
+                  minHeight: 56,
+                  paddingHorizontal: tokens.space[4],
+                  borderTopWidth: i === 0 ? 0 : 1,
+                  borderTopColor: c.line,
+                }}
               >
                 <l.Icon size={24} color={c.text} />
                 <AppText style={{ flex: 1, fontWeight: '600' }}>{t(l.label)}</AppText>
@@ -63,10 +93,23 @@ export default function Profile(): ReactElement {
               </Pressable>
             ))}
           </Card>
-          <Button label={t('profile.signOut')} variant="ghost" loading={signOut.isPending} onPress={() => { signOut.mutate(); }} accessibilityLabel={t('profile.signOut')} />
+          <Button
+            label={t('profile.signOut')}
+            variant="ghost"
+            loading={signOut.isPending}
+            onPress={() => {
+              signOut.mutate();
+            }}
+            accessibilityLabel={t('profile.signOut')}
+          />
         </>
       ) : (
-        <Button label={t('common.signIn')} onPress={() => { router.push({ pathname: '/login', params: { redirect: '/profile' } }); }} />
+        <Button
+          label={t('common.signIn')}
+          onPress={() => {
+            router.push({ pathname: '/login', params: { redirect: '/profile' } });
+          }}
+        />
       )}
     </Screen>
   );

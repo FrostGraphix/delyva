@@ -30,14 +30,25 @@ function kindKey(kind: string): MessageKey {
 
 function TxRow({ tx }: { readonly tx: WalletTransaction }): ReactElement {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: tokens.space[2] }} testID="wallet-tx">
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: tokens.space[2],
+      }}
+      testID="wallet-tx"
+    >
       <View>
         <AppText style={{ fontWeight: '600' }}>{t(kindKey(tx.kind))}</AppText>
         <AppText variant="caption" tone="muted">
           {new Date(tx.createdAt).toLocaleString('en-NG')}
         </AppText>
       </View>
-      <AppText numeric tone={tx.amount.amountMinor > 0 ? 'accent' : 'default'} style={{ fontWeight: '700' }}>
+      <AppText
+        numeric
+        tone={tx.amount.amountMinor > 0 ? 'accent' : 'default'}
+        style={{ fontWeight: '700' }}
+      >
         {formatMoney(tx.amount)}
       </AppText>
     </View>
@@ -51,7 +62,9 @@ function usePendingIntent(intent: PaymentIntent | null): PaymentIntent | null {
     queryFn: () => api.getPaymentIntent(intent?.id ?? ''),
     enabled: intent !== null,
     refetchInterval: (query) =>
-      query.state.data?.status === 'succeeded' || query.state.data?.status === 'failed' ? false : PAYMENT_POLL_MS,
+      query.state.data?.status === 'succeeded' || query.state.data?.status === 'failed'
+        ? false
+        : PAYMENT_POLL_MS,
   });
   return q.data ?? intent;
 }
@@ -68,7 +81,8 @@ function TopUp(): ReactElement {
   const chosen = custom ? nairaInputToMinor(custom) : amount;
   const valid = chosen !== null && chosen >= MIN_TOP_UP_MINOR && chosen <= MAX_TOP_UP_MINOR;
   useEffect(() => {
-    if (live?.status === 'succeeded') void qc.invalidateQueries({ queryKey: paymentsKeys.wallet() });
+    if (live?.status === 'succeeded')
+      void qc.invalidateQueries({ queryKey: paymentsKeys.wallet() });
   }, [live?.status, qc]);
   const start = (): void => {
     if (!valid) return;
@@ -77,7 +91,8 @@ function TopUp(): ReactElement {
       {
         onSuccess: (pi) => {
           setIntent(pi);
-          if (pi.authorizationUrl) void WebBrowser.openBrowserAsync(pi.authorizationUrl).catch(() => undefined);
+          if (pi.authorizationUrl)
+            void WebBrowser.openBrowserAsync(pi.authorizationUrl).catch(() => undefined);
         },
       },
     );
@@ -85,29 +100,103 @@ function TopUp(): ReactElement {
   return (
     <Card testID="topup">
       <AppText variant="h3">{t('wallet.topUp')}</AppText>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: tokens.space[2], marginVertical: tokens.space[3] }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: tokens.space[2],
+          marginVertical: tokens.space[3],
+        }}
+      >
         {TOP_UP_PRESETS_MINOR.map((p) => (
-          <Chip key={p} label={formatMinor(p)} testID={`topup-${String(p)}`} selected={!custom && amount === p} onPress={() => { setCustom(''); setAmount(p); }} />
+          <Chip
+            key={p}
+            label={formatMinor(p)}
+            testID={`topup-${String(p)}`}
+            selected={!custom && amount === p}
+            onPress={() => {
+              setCustom('');
+              setAmount(p);
+            }}
+          />
         ))}
       </View>
-      <TextField label={t('wallet.custom')} value={custom} onChangeText={setCustom} keyboardType="number-pad" testID="topup-custom"
-        error={custom && !valid ? t('wallet.amountError', { min: formatMinor(MIN_TOP_UP_MINOR), max: formatMinor(MAX_TOP_UP_MINOR) }) : null} />
+      <TextField
+        label={t('wallet.custom')}
+        value={custom}
+        onChangeText={setCustom}
+        keyboardType="number-pad"
+        testID="topup-custom"
+        error={
+          custom && !valid
+            ? t('wallet.amountError', {
+                min: formatMinor(MIN_TOP_UP_MINOR),
+                max: formatMinor(MAX_TOP_UP_MINOR),
+              })
+            : null
+        }
+      />
       <View style={{ gap: tokens.space[2], marginTop: tokens.space[3] }}>
-        <AppText variant="caption" tone="muted">{t('wallet.method')}</AppText>
-        <ChoiceRow kind="radio" label={t('checkout.method.card')} selected={method === 'card'} onPress={() => { setMethod('card'); }} />
-        <ChoiceRow kind="radio" label={t('checkout.method.transfer')} selected={method === 'transfer'} onPress={() => { setMethod('transfer'); }} />
+        <AppText variant="caption" tone="muted">
+          {t('wallet.method')}
+        </AppText>
+        <ChoiceRow
+          kind="radio"
+          label={t('checkout.method.card')}
+          selected={method === 'card'}
+          onPress={() => {
+            setMethod('card');
+          }}
+        />
+        <ChoiceRow
+          kind="radio"
+          label={t('checkout.method.transfer')}
+          selected={method === 'transfer'}
+          onPress={() => {
+            setMethod('transfer');
+          }}
+        />
       </View>
       <View style={{ marginTop: tokens.space[3], gap: tokens.space[2] }}>
         {live?.status === 'requires_action' || live?.status === 'processing' ? (
           <>
-            <AppText tone="muted" accessibilityLiveRegion="polite" testID="topup-pending">{t('wallet.topUpPending')}</AppText>
-            <Button label={t('payment.check')} variant="soft" loading={verify.isPending} onPress={() => { verify.mutate({ id: live.id }, { onSuccess: () => void qc.invalidateQueries({ queryKey: paymentsKeys.intent(live.id) }) }); }} />
+            <AppText tone="muted" accessibilityLiveRegion="polite" testID="topup-pending">
+              {t('wallet.topUpPending')}
+            </AppText>
+            <Button
+              label={t('payment.check')}
+              variant="soft"
+              loading={verify.isPending}
+              onPress={() => {
+                verify.mutate(
+                  { id: live.id },
+                  {
+                    onSuccess: () =>
+                      void qc.invalidateQueries({ queryKey: paymentsKeys.intent(live.id) }),
+                  },
+                );
+              }}
+            />
           </>
         ) : null}
-        {live?.status === 'succeeded' ? <AppText tone="accent" testID="topup-done" accessibilityLiveRegion="polite">{t('wallet.topUpDone')}</AppText> : null}
-        {live?.status === 'failed' ? <AppText tone="danger">{t('wallet.topUpFailed')}</AppText> : null}
-        {create.isError ? <AppText tone="danger">{errorMessage(create.error, t('common.errorBody'))}</AppText> : null}
-        <Button label={t('wallet.topUpAction', { amount: valid ? formatMinor(chosen) : '' })} size="lg" disabled={!valid} loading={create.isPending} onPress={start} />
+        {live?.status === 'succeeded' ? (
+          <AppText tone="accent" testID="topup-done" accessibilityLiveRegion="polite">
+            {t('wallet.topUpDone')}
+          </AppText>
+        ) : null}
+        {live?.status === 'failed' ? (
+          <AppText tone="danger">{t('wallet.topUpFailed')}</AppText>
+        ) : null}
+        {create.isError ? (
+          <AppText tone="danger">{errorMessage(create.error, t('common.errorBody'))}</AppText>
+        ) : null}
+        <Button
+          label={t('wallet.topUpAction', { amount: valid ? formatMinor(chosen) : '' })}
+          size="lg"
+          disabled={!valid}
+          loading={create.isPending}
+          onPress={start}
+        />
       </View>
     </Card>
   );
@@ -118,15 +207,37 @@ export default function WalletScreen(): ReactElement {
   const wallet = useWallet(api);
   const txs = useWalletTransactions(api);
   return (
-    <Screen title={t('wallet.title')} back testID="wallet" onRefresh={() => { void wallet.refetch(); void txs.refetch(); }} refreshing={wallet.isRefetching}>
+    <Screen
+      title={t('wallet.title')}
+      back
+      testID="wallet"
+      onRefresh={() => {
+        void wallet.refetch();
+        void txs.refetch();
+      }}
+      refreshing={wallet.isRefetching}
+    >
       <QueryBoundary query={wallet} skeletonRows={1}>
         {(w) => (
-          <Card style={{ backgroundColor: tokens.color.ink[900], borderColor: tokens.color.ink[900] }}>
-            <AppText variant="caption" tone="inverse">{t('wallet.balance')}</AppText>
-            <AppText variant="display" numeric testID="wallet-balance" style={{ color: tokens.color.neutral[0] }}>
+          <Card
+            style={{ backgroundColor: tokens.color.ink[900], borderColor: tokens.color.ink[900] }}
+          >
+            <AppText variant="caption" tone="inverse">
+              {t('wallet.balance')}
+            </AppText>
+            <AppText
+              variant="display"
+              numeric
+              testID="wallet-balance"
+              style={{ color: tokens.color.neutral[0] }}
+            >
               {formatMoney(w.available)}
             </AppText>
-            {w.held.amountMinor > 0 ? <AppText variant="caption" tone="inverse">{t('wallet.held', { amount: formatMoney(w.held) })}</AppText> : null}
+            {w.held.amountMinor > 0 ? (
+              <AppText variant="caption" tone="inverse">
+                {t('wallet.held', { amount: formatMoney(w.held) })}
+              </AppText>
+            ) : null}
           </Card>
         )}
       </QueryBoundary>
@@ -135,9 +246,17 @@ export default function WalletScreen(): ReactElement {
       <QueryBoundary query={txs} skeletonRows={3} skeletonHeight={48}>
         {(page) =>
           page.items.length === 0 ? (
-            <StateView illustration={<WalletIcon size={32} color={tokens.color.ink[900]} />} title={t('wallet.emptyTitle')} message={t('wallet.emptyBody')} />
+            <StateView
+              illustration={<WalletIcon size={32} color={tokens.color.ink[900]} />}
+              title={t('wallet.emptyTitle')}
+              message={t('wallet.emptyBody')}
+            />
           ) : (
-            <Card>{page.items.map((x) => <TxRow key={x.id} tx={x} />)}</Card>
+            <Card>
+              {page.items.map((x) => (
+                <TxRow key={x.id} tx={x} />
+              ))}
+            </Card>
           )
         }
       </QueryBoundary>

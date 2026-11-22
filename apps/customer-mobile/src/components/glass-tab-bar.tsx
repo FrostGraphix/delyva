@@ -41,7 +41,9 @@ export function GlassTabBar({ state }: TabBarProps): ReactElement {
         bottom: Math.max(insets.bottom, tokens.space[3]),
       }}
     >
-      <GlassSurface style={{ flexDirection: 'row', padding: tokens.space[2], alignItems: 'center' }}>
+      <GlassSurface
+        style={{ flexDirection: 'row', padding: tokens.space[2], alignItems: 'center' }}
+      >
         {state.routes.map((route, i) => {
           const tab = TABS[route.name];
           if (!tab) return null;

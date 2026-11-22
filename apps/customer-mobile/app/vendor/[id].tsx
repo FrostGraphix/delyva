@@ -98,7 +98,11 @@ function Menu({
               </AppText>
             </View>
           ) : null}
-          <AppText variant="caption" tone={branch?.isOpenNow ? 'accent' : 'danger'} style={{ alignSelf: 'center', fontWeight: '700' }}>
+          <AppText
+            variant="caption"
+            tone={branch?.isOpenNow ? 'accent' : 'danger'}
+            style={{ alignSelf: 'center', fontWeight: '700' }}
+          >
             {branch?.isOpenNow ? t('menu.open') : t('menu.closed')}
           </AppText>
         </View>
@@ -119,7 +123,11 @@ function Menu({
         </View>
       ) : null}
       {cats.length === 0 ? (
-        <StateView title={t('menu.emptyTitle')} message={t('menu.emptyBody')} illustration={<StorefrontIcon size={32} color={tokens.color.ink[900]} />} />
+        <StateView
+          title={t('menu.emptyTitle')}
+          message={t('menu.emptyBody')}
+          illustration={<StorefrontIcon size={32} color={tokens.color.ink[900]} />}
+        />
       ) : (
         shown.map((x) => (
           <View key={x.id} style={{ gap: tokens.space[2] }}>
@@ -158,7 +166,11 @@ function Menu({
 /** C11 Merchant page: hero, info, category chips, dishes and the item sheet (C12). */
 export default function VendorScreen(): ReactElement {
   const c = usePalette();
-  const { id, branchId, eta } = useLocalSearchParams<{ id: string; branchId?: string; eta?: string }>();
+  const { id, branchId, eta } = useLocalSearchParams<{
+    id: string;
+    branchId?: string;
+    eta?: string;
+  }>();
   const vendor = useVendor(api, id);
   const count = useCartCount();
   return (
@@ -171,7 +183,7 @@ export default function VendorScreen(): ReactElement {
             variant="ink"
             size="lg"
             onPress={() => {
-              router.push('/cart');
+              router.navigate('/cart');
             }}
           />
         ) : undefined
@@ -187,9 +199,19 @@ export default function VendorScreen(): ReactElement {
           justifyContent: 'center',
         }}
       >
-        {vendor.data ? <CategoryGlyph category={vendor.data.category} size={32} color={tokens.color.ink[900]} /> : <ShoppingBagIcon size={32} color={tokens.color.ink[900]} />}
+        {vendor.data ? (
+          <CategoryGlyph category={vendor.data.category} size={32} color={tokens.color.ink[900]} />
+        ) : (
+          <ShoppingBagIcon size={32} color={tokens.color.ink[900]} />
+        )}
         <View style={{ position: 'absolute', top: tokens.space[3], left: tokens.space[4] }}>
-          <IconButton variant="glass" icon={<CaretLeftIcon color={c.text} />} accessibilityLabel={t('common.back')} onPress={goBack} testID="back" />
+          <IconButton
+            variant="glass"
+            icon={<CaretLeftIcon color={c.text} />}
+            accessibilityLabel={t('common.back')}
+            onPress={goBack}
+            testID="back"
+          />
         </View>
       </View>
       <QueryBoundary query={vendor} skeletonRows={5}>

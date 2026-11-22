@@ -50,7 +50,8 @@ export function useOrderLive(orderId: string): OrderLive {
     rt.socket.on('connect', join);
     rt.socket.on('disconnect', drop);
     const offStatus = rt.onOrderStatus((p) => {
-      if (p.orderId === orderId) void qc.invalidateQueries({ queryKey: orderingKeys.order(orderId) });
+      if (p.orderId === orderId)
+        void qc.invalidateQueries({ queryKey: orderingKeys.order(orderId) });
     });
     const offRider = rt.onRiderLocation((p) => {
       if (p.orderId === orderId) setRider(p);

@@ -28,7 +28,9 @@ export default function Login(): ReactElement {
   const verify = useVerifyOtp(api);
   const [raw, setRaw] = useState('');
   const [touched, setTouched] = useState(false);
-  const [sent, setSent] = useState<{ phone: string; resendAfter: number; key: string } | null>(null);
+  const [sent, setSent] = useState<{ phone: string; resendAfter: number; key: string } | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const phone = toNigeriaE164(raw);
   const firstName = usePrefs((s) => s.firstName);
@@ -63,8 +65,8 @@ export default function Login(): ReactElement {
             await syncGuestCart().catch(() => undefined);
             await qc.invalidateQueries();
             const next = (redirect ?? '/home') as Href;
-            if (firstName) router.replace(next);
-            else router.replace({ pathname: '/name', params: { redirect: redirect ?? '/home' } });
+            if (firstName) router.navigate(next);
+            else router.navigate({ pathname: '/name', params: { redirect: redirect ?? '/home' } });
           })();
         },
         onError: (e) => {

@@ -13,7 +13,12 @@ import { QueryBoundary } from '../../src/components/query-boundary';
 import { Screen } from '../../src/components/screen';
 import { ORDER_POLL_CONNECTED_MS, ORDER_POLL_FALLBACK_MS } from '../../src/config';
 import { haptic } from '../../src/device/haptics';
-import { showsDeliveryOtp, statusKey, TRACKING_STEPS, trackingStep } from '../../src/features/tracking';
+import {
+  showsDeliveryOtp,
+  statusKey,
+  TRACKING_STEPS,
+  trackingStep,
+} from '../../src/features/tracking';
 import { t } from '../../src/i18n';
 import { usePrefs } from '../../src/state/prefs-store';
 
@@ -44,14 +49,26 @@ function RiderCard({ order }: { readonly order: Order }): ReactElement {
           </AppText>
         </View>
         {/* DEBT(engagement): call/chat disabled — masked relay calling and chat not built — enable via the voice provider in Phase 2. */}
-        <IconButton icon={<PhoneIcon color={c.textDisabled} />} accessibilityLabel={`${t('track.call')}. ${t('track.contactSoon')}`} onPress={() => undefined} />
-        <IconButton icon={<ChatIcon color={c.textDisabled} />} accessibilityLabel={`${t('track.chat')}. ${t('track.contactSoon')}`} onPress={() => undefined} />
+        <IconButton
+          icon={<PhoneIcon color={c.textDisabled} />}
+          accessibilityLabel={`${t('track.call')}. ${t('track.contactSoon')}`}
+          onPress={() => undefined}
+        />
+        <IconButton
+          icon={<ChatIcon color={c.textDisabled} />}
+          accessibilityLabel={`${t('track.chat')}. ${t('track.contactSoon')}`}
+          onPress={() => undefined}
+        />
       </View>
     </Card>
   );
 }
 
-function Tracking({ order, connected, rider }: {
+function Tracking({
+  order,
+  connected,
+  rider,
+}: {
   readonly order: Order;
   readonly connected: boolean;
   readonly rider: { lat: number; lng: number } | null;
@@ -77,7 +94,13 @@ function Tracking({ order, connected, rider }: {
         rider={order.status === 'DELIVERED' ? null : rider}
       />
       <Card>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+          }}
+        >
           <View style={{ flex: 1, gap: tokens.space[1] }}>
             <AppText variant="h2" testID="track-status" accessibilityLiveRegion="polite">
               {t(statusKey(order.status))}
@@ -101,10 +124,19 @@ function Tracking({ order, connected, rider }: {
           <ProgressSteps
             steps={steps}
             current={step}
-            accessibilityLabel={t('track.stepLabel', { index: step + 1, total: steps.length, label: stepLabel })}
+            accessibilityLabel={t('track.stepLabel', {
+              index: step + 1,
+              total: steps.length,
+              label: stepLabel,
+            })}
           />
         </View>
-        <AppText variant="micro" tone={connected ? 'accent' : 'muted'} style={{ marginTop: tokens.space[3] }} testID="track-mode">
+        <AppText
+          variant="micro"
+          tone={connected ? 'accent' : 'muted'}
+          style={{ marginTop: tokens.space[3] }}
+          testID="track-mode"
+        >
           {connected ? t('track.live') : t('track.polling')}
         </AppText>
       </Card>
@@ -137,7 +169,11 @@ function Tracking({ order, connected, rider }: {
 export default function TrackScreen(): ReactElement {
   const { id } = useLocalSearchParams<{ id: string }>();
   const live = useOrderLive(id);
-  const order = useOrder(ordering, id, live.connected ? ORDER_POLL_CONNECTED_MS : ORDER_POLL_FALLBACK_MS);
+  const order = useOrder(
+    ordering,
+    id,
+    live.connected ? ORDER_POLL_CONNECTED_MS : ORDER_POLL_FALLBACK_MS,
+  );
   return (
     <Screen
       title={t('track.title')}

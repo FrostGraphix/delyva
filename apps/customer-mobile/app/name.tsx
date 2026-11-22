@@ -28,7 +28,7 @@ export default function NameScreen(): ReactElement {
             if (!valid) return;
             setFirstName(name.trim());
             track({ name: 'onboarding_step_completed', step: 'name' });
-            router.replace(redirect ?? '/home');
+            router.navigate(redirect ?? '/home');
           }}
         />
       }

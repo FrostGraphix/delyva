@@ -34,7 +34,15 @@ interface LineProps {
   readonly testID: string;
 }
 
-function Line({ name, options, quantity, total, problem, onQuantity, testID }: LineProps): ReactElement {
+function Line({
+  name,
+  options,
+  quantity,
+  total,
+  problem,
+  onQuantity,
+  testID,
+}: LineProps): ReactElement {
   const c = usePalette();
   return (
     <View testID={testID} style={{ gap: tokens.space[2], paddingVertical: tokens.space[2] }}>
@@ -141,7 +149,12 @@ function ServerCart({ cart }: { readonly cart: Cart }): ReactElement {
           }}
         />
       ))}
-      <PriceRow label={t('cart.subtotal')} value={formatMoney(cart.itemsSubtotal)} emphasis testID="cart-subtotal" />
+      <PriceRow
+        label={t('cart.subtotal')}
+        value={formatMoney(cart.itemsSubtotal)}
+        emphasis
+        testID="cart-subtotal"
+      />
       <AppText variant="caption" tone="muted">
         {t('cart.estimateNote')}
       </AppText>

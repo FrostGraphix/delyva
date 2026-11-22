@@ -22,7 +22,12 @@ export function PriceBreakdown({ rows }: PriceBreakdownProps): ReactElement {
           key={r.key}
           style={
             r.emphasis
-              ? { borderTopWidth: 1, borderTopColor: c.line, marginTop: tokens.space[2], paddingTop: tokens.space[2] }
+              ? {
+                  borderTopWidth: 1,
+                  borderTopColor: c.line,
+                  marginTop: tokens.space[2],
+                  paddingTop: tokens.space[2],
+                }
               : undefined
           }
         >

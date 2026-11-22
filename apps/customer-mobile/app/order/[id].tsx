@@ -48,7 +48,10 @@ function Detail({ order }: { readonly order: Order }): ReactElement {
       <Card>
         <AppText variant="h3">{t('order.items')}</AppText>
         {order.items.map((i) => (
-          <View key={`${i.itemId}-${i.options.map((o) => o.id).join()}`} style={{ flexDirection: 'row', paddingVertical: tokens.space[2], gap: tokens.space[2] }}>
+          <View
+            key={`${i.itemId}-${i.options.map((o) => o.id).join()}`}
+            style={{ flexDirection: 'row', paddingVertical: tokens.space[2], gap: tokens.space[2] }}
+          >
             <View style={{ flex: 1 }}>
               <AppText>{`${String(i.quantity)} × ${i.name}`}</AppText>
               {i.options.length > 0 ? (
@@ -73,7 +76,14 @@ function Detail({ order }: { readonly order: Order }): ReactElement {
       <Card>
         <AppText variant="h3">{t('order.timeline')}</AppText>
         {order.timeline.map((e) => (
-          <View key={`${e.status}-${e.at}`} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: tokens.space[1] }}>
+          <View
+            key={`${e.status}-${e.at}`}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingVertical: tokens.space[1],
+            }}
+          >
             <AppText variant="caption">{t(statusKey(e.status))}</AppText>
             <AppText variant="caption" tone="muted" numeric>
               {new Date(e.at).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' })}
@@ -90,10 +100,25 @@ function Detail({ order }: { readonly order: Order }): ReactElement {
           }}
         />
       ) : null}
-      <Button label={t('order.reorder')} variant="brand" loading={reorder.isPending} onPress={() => { reorder.mutate(); }} />
-      {reorder.isError ? <AppText tone="danger">{errorMessage(reorder.error, t('common.errorBody'))}</AppText> : null}
+      <Button
+        label={t('order.reorder')}
+        variant="brand"
+        loading={reorder.isPending}
+        onPress={() => {
+          reorder.mutate();
+        }}
+      />
+      {reorder.isError ? (
+        <AppText tone="danger">{errorMessage(reorder.error, t('common.errorBody'))}</AppText>
+      ) : null}
       {canCustomerCancel(order.status) ? (
-        <Button label={t('order.cancel')} variant="danger" onPress={() => { setConfirm(true); }} />
+        <Button
+          label={t('order.cancel')}
+          variant="danger"
+          onPress={() => {
+            setConfirm(true);
+          }}
+        />
       ) : null}
       {cancel.isError ? (
         <AppText tone="danger" accessibilityLiveRegion="polite">
@@ -102,7 +127,9 @@ function Detail({ order }: { readonly order: Order }): ReactElement {
       ) : null}
       <BottomSheet
         visible={confirm}
-        onClose={() => { setConfirm(false); }}
+        onClose={() => {
+          setConfirm(false);
+        }}
         closeLabel={t('common.close')}
         footer={
           <View style={{ gap: tokens.space[2] }}>
@@ -119,12 +146,20 @@ function Detail({ order }: { readonly order: Order }): ReactElement {
                       qc.setQueryData(orderingKeys.order(o.id), o);
                       void qc.invalidateQueries({ queryKey: orderingKeys.all });
                     },
-                    onSettled: () => { setConfirm(false); },
+                    onSettled: () => {
+                      setConfirm(false);
+                    },
                   },
                 );
               }}
             />
-            <Button label={t('order.cancelKeep')} variant="ghost" onPress={() => { setConfirm(false); }} />
+            <Button
+              label={t('order.cancelKeep')}
+              variant="ghost"
+              onPress={() => {
+                setConfirm(false);
+              }}
+            />
           </View>
         }
       >
@@ -140,7 +175,11 @@ export default function OrderScreen(): ReactElement {
   const { id } = useLocalSearchParams<{ id: string }>();
   const order = useOrder(ordering, id, 30_000);
   return (
-    <Screen title={order.data ? t('order.title', { ref: order.data.ref }) : undefined} back testID="order-detail">
+    <Screen
+      title={order.data ? t('order.title', { ref: order.data.ref }) : undefined}
+      back
+      testID="order-detail"
+    >
       <QueryBoundary query={order}>{(o) => <Detail order={o} />}</QueryBoundary>
     </Screen>
   );

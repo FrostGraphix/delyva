@@ -22,7 +22,12 @@ export default function Splash(): ReactElement {
   return (
     <View
       testID="splash"
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: c.primary }}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: c.primary,
+      }}
     >
       <AppText variant="display" tone="onPrimary">
         {t('app.name')}

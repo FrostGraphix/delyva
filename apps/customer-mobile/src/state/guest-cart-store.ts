@@ -49,7 +49,9 @@ export const useGuestCart = create<GuestCartState>()(
       setQuantity: (key, quantity) => {
         set((s) => ({
           lines: s.lines.map((l) =>
-            l.key === key ? { ...l, quantity: Math.min(MAX_LINE_QUANTITY, Math.max(1, quantity)) } : l,
+            l.key === key
+              ? { ...l, quantity: Math.min(MAX_LINE_QUANTITY, Math.max(1, quantity)) }
+              : l,
           ),
         }));
       },

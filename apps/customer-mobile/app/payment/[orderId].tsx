@@ -73,7 +73,9 @@ export default function PaymentScreen(): ReactElement {
                   variant="ghost"
                   onPress={() => {
                     if (o.payment.authorizationUrl) {
-                      void WebBrowser.openBrowserAsync(o.payment.authorizationUrl).catch(() => undefined);
+                      void WebBrowser.openBrowserAsync(o.payment.authorizationUrl).catch(
+                        () => undefined,
+                      );
                     }
                   }}
                 />
