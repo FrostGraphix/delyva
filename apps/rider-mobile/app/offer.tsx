@@ -1,7 +1,7 @@
 import type { DispatchOffer, Trip } from '@delyva/contracts';
 import { tokens } from '@delyva/design-tokens';
 import { dispatchKeys } from '@delyva/sdk';
-import { Banner, Button, Card, StatTile, StateMessage, Typography } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderCard, StatTile, RiderStateMessage, Typography } from '@delyva/ui-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { type ReactElement, useRef } from 'react';
@@ -45,7 +45,7 @@ function OfferCard({ offer }: { offer: DispatchOffer }): ReactElement {
   const gone = problemCode(respond.error) === 'offer_unavailable' || left === 0;
   if (gone) {
     return (
-      <StateMessage
+      <RiderStateMessage
         testID="offer-gone"
         title={t('offer.expired')}
         body={t('offer.gone')}
@@ -80,13 +80,13 @@ function OfferCard({ offer }: { offer: DispatchOffer }): ReactElement {
         />
       </View>
       {/* DEBT(dispatch): DispatchOffer has no earnings field — add an estimated rider payout to the offer contract. */}
-      <Card testID="offer-earnings">
+      <RiderCard testID="offer-earnings">
         <Typography variant="caption" tone="muted">
           {t('offer.earnings')}
         </Typography>
         <Typography variant="h3">{t('offer.earningsPending')}</Typography>
-      </Card>
-      {respond.isError ? <Banner tone="danger" text={t('common.errorBody')} /> : null}
+      </RiderCard>
+      {respond.isError ? <RiderBanner tone="danger" text={t('common.errorBody')} /> : null}
       <Button
         label={t('offer.accept')}
         variant="brand"
@@ -118,7 +118,7 @@ export default function OfferScreen(): ReactElement {
       {offer ? (
         <OfferCard key={offer.id} offer={offer} />
       ) : (
-        <StateMessage
+        <RiderStateMessage
           testID="offer-gone"
           title={t('offer.expired')}
           body={t('offer.gone')}

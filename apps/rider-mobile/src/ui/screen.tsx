@@ -1,5 +1,5 @@
 import { tokens } from '@delyva/design-tokens';
-import { Banner, Typography, useThemeColors } from '@delyva/ui-native';
+import { RiderBanner, Typography, useThemeColors } from '@delyva/ui-native';
 import type { ReactElement, ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -42,9 +42,9 @@ export function Screen({
         contentContainerStyle={{ padding: tokens.space[4], gap: tokens.space[4], flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        {!online ? <Banner testID="offline-banner" text={t('common.offline')} /> : null}
+        {!online ? <RiderBanner testID="offline-banner" text={t('common.offline')} /> : null}
         {pending > 0 ? (
-          <Banner testID="queue-banner" tone="info" text={t('common.queued', { count: pending })} />
+          <RiderBanner testID="queue-banner" tone="info" text={t('common.queued', { count: pending })} />
         ) : null}
         {eyebrow ? (
           <Typography variant="caption" tone="muted">

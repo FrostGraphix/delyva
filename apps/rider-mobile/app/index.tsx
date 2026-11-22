@@ -1,4 +1,4 @@
-import { Skeleton, StateMessage } from '@delyva/ui-native';
+import { RiderSkeleton, RiderStateMessage } from '@delyva/ui-native';
 import { Redirect } from 'expo-router';
 import type { ReactElement } from 'react';
 import { API_URL } from '../src/config';
@@ -13,7 +13,7 @@ export default function Gate(): ReactElement {
   if (API_URL === '') {
     return (
       <Screen>
-        <StateMessage
+        <RiderStateMessage
           tone="danger"
           title={t('common.errorTitle')}
           body={t('common.configMissing')}
@@ -24,7 +24,7 @@ export default function Gate(): ReactElement {
   if (status === 'loading') {
     return (
       <Screen>
-        <Skeleton label={t('common.loading')} />
+        <RiderSkeleton label={t('common.loading')} />
       </Screen>
     );
   }

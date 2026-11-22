@@ -1,35 +1,54 @@
 import { tokens } from '@delyva/design-tokens';
 import type { ReactElement, ReactNode } from 'react';
-import { View } from 'react-native';
-import { useThemeColors } from './use-theme-colors.js';
+import { Pressable, View, type ViewStyle } from 'react-native';
+import { usePalette } from './theme.js';
 
 /** Card props. */
 export interface CardProps {
   readonly children: ReactNode;
-  /** Optional test id for end-to-end tests. */
+  /** Makes the card a button; then pass `accessibilityLabel`. */
+  readonly onPress?: () => void;
+  readonly accessibilityLabel?: string;
+  readonly padded?: boolean;
+  readonly style?: ViewStyle;
   readonly testID?: string;
-  /** Lay children out in a row. */
-  readonly row?: boolean;
 }
 
-/** Surface card on the token palette (radius xl, 16 px padding, 1 px line). */
-export function Card({ children, testID, row = false }: CardProps): ReactElement {
-  const c = useThemeColors();
+/** Flat content card (solid surface, hairline border); never glass (docs/07 §13). */
+export function Card({
+  children,
+  onPress,
+  accessibilityLabel,
+  padded = true,
+  style,
+  testID,
+}: CardProps): ReactElement {
+  const c = usePalette();
+  const base: ViewStyle = {
+    backgroundColor: c.surface,
+    borderRadius: tokens.radius.xl,
+    borderWidth: 1,
+    borderColor: c.line,
+    padding: padded ? tokens.space[4] : 0,
+    overflow: 'hidden',
+    ...style,
+  };
+  if (!onPress) {
+    return (
+      <View style={base} testID={testID}>
+        {children}
+      </View>
+    );
+  }
   return (
-    <View
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
       testID={testID}
-      style={{
-        backgroundColor: c.surface,
-        borderColor: c.line,
-        borderWidth: 1,
-        borderRadius: tokens.radius.xl,
-        padding: tokens.space[4],
-        gap: tokens.space[3],
-        flexDirection: row ? 'row' : 'column',
-        alignItems: row ? 'center' : 'stretch',
-      }}
+      style={({ pressed }) => ({ ...base, transform: [{ scale: pressed ? 0.99 : 1 }] })}
     >
       {children}
-    </View>
+    </Pressable>
   );
 }

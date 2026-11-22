@@ -1,6 +1,6 @@
 import { RiderPersonalDetailsSchema } from '@delyva/contracts';
 import { useMyRiderApplication } from '@delyva/sdk';
-import { Banner, Button, TextField } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderTextField } from '@delyva/ui-native';
 import { type ReactElement, useEffect, useState } from 'react';
 import { api } from '../../src/api/client';
 import { t } from '../../src/i18n';
@@ -45,22 +45,22 @@ export default function PersonalStep(): ReactElement {
         />
       }
     >
-      {form.formError ? <Banner tone="danger" text={form.formError} /> : null}
-      <TextField
+      {form.formError ? <RiderBanner tone="danger" text={form.formError} /> : null}
+      <RiderTextField
         testID="first-name"
         label={t('onb.firstName')}
         value={v.firstName}
         onChangeText={field('firstName')}
         error={form.errors.firstName}
       />
-      <TextField
+      <RiderTextField
         testID="last-name"
         label={t('onb.lastName')}
         value={v.lastName}
         onChangeText={field('lastName')}
         error={form.errors.lastName}
       />
-      <TextField
+      <RiderTextField
         testID="dob"
         label={t('onb.dob')}
         value={v.dateOfBirth}
@@ -69,7 +69,7 @@ export default function PersonalStep(): ReactElement {
         keyboardType="number-pad"
         maxLength={10}
       />
-      <TextField
+      <RiderTextField
         testID="state"
         label={t('onb.state')}
         value={v.stateOfResidence}

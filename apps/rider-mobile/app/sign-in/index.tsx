@@ -1,4 +1,4 @@
-import { Button, TextField, Typography } from '@delyva/ui-native';
+import { Button, RiderTextField, Typography } from '@delyva/ui-native';
 import { useRequestOtp } from '@delyva/sdk';
 import { router } from 'expo-router';
 import { type ReactElement, useRef, useState } from 'react';
@@ -59,7 +59,7 @@ export default function PhoneScreen(): ReactElement {
       }
     >
       <Typography tone="muted">{t('auth.phoneBody')}</Typography>
-      <TextField
+      <RiderTextField
         testID="phone-input"
         label={t('auth.phoneLabel')}
         hint={t('auth.phoneHint')}

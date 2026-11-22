@@ -1,4 +1,7 @@
 export * from './button.js';
+export * from './feedback.js';
+export * from './form-controls.js';
+export * from './overlays.js';
 export * from './card.js';
 export * from './skeleton.js';
 export * from './badge.js';

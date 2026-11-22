@@ -1,5 +1,5 @@
 import { RiderVehicleSchema } from '@delyva/contracts';
-import { Banner, Button, ChoiceGroup, TextField } from '@delyva/ui-native';
+import { RiderBanner, Button, ChoiceGroup, RiderTextField } from '@delyva/ui-native';
 import { type ReactElement, useState } from 'react';
 import { api } from '../../src/api/client';
 import { t } from '../../src/i18n';
@@ -65,7 +65,7 @@ export default function VehicleStep(): ReactElement {
         />
       }
     >
-      {form.formError ? <Banner tone="danger" text={form.formError} /> : null}
+      {form.formError ? <RiderBanner tone="danger" text={form.formError} /> : null}
       <ChoiceGroup
         testID="vehicle-type"
         label={t('onb.vehicleType')}
@@ -77,7 +77,7 @@ export default function VehicleStep(): ReactElement {
       />
       {motor ? (
         <>
-          <TextField
+          <RiderTextField
             testID="plate"
             label={t('onb.plate')}
             value={plate}
@@ -85,7 +85,7 @@ export default function VehicleStep(): ReactElement {
             error={form.errors.plateNumber}
             maxLength={12}
           />
-          <TextField
+          <RiderTextField
             testID="licence-number"
             label={t('onb.licenceNumber')}
             value={licence}
@@ -93,7 +93,7 @@ export default function VehicleStep(): ReactElement {
             error={form.errors.licenceNumber}
             maxLength={20}
           />
-          <TextField
+          <RiderTextField
             testID="licence-expiry"
             label={t('onb.licenceExpiry')}
             value={expiry}

@@ -1,6 +1,6 @@
 import { tokens } from '@delyva/design-tokens';
 import { useMyRiderEarnings } from '@delyva/sdk';
-import { Banner, StatTile, StateMessage } from '@delyva/ui-native';
+import { RiderBanner, StatTile, RiderStateMessage } from '@delyva/ui-native';
 import type { ReactElement } from 'react';
 import { View } from 'react-native';
 import { api } from '../src/api/client';
@@ -36,9 +36,9 @@ export default function EarningsScreen(): ReactElement {
                 value={String(e.completedTrips)}
               />
             </View>
-            {e.completedTrips === 0 ? <StateMessage title={t('earnings.empty')} /> : null}
+            {e.completedTrips === 0 ? <RiderStateMessage title={t('earnings.empty')} /> : null}
             {/* DEBT(payments): rider cash-out flow not built — needs a payout request endpoint. */}
-            <Banner tone="info" text={t('earnings.cashOut')} />
+            <RiderBanner tone="info" text={t('earnings.cashOut')} />
           </>
         )}
       </QueryView>

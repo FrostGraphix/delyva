@@ -1,7 +1,7 @@
 import type { RiderApplication } from '@delyva/contracts';
 import { useMyRiderApplication } from '@delyva/sdk';
 import { ClockIcon, CheckCircleIcon, XIcon } from '@delyva/icons/native';
-import { Banner, Button, Card, Typography, useThemeColors } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderCard, Typography, useThemeColors } from '@delyva/ui-native';
 import { router } from 'expo-router';
 import { type ReactElement, useState } from 'react';
 import { api, refreshSession } from '../../src/api/client';
@@ -14,30 +14,30 @@ function StatusCard({ app }: { app: RiderApplication }): ReactElement {
   const c = useThemeColors();
   if (app.status === 'approved') {
     return (
-      <Card testID="status-approved">
+      <RiderCard testID="status-approved">
         <CheckCircleIcon size={32} color={c.accentText} />
         <Typography variant="h2">{t('status.approved')}</Typography>
         <Typography tone="muted">{t('status.approvedBody')}</Typography>
-      </Card>
+      </RiderCard>
     );
   }
   if (app.status === 'rejected') {
     return (
-      <Card testID="status-rejected">
+      <RiderCard testID="status-rejected">
         <XIcon size={32} color={c.danger} />
         <Typography variant="h2">{t('status.rejected')}</Typography>
         <Typography tone="muted">
           {t('status.rejectedBody', { reason: app.rejectionReason ?? '—' })}
         </Typography>
-      </Card>
+      </RiderCard>
     );
   }
   return (
-    <Card testID="status-pending">
+    <RiderCard testID="status-pending">
       <ClockIcon size={32} color={c.accentText} />
       <Typography variant="h2">{t('status.pending')}</Typography>
       <Typography tone="muted">{t('status.pendingBody')}</Typography>
-    </Card>
+    </RiderCard>
   );
 }
 
@@ -73,7 +73,7 @@ export default function StatusScreen(): ReactElement {
         )
       }
     >
-      {failed ? <Banner tone="danger" text={t('common.errorBody')} /> : null}
+      {failed ? <RiderBanner tone="danger" text={t('common.errorBody')} /> : null}
       <QueryView query={app}>{(data) => <StatusCard app={data} />}</QueryView>
     </Screen>
   );

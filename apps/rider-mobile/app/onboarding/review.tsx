@@ -1,6 +1,6 @@
 import type { RiderApplication } from '@delyva/contracts';
 import { onboardingKeys, useMyRiderApplication } from '@delyva/sdk';
-import { Banner, Button, Card, Typography } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderCard, Typography } from '@delyva/ui-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { type ReactElement, useRef } from 'react';
@@ -14,7 +14,7 @@ import { Screen } from '../../src/ui/screen';
 function Summary({ app }: { app: RiderApplication }): ReactElement {
   const p = app.personalDetails;
   return (
-    <Card testID="review-summary">
+    <RiderCard testID="review-summary">
       <Typography variant="h3">{p ? `${p.firstName} ${p.lastName}` : '—'}</Typography>
       <Typography tone="muted">{`NIN •••• ${app.identity?.ninLast4 ?? '—'}`}</Typography>
       <Typography tone="muted">
@@ -33,7 +33,7 @@ function Summary({ app }: { app: RiderApplication }): ReactElement {
           {t('onb.quizPassed', { score: app.quiz.scorePercent })}
         </Typography>
       ) : null}
-    </Card>
+    </RiderCard>
   );
 }
 
@@ -66,7 +66,7 @@ export default function ReviewStep(): ReactElement {
       }
     >
       <Typography tone="muted">{t('onb.reviewBody')}</Typography>
-      {submit.isError ? <Banner tone="danger" text={t('common.errorBody')} /> : null}
+      {submit.isError ? <RiderBanner tone="danger" text={t('common.errorBody')} /> : null}
       <QueryView query={app}>{(data) => <Summary app={data} />}</QueryView>
     </Screen>
   );

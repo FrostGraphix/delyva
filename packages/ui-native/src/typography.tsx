@@ -4,15 +4,15 @@ import { Text } from 'react-native';
 import { useThemeColors } from './use-theme-colors.js';
 
 /** Typography variants mapped to the type tokens. */
-export type TextVariant = 'display' | 'h1' | 'h2' | 'h3' | 'bodyL' | 'body' | 'caption';
+export type RiderTextVariant = 'display' | 'h1' | 'h2' | 'h3' | 'bodyL' | 'body' | 'caption';
 /** Semantic text tones. */
-export type TextTone = 'default' | 'muted' | 'accent' | 'danger' | 'inverse';
+export type RiderTextTone = 'default' | 'muted' | 'accent' | 'danger' | 'inverse';
 
 /** Typography props. */
 export interface TypographyProps {
   readonly children: ReactNode;
-  readonly variant?: TextVariant;
-  readonly tone?: TextTone;
+  readonly variant?: RiderTextVariant;
+  readonly tone?: RiderTextTone;
   /** Marks the text as a screen header for screen readers. */
   readonly header?: boolean;
   readonly testID?: string;

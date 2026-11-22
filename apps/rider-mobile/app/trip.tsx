@@ -3,12 +3,12 @@ import { tokens } from '@delyva/design-tokens';
 import { NavigationArrowIcon } from '@delyva/icons/native';
 import { useMyCurrentTrip } from '@delyva/sdk';
 import {
-  Banner,
+  RiderBanner,
   Button,
-  Card,
+  RiderCard,
   CodeInput,
-  StateMessage,
-  TextField,
+  RiderStateMessage,
+  RiderTextField,
   Typography,
   useThemeColors,
 } from '@delyva/ui-native';
@@ -66,8 +66,8 @@ function Undeliverable({ trip, runner }: { trip: Trip; runner: TripActionRunner 
       />
     );
   return (
-    <Card testID="undeliverable-form">
-      <TextField
+    <RiderCard testID="undeliverable-form">
+      <RiderTextField
         testID="undeliverable-reason"
         label={t('trip.undeliverableReason')}
         value={reason}
@@ -82,7 +82,7 @@ function Undeliverable({ trip, runner }: { trip: Trip; runner: TripActionRunner 
           runner.run(trip, 'undeliverable', { reason: reason.trim() });
         }}
       />
-    </Card>
+    </RiderCard>
   );
 }
 
@@ -113,8 +113,8 @@ function TripStageView({
       <Typography variant="h1" header testID="trip-stage">
         {t(stage.title)}
       </Typography>
-      {runner.queued ? <Banner tone="info" testID="trip-queued" text={t('trip.queued')} /> : null}
-      {runner.error ? <Banner tone="danger" testID="trip-error" text={runner.error} /> : null}
+      {runner.queued ? <RiderBanner tone="info" testID="trip-queued" text={t('trip.queued')} /> : null}
+      {runner.error ? <RiderBanner tone="danger" testID="trip-error" text={runner.error} /> : null}
       {stage.target ? (
         <Button
           label={t('trip.navigate')}
@@ -126,7 +126,7 @@ function TripStageView({
         />
       ) : null}
       {stage.code ? (
-        <Card>
+        <RiderCard>
           <NavigationArrowIcon size={24} color={c.accentText} />
           <CodeInput
             testID="handoff-code"
@@ -135,7 +135,7 @@ function TripStageView({
             value={code}
             onChange={setCode}
           />
-        </Card>
+        </RiderCard>
       ) : null}
       {stage.actionLabel ? (
         <Button
@@ -176,7 +176,7 @@ export default function TripScreen(): ReactElement {
         {({ trip }) => {
           if (!trip) {
             return (
-              <StateMessage
+              <RiderStateMessage
                 testID="trip-none"
                 title={t('trip.none')}
                 body={t('trip.noneBody')}

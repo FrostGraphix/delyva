@@ -1,4 +1,4 @@
-import { Card, Typography } from '@delyva/ui-native';
+import { RiderCard, Typography } from '@delyva/ui-native';
 import type { ReactElement } from 'react';
 import { t } from '../src/i18n';
 import { RiderNav } from '../src/ui/rider-nav';
@@ -11,10 +11,10 @@ import { Screen } from '../src/ui/screen';
 export default function IssueScreen(): ReactElement {
   return (
     <Screen testID="screen-issue" title={t('issue.title')} nav={<RiderNav active="issue" />}>
-      <Card testID="sos-card">
+      <RiderCard testID="sos-card">
         <Typography variant="h2">{t('issue.sos')}</Typography>
         <Typography tone="muted">{t('issue.body')}</Typography>
-      </Card>
+      </RiderCard>
     </Screen>
   );
 }

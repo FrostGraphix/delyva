@@ -1,6 +1,6 @@
 import type { UploadPurpose } from '@delyva/contracts';
 import { CheckCircleIcon } from '@delyva/icons/native';
-import { Button, Card, Typography, useThemeColors } from '@delyva/ui-native';
+import { Button, RiderCard, Typography, useThemeColors } from '@delyva/ui-native';
 import { type ReactElement, useState } from 'react';
 import { t } from '../i18n';
 import { pickAndUpload } from './upload';
@@ -37,7 +37,7 @@ export function UploadField(p: UploadFieldProps): ReactElement {
   };
   const done = p.uploadId !== null;
   return (
-    <Card testID={`${p.testID}-card`}>
+    <RiderCard testID={`${p.testID}-card`}>
       <Typography variant="h3">{p.label}</Typography>
       {p.hint ? <Typography tone="muted">{p.hint}</Typography> : null}
       {done ? (
@@ -56,6 +56,6 @@ export function UploadField(p: UploadFieldProps): ReactElement {
         loading={busy}
         onPress={onPress}
       />
-    </Card>
+    </RiderCard>
   );
 }

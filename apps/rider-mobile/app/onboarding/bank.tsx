@@ -1,5 +1,5 @@
 import { BankAccountInputSchema } from '@delyva/contracts';
-import { Banner, Button, Card, TextField, Typography } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderCard, RiderTextField, Typography } from '@delyva/ui-native';
 import { type ReactElement, useState } from 'react';
 import { api } from '../../src/api/client';
 import { t } from '../../src/i18n';
@@ -53,13 +53,13 @@ export default function BankStep(): ReactElement {
         )
       }
     >
-      {form.formError && !mismatch ? <Banner tone="danger" text={form.formError} /> : null}
+      {form.formError && !mismatch ? <RiderBanner tone="danger" text={form.formError} /> : null}
       {mismatch ? (
-        <Card testID="name-mismatch">
+        <RiderCard testID="name-mismatch">
           <Typography variant="h3">{t('onb.nameMismatch')}</Typography>
-        </Card>
+        </RiderCard>
       ) : null}
-      <TextField
+      <RiderTextField
         testID="bank-code"
         label={t('onb.bankCode')}
         value={bankCode}
@@ -71,7 +71,7 @@ export default function BankStep(): ReactElement {
         maxLength={6}
         error={form.errors.bankCode}
       />
-      <TextField
+      <RiderTextField
         testID="account-number"
         label={t('onb.accountNumber')}
         value={accountNumber}

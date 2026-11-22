@@ -114,6 +114,10 @@ export class OrderingClient {
   getOrder(id: string): Promise<Order> {
     return this.t.request('GET', pathOf(ROUTES.getOrder.path, { id }), undefined, OrderSchema);
   }
+  /** GET /v1/vendor-orders/{id} (vendor members only) */
+  getVendorOrder(id: string): Promise<Order> {
+    return this.t.request('GET', pathOf(ROUTES.getVendorOrder.path, { id }), undefined, OrderSchema);
+  }
   /** POST /v1/orders/{id}/cancel */
   cancelOrder(id: string, body: CancelOrder = {}, idempotencyKey?: string): Promise<Order> {
     return this.t.request(

@@ -1,5 +1,5 @@
 import { CheckCircleIcon, WarningIcon } from '@delyva/icons/native';
-import { Button, Card, Typography, useThemeColors } from '@delyva/ui-native';
+import { Button, RiderCard, Typography, useThemeColors } from '@delyva/ui-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import type { ReactElement } from 'react';
 import { t } from '../src/i18n';
@@ -24,7 +24,7 @@ export default function DeliveredScreen(): ReactElement {
         />
       }
     >
-      <Card testID={failed ? 'summary-undeliverable' : 'summary-delivered'}>
+      <RiderCard testID={failed ? 'summary-undeliverable' : 'summary-delivered'}>
         {failed ? (
           <WarningIcon size={32} color={c.warning} />
         ) : (
@@ -36,7 +36,7 @@ export default function DeliveredScreen(): ReactElement {
         <Typography tone="muted">
           {failed ? t('delivered.undeliverableBody') : t('delivered.body')}
         </Typography>
-      </Card>
+      </RiderCard>
     </Screen>
   );
 }

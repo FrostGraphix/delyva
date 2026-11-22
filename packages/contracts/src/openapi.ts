@@ -17,7 +17,11 @@ import {
   NotificationPreferencesSchema,
   RegisterDeviceSchema,
 } from './notifications/index.js';
-import { LocationBatchResultSchema, RiderLocationBatchSchema } from './realtime/index.js';
+import {
+  LocationBatchResultSchema,
+  RealtimeTicketSchema,
+  RiderLocationBatchSchema,
+} from './realtime/index.js';
 import { PAYMENT_ROUTES } from './payments/payment-routes.js';
 import { ORDERING_ROUTES } from './ordering/routes.js';
 import { ONBOARDING_ROUTES } from './onboarding/routes.js';
@@ -270,6 +274,15 @@ export const ROUTES = {
     body: RiderLocationBatchSchema,
     success: { status: 202, schema: LocationBatchResultSchema },
     errors: [400, 401, 403, 429],
+    auth: true,
+  },
+  createRealtimeTicket: {
+    method: 'post',
+    path: '/v1/realtime/tickets',
+    operationId: 'createRealtimeTicket',
+    summary: 'Issue a 60 s single-use Socket.IO handshake ticket (cookie-session web clients)',
+    success: { status: 201, schema: RealtimeTicketSchema },
+    errors: [401, 429],
     auth: true,
   },
   ...PAYMENT_ROUTES,

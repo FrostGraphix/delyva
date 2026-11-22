@@ -9,6 +9,7 @@ import { GeoService } from '../geo/application/geo.service.js';
 import { GeoModule } from '../geo/geo.module.js';
 import { IdentityModule } from '../identity/identity.module.js';
 import { JoseAccessTokenSigner } from '../identity/infrastructure/jose-access-token.signer.js';
+import { MyVendorsController } from './api/my-vendors.controller.js';
 import { VendorApprovalsController } from './api/vendor-approvals.controller.js';
 import { VendorMenuController } from './api/vendor-menu.controller.js';
 import { VendorsController } from './api/vendors.controller.js';
@@ -18,6 +19,7 @@ import { CreateMenuItem } from './application/create-menu-item.use-case.js';
 import { CreateModifierGroup } from './application/create-modifier-group.use-case.js';
 import { DiscoverVendors } from './application/discover-vendors.query.js';
 import { GetVendor } from './application/get-vendor.query.js';
+import { ListMyVendors } from './application/list-my-vendors.query.js';
 import type { Clock } from './application/ports.js';
 import { ReplaceOpeningHours } from './application/replace-opening-hours.use-case.js';
 import { SetItemAvailability } from './application/set-item-availability.use-case.js';
@@ -27,6 +29,7 @@ import { VendorOnboardingService } from './application/vendor-onboarding.service
 import { DrizzleCatalogOnboardingRepository } from './infrastructure/drizzle-catalog-onboarding.repository.js';
 import { DrizzleCatalogReadRepository } from './infrastructure/drizzle-catalog-read.repository.js';
 import { DrizzleCatalogWriteRepository } from './infrastructure/drizzle-catalog-write.repository.js';
+import { DrizzleMyVendorsReader } from './infrastructure/drizzle-my-vendors.reader.js';
 import { VendorOwnershipChecker } from './infrastructure/vendor-ownership.checker.js';
 
 const clock: Clock = { now: () => new Date(), uuid: () => randomUUID() };
@@ -36,7 +39,12 @@ type W = DrizzleCatalogWriteRepository;
 /** Catalog bounded context: vendors, branches, hours, menus, items, modifiers, availability. */
 @Module({
   imports: [IdentityModule, GeoModule],
-  controllers: [VendorsController, VendorMenuController, VendorApprovalsController],
+  controllers: [
+    MyVendorsController,
+    VendorsController,
+    VendorMenuController,
+    VendorApprovalsController,
+  ],
   providers: [
     {
       provide: ACCESS_TOKEN_VERIFIER,
@@ -73,6 +81,11 @@ type W = DrizzleCatalogWriteRepository;
       provide: GetVendor,
       inject: [DrizzleCatalogReadRepository],
       useFactory: (catalog: R) => new GetVendor({ catalog, clock }),
+    },
+    {
+      provide: ListMyVendors,
+      inject: [DB],
+      useFactory: (db: Db) => new ListMyVendors(new DrizzleMyVendorsReader(db)),
     },
     {
       provide: CreateMenuItem,

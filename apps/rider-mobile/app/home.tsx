@@ -2,7 +2,7 @@ import type { RiderProfile } from '@delyva/contracts';
 import { tokens } from '@delyva/design-tokens';
 import { BatteryIcon, MapPinIcon, PowerIcon } from '@delyva/icons/native';
 import { useMyCurrentTrip, useMyRiderProfile, useSetRiderAvailability } from '@delyva/sdk';
-import { Banner, Button, Card, StatTile, Typography, useThemeColors } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderCard, StatTile, Typography, useThemeColors } from '@delyva/ui-native';
 import { router } from 'expo-router';
 import type { ReactElement } from 'react';
 import { View } from 'react-native';
@@ -32,7 +32,7 @@ function ShiftCard({
   const c = useThemeColors();
   const online = profile.status !== 'offline';
   return (
-    <Card testID="shift-card">
+    <RiderCard testID="shift-card">
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: tokens.space[3] }}>
         <PowerIcon size={32} color={online ? c.accentText : c.textMuted} />
         <Typography variant="h1" header testID="shift-status">
@@ -45,7 +45,7 @@ function ShiftCard({
           {battery === null ? t('home.batteryUnknown') : t('home.battery', { pct: battery })}
         </Typography>
       </View>
-    </Card>
+    </RiderCard>
   );
 }
 
@@ -75,17 +75,17 @@ function Waiting({ online }: { online: boolean }): ReactElement {
   return (
     <>
       {online ? (
-        <Card testID="waiting-panel">
+        <RiderCard testID="waiting-panel">
           <MapPinIcon size={32} color={c.accentText} />
           <Typography variant="h2">{t('home.waiting')}</Typography>
           <Typography tone="muted">{t('home.waitingBody')}</Typography>
-        </Card>
+        </RiderCard>
       ) : null}
       {/* DEBT(dispatch): busy-zone hint is a placeholder — no demand/heatmap endpoint yet — add GET /v1/riders/me/zone-hints. */}
-      <Card testID="busy-zone">
+      <RiderCard testID="busy-zone">
         <Typography variant="h3">{t('home.busyZone')}</Typography>
         <Typography tone="muted">{t('home.busyZoneBody')}</Typography>
-      </Card>
+      </RiderCard>
     </>
   );
 }
@@ -141,12 +141,12 @@ export default function HomeScreen(): ReactElement {
           <>
             <ShiftCard profile={p} battery={battery} />
             {permission === 'denied' ? (
-              <Banner tone="danger" testID="location-denied" text={t('home.locationDenied')} />
+              <RiderBanner tone="danger" testID="location-denied" text={t('home.locationDenied')} />
             ) : null}
             {lowBattery ? (
-              <Banner tone="danger" text={t('home.batteryLow', { pct: battery })} />
+              <RiderBanner tone="danger" text={t('home.batteryLow', { pct: battery })} />
             ) : null}
-            {toggle.isError ? <Banner tone="danger" text={t('common.errorBody')} /> : null}
+            {toggle.isError ? <RiderBanner tone="danger" text={t('common.errorBody')} /> : null}
             {trip.data?.trip ? (
               <Button
                 label={t('home.activeTrip')}

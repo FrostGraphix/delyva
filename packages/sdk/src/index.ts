@@ -8,3 +8,4 @@ export * from './payments.js';
 export * from './ordering.js';
 export * from './onboarding-hooks.js';
 export * from './dispatch-hooks.js';
+export * from './vendor-portal.js';

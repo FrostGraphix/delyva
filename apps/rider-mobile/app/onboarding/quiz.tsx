@@ -1,6 +1,6 @@
 import type { Quiz, QuizResult } from '@delyva/contracts';
 import { onboardingKeys, useRiderQuiz } from '@delyva/sdk';
-import { Banner, Button, Card, ChoiceGroup, Typography } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderCard, ChoiceGroup, Typography } from '@delyva/ui-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { type ReactElement, useRef, useState } from 'react';
@@ -41,11 +41,11 @@ function QuizForm({ quiz }: { quiz: Quiz }): ReactElement {
     <>
       <Typography tone="muted">{t('onb.quizBody', { pass: quiz.passMarkPercent })}</Typography>
       {result && !result.passed ? (
-        <Banner tone="danger" text={t('onb.quizFailed', { score: result.scorePercent })} />
+        <RiderBanner tone="danger" text={t('onb.quizFailed', { score: result.scorePercent })} />
       ) : null}
-      {submit.isError ? <Banner tone="danger" text={t('common.errorBody')} /> : null}
+      {submit.isError ? <RiderBanner tone="danger" text={t('common.errorBody')} /> : null}
       {quiz.questions.map((q, i) => (
-        <Card key={q.id} testID={`quiz-q-${String(i + 1)}`}>
+        <RiderCard key={q.id} testID={`quiz-q-${String(i + 1)}`}>
           <Typography variant="h3">{`${String(i + 1)}. ${q.prompt}`}</Typography>
           <ChoiceGroup
             testID={`quiz-${q.id}`}
@@ -56,7 +56,7 @@ function QuizForm({ quiz }: { quiz: Quiz }): ReactElement {
             }}
             options={q.options.map((o) => ({ value: o.id, label: o.label }))}
           />
-        </Card>
+        </RiderCard>
       ))}
       <Button
         label={t('onb.quizSubmit')}

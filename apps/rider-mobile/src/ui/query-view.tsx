@@ -1,4 +1,4 @@
-import { Skeleton, StateMessage } from '@delyva/ui-native';
+import { RiderSkeleton, RiderStateMessage } from '@delyva/ui-native';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
 import { t } from '../i18n';
@@ -16,7 +16,7 @@ export function QueryView<T>({
   if (query.data !== undefined) return children(query.data);
   if (query.isError) {
     return (
-      <StateMessage
+      <RiderStateMessage
         testID="error-state"
         tone="danger"
         title={t('common.errorTitle')}
@@ -28,5 +28,5 @@ export function QueryView<T>({
       />
     );
   }
-  return <Skeleton rows={rows} label={t('common.loading')} />;
+  return <RiderSkeleton rows={rows} label={t('common.loading')} />;
 }

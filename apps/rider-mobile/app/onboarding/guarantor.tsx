@@ -1,5 +1,5 @@
 import { RiderGuarantorSchema } from '@delyva/contracts';
-import { Banner, Button, TextField } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderTextField } from '@delyva/ui-native';
 import { type ReactElement, useState } from 'react';
 import { api } from '../../src/api/client';
 import { t } from '../../src/i18n';
@@ -34,15 +34,15 @@ export default function GuarantorStep(): ReactElement {
         />
       }
     >
-      {form.formError ? <Banner tone="danger" text={form.formError} /> : null}
-      <TextField
+      {form.formError ? <RiderBanner tone="danger" text={form.formError} /> : null}
+      <RiderTextField
         testID="guarantor-name"
         label={t('onb.guarantorName')}
         value={fullName}
         onChangeText={setFullName}
         error={form.errors.fullName}
       />
-      <TextField
+      <RiderTextField
         testID="guarantor-phone"
         label={t('onb.guarantorPhone')}
         value={phone}
@@ -50,7 +50,7 @@ export default function GuarantorStep(): ReactElement {
         keyboardType="phone-pad"
         error={form.errors.phone}
       />
-      <TextField
+      <RiderTextField
         testID="guarantor-relationship"
         label={t('onb.relationship')}
         value={relationship}

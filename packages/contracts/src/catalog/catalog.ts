@@ -207,3 +207,19 @@ export const ItemAvailabilityChangedPayloadSchema = z.object({
 });
 /** Payload of `catalog.item.availability_changed`. */
 export type ItemAvailabilityChangedPayload = z.infer<typeof ItemAvailabilityChangedPayloadSchema>;
+
+/** One vendor the caller belongs to (GET /v1/me/vendors). */
+export const MyVendorSchema = z.strictObject({
+  id: z.uuid(),
+  name: z.string(),
+  status: VendorStatusSchema,
+  role: z.enum(['owner', 'staff']),
+  branchIds: z.array(z.uuid()),
+});
+/** One vendor membership. */
+export type MyVendor = z.infer<typeof MyVendorSchema>;
+
+/** GET /v1/me/vendors response. */
+export const MyVendorListSchema = z.strictObject({ items: z.array(MyVendorSchema) });
+/** GET /v1/me/vendors response. */
+export type MyVendorList = z.infer<typeof MyVendorListSchema>;

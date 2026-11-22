@@ -1,64 +1,65 @@
 import { tokens } from '@delyva/design-tokens';
-import type { ReactElement } from 'react';
-import { Text, TextInput, View } from 'react-native';
-import { useThemeColors } from './use-theme-colors.js';
+import type { ReactElement, ReactNode } from 'react';
+import { TextInput, type TextInputProps, View } from 'react-native';
+import { AppText } from './app-text.js';
+import { usePalette } from './theme.js';
 
-/** Text field props. */
-export interface TextFieldProps {
-  /** Visible label; also the accessibility label. */
+/** TextField props. */
+export interface TextFieldProps extends Omit<TextInputProps, 'style' | 'placeholderTextColor'> {
+  /** Visible label (also the accessibility label). */
   readonly label: string;
-  readonly value: string;
-  readonly onChangeText: (value: string) => void;
-  /** Validation message shown under the field (announced to screen readers). */
+  readonly leading?: ReactNode;
   readonly error?: string | null;
-  readonly hint?: string;
-  readonly keyboardType?: 'default' | 'number-pad' | 'phone-pad';
-  readonly maxLength?: number;
-  readonly placeholder?: string;
-  readonly testID?: string;
-  readonly autoFocus?: boolean;
+  readonly hideLabel?: boolean;
 }
 
-/** Labelled 56 px text input with an error slot, on tokens only. */
-export function TextField(p: TextFieldProps): ReactElement {
-  const c = useThemeColors();
-  const hasError = typeof p.error === 'string' && p.error.length > 0;
+/** Flat rounded input with optional leading icon/prefix and inline error. */
+export function TextField({
+  label,
+  leading,
+  error,
+  hideLabel = false,
+  ...input
+}: TextFieldProps): ReactElement {
+  const c = usePalette();
   return (
     <View style={{ gap: tokens.space[1] }}>
-      <Text style={{ color: c.text, fontSize: tokens.type.caption.size, fontWeight: '600' }}>
-        {p.label}
-      </Text>
-      <TextInput
-        testID={p.testID}
-        accessibilityLabel={p.label}
-        accessibilityHint={p.hint}
-        value={p.value}
-        onChangeText={p.onChangeText}
-        keyboardType={p.keyboardType ?? 'default'}
-        maxLength={p.maxLength}
-        placeholder={p.placeholder}
-        placeholderTextColor={c.textMuted}
-        autoFocus={p.autoFocus}
+      {hideLabel ? null : (
+        <AppText variant="caption" tone="muted">
+          {label}
+        </AppText>
+      )}
+      <View
         style={{
-          height: tokens.space[14],
-          borderRadius: tokens.radius.md,
-          borderWidth: hasError ? 2 : 1,
-          borderColor: hasError ? c.danger : c.line,
-          backgroundColor: c.surface,
-          color: c.text,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: tokens.space[2],
+          minHeight: tokens.touchTarget + 4,
           paddingHorizontal: tokens.space[4],
-          fontSize: tokens.type.bodyL.size,
+          borderRadius: tokens.radius.lg,
+          borderWidth: 1,
+          borderColor: error ? c.danger : c.line,
+          backgroundColor: c.surface,
         }}
-      />
-      {hasError ? (
-        <Text
-          accessibilityLiveRegion="polite"
-          style={{ color: c.danger, fontSize: tokens.type.caption.size }}
-        >
-          {p.error}
-        </Text>
-      ) : p.hint ? (
-        <Text style={{ color: c.textMuted, fontSize: tokens.type.caption.size }}>{p.hint}</Text>
+      >
+        {leading}
+        <TextInput
+          accessibilityLabel={label}
+          placeholderTextColor={c.textMuted}
+          {...input}
+          style={{
+            flex: 1,
+            minHeight: tokens.touchTarget,
+            color: c.text,
+            fontSize: tokens.type.bodyL.size,
+            fontFamily: tokens.font.family.body,
+          }}
+        />
+      </View>
+      {error ? (
+        <AppText variant="caption" tone="danger" accessibilityLiveRegion="polite">
+          {error}
+        </AppText>
       ) : null}
     </View>
   );

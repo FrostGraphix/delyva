@@ -1,6 +1,6 @@
 import { RiderIdentitySchema } from '@delyva/contracts';
 import { useMyRiderApplication } from '@delyva/sdk';
-import { Banner, Button, TextField } from '@delyva/ui-native';
+import { RiderBanner, Button, RiderTextField } from '@delyva/ui-native';
 import { type ReactElement, useState } from 'react';
 import { api } from '../../src/api/client';
 import { t } from '../../src/i18n';
@@ -39,7 +39,7 @@ export default function IdentityStep(): ReactElement {
         />
       }
     >
-      {form.formError ? <Banner tone="danger" text={form.formError} /> : null}
+      {form.formError ? <RiderBanner tone="danger" text={form.formError} /> : null}
       <UploadField
         testID="selfie"
         purpose="selfie"
@@ -49,7 +49,7 @@ export default function IdentityStep(): ReactElement {
         onUploaded={setSelfie}
         error={form.errors.selfieUploadId}
       />
-      <TextField
+      <RiderTextField
         testID="nin"
         label={t('onb.nin')}
         value={nin}

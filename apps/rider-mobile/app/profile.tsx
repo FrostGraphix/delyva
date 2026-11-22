@@ -1,5 +1,5 @@
 import { useMyRiderProfile } from '@delyva/sdk';
-import { Button, Card, Typography } from '@delyva/ui-native';
+import { Button, RiderCard, Typography } from '@delyva/ui-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactElement } from 'react';
@@ -14,12 +14,12 @@ import { Screen } from '../src/ui/screen';
 /** One label/value row. */
 function Row({ label, value }: { label: string; value: string }): ReactElement {
   return (
-    <Card>
+    <RiderCard>
       <Typography variant="caption" tone="muted">
         {label}
       </Typography>
       <Typography variant="h3">{value}</Typography>
-    </Card>
+    </RiderCard>
   );
 }
 

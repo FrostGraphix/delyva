@@ -1,0 +1,22 @@
+{
+  "name": "@delyva/e2e-customer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright click-through of the customer web build against a real API + Postgres + Redis.",
+  "scripts": {
+    "e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "devDependencies": {
+    "@delyva/config": "workspace:*",
+    "@playwright/test": "1.65.1",
+    "@types/node": "26.6.6",
+    "@types/pg": "8.23.1",
+    "eslint": "10.15.0",
+    "ioredis": "6.0.0",
+    "pg": "8.23.1",
+    "typescript": "6.0.3"
+  }
+}
