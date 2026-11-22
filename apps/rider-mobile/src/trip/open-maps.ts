@@ -9,7 +9,11 @@ export async function openMaps(to: DispatchPoint): Promise<void> {
   const url = mapsUrl(to, platform);
   if (platform === 'web') {
     // expo-linking navigates the current tab on web, which would drop the active trip screen.
-    window.open(url, '_blank', 'noopener');
+    (globalThis as { open?: (u: string, target: string, features: string) => unknown }).open?.(
+      url,
+      '_blank',
+      'noopener',
+    );
     return;
   }
   try {
