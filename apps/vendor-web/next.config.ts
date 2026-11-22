@@ -38,6 +38,8 @@ const securityHeaders = [
 
 const config: NextConfig = {
   reactStrictMode: true,
+  // Dev-only: lets the E2E browser use 127.0.0.1 without Next blocking HMR.
+  allowedDevOrigins: ['127.0.0.1'],
   poweredByHeader: false,
   headers: () => Promise.resolve([{ source: '/:path*', headers: securityHeaders }]),
 };

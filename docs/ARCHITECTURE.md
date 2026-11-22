@@ -616,3 +616,20 @@ See ADR 0600. Module `apps/api/src/modules/dispatch` (api / application / domain
 - DEBT(dispatch): single-instance Redis lock (not Redlock); unique indexes are the fence.
 - DEBT(dispatch): device location trusted for offline replays (mock-location detection pending); straight-line ETA; no writer yet for plate/hub/rating (onboarding, ratings); no batching.
 - DEBT(dispatch): outbox consumer polls the shared table (as notifications); manual override has no admin audit-log entry (reason on trip row + event only).
+
+## Vendor web (`apps/vendor-web`)
+
+Next.js 16 portal that works as a tablet kitchen screen and desktop console. See ADR 0820.
+
+- **Auth/BFF:** phone + OTP; tokens only in httpOnly Secure SameSite=Lax cookies set by Next route handlers; same-origin `/api/v1/*` allowlisted proxy with server-side refresh; double-submit CSRF + origin checks. Realtime via single-use 60 s socket tickets (`POST /v1/realtime/tickets`); vendor bootstrap via `GET /v1/me/vendors` (both additive API endpoints).
+- **Pages:** `/login`, `/onboarding` (wizard over `/v1/vendor-applications/me/*`, signed uploads via the BFF, CSV import with line-numbered errors, bank name-mismatch confirm, test-order checklist, submit) and `/onboarding/status`, `/orders` (kanban board + loud alert), `/orders/[id]`, `/menu`, `/hours`, `/earnings` (TanStack Table), `/settings`.
+- **UX contract:** every page has skeleton loading, empty, error+retry, offline banner and toast feedback; a11y labels/focus; strings from `lib/i18n` keys; light/dark/system via tokens (no raw hex). Shared components added to `packages/ui-web` (feedback, form controls, dialog, toast) and icons to `packages/icons`.
+- **Tests:** Vitest + Testing Library (`pnpm --filter @delyva/vendor-web test`); Playwright E2E in `tests/e2e/vendor/` (`pnpm test:e2e:vendor`) against the real API (DB `delyva_vendorweb_e2e`, Redis db 5, prefix `vendorweb-e2e`).
+- **Config:** `DELYVA_API_URL`, `NEXT_PUBLIC_REALTIME_URL`, `NEXT_PUBLIC_AUTO_REJECT_SECONDS`, `VENDOR_WEB_ALLOWED_ORIGINS`.
+
+### Known technical debt (vendor web)
+
+- DEBT(payments): no vendor payout/balance read endpoint; earnings shows gross delivered value only.
+- DEBT(catalog): no busy-mode endpoint (disabled placeholder), no category CRUD, no member-scoped menu read (non-live vendors cannot manage menus via the public read).
+- DEBT(realtime): no vendor-wide order room; new orders are polled every 5 s.
+- DEBT(web): CSP allows `'unsafe-inline'` scripts; refresh-rotation dedupe is per process; single locale (English).

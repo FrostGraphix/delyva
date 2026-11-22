@@ -157,8 +157,9 @@ describe('OrderCard', () => {
 describe('useSecondsLeft', () => {
   it('ticks down to a deadline and returns null without one', () => {
     vi.useFakeTimers();
+    const initial: { d: Date | null } = { d: new Date(Date.now() + 10_000) };
     const { result, rerender } = renderHook(({ d }: { d: Date | null }) => useSecondsLeft(d), {
-      initialProps: { d: new Date(Date.now() + 10_000) as Date | null },
+      initialProps: initial,
     });
     expect(Math.round(result.current ?? -1)).toBe(10);
     act(() => {
