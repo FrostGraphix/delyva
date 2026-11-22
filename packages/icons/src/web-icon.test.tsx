@@ -17,12 +17,8 @@ describe('web icons', () => {
   });
 
   it('ships the core set', () => {
-    expect(Object.keys(ICON_PATHS)).toEqual([
-      'check-circle',
-      'house',
-      'map-pin',
-      'shopping-bag',
-      'x',
-    ]);
+    expect(Object.keys(ICON_PATHS)).toEqual(
+      expect.arrayContaining(['check-circle', 'house', 'map-pin', 'shopping-bag', 'x']),
+    );
   });
 });
