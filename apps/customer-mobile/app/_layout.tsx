@@ -1,17 +1,28 @@
-import { themeColors } from '@delyva/design-tokens';
+import { usePalette, useScheme } from '@delyva/ui-native';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import type { ReactElement } from 'react';
-import { useColorScheme } from 'react-native';
+import { type ReactElement, useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { queryClient } from '../src/api/query-client';
+import { useSession } from '../src/auth/session-store';
 
-/** Root navigator; background follows the light/dark token theme. */
+/** Root: providers (query cache, safe area), session hydration and the stack navigator. */
 export default function RootLayout(): ReactElement {
-  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
-  const colors = themeColors(scheme);
+  const scheme = useScheme();
+  const c = usePalette();
+  useEffect(() => {
+    void useSession.getState().hydrate();
+  }, []);
   return (
-    <>
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
-    </>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
+          <Stack.Screen name="vendor/[id]" />
+          <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+        </Stack>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }
