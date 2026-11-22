@@ -26,6 +26,16 @@ export function problem(status: number, code: string, title: string): NextRespon
   );
 }
 
+/**
+ * The origin the browser used to reach us. `nextUrl.origin` can differ (dev binds to localhost
+ * while the browser uses 127.0.0.1), so derive it from the Host header and forwarded protocol.
+ */
+export function selfOrigin(req: NextRequest): string {
+  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? req.nextUrl.host;
+  const proto = req.headers.get('x-forwarded-proto') ?? req.nextUrl.protocol.replace(':', '');
+  return `${proto}://${host}`;
+}
+
 /** Rejects cross-site or token-less mutations. `requireToken=false` only for login. */
 export function csrfGuard(req: NextRequest, requireToken: boolean): NextResponse | null {
   const { allowedOrigins } = serverConfig();
@@ -33,7 +43,7 @@ export function csrfGuard(req: NextRequest, requireToken: boolean): NextResponse
     method: req.method,
     origin: req.headers.get('origin'),
     fetchSite: req.headers.get('sec-fetch-site'),
-    selfOrigin: req.nextUrl.origin,
+    selfOrigin: selfOrigin(req),
     allowedOrigins,
     cookieToken: req.cookies.get(COOKIE.csrf)?.value,
     headerToken: req.headers.get(CSRF_HEADER),
