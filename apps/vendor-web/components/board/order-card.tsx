@@ -109,7 +109,7 @@ export function OrderCard({
       </p>
       {isNew ? <Countdown from={placedAt(o)} /> : null}
       {o?.pickupCode && summary.status !== 'PLACED' ? (
-        <p className="rounded-lg bg-lime-100 px-3 py-2 text-body text-ink-900">
+        <p className="rounded-lg bg-accent-100 px-3 py-2 text-body text-ink-900">
           {t('board.pickupCode')}:{' '}
           <strong className="font-heading text-h3 tracking-widest">{o.pickupCode}</strong>
         </p>

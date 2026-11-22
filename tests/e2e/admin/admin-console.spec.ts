@@ -13,6 +13,7 @@ import {
   type Actor,
   waitForOtpCooldown,
 } from './support/api';
+import { primaryRgb } from '../accent';
 import { base32Decode, hotp, nextTotp, totpStep } from './support/totp';
 
 const SHOTS = path.join(__dirname, 'screenshots');
@@ -352,5 +353,56 @@ test('logout clears the session; sign-in again works with a fresh TOTP code', as
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page).toHaveURL(/\/overview/);
   await shot('26-relogin-overview');
+  expectNoConsoleErrors();
+});
+
+test('accent picker: Orange re-themes the console, persists across reload; screenshots in both accents', async () => {
+  const html = page.locator('html');
+  const activeNav = page.locator('aside nav a[aria-current="page"]');
+  const bg = (): Promise<string> => activeNav.evaluate((el) => getComputedStyle(el).backgroundColor);
+  const overviewAndPricing = async (accent: 'green' | 'orange'): Promise<void> => {
+    await page.goto('/overview');
+    await expect(page.getByRole('heading', { name: 'Overview', level: 1 })).toBeVisible();
+    await expect(page.getByText('Loading')).toHaveCount(0);
+    await shot(`30-accent-${accent}-overview`);
+    await page.goto('/pricing');
+    await expect(page.getByRole('heading', { name: 'Delivery fee rules' })).toBeVisible();
+    await shot(`31-accent-${accent}-pricing`);
+  };
+
+  await overviewAndPricing('green');
+  await page.goto('/settings');
+  await expect(page.getByRole('heading', { name: 'Appearance', level: 1 })).toBeVisible();
+  await expect(html).toHaveAttribute('data-accent', 'green');
+  await expect(page.getByRole('radio', { name: /Green/ })).toBeChecked();
+  const greenBg = await bg();
+  expect(greenBg).toBe(primaryRgb('green', __dirname));
+
+  await page.locator('label').filter({ hasText: 'Orange' }).click();
+  await expect(html).toHaveAttribute('data-accent', 'orange');
+  await expect(page.getByRole('radio', { name: /Orange/ })).toBeChecked();
+  await expect(page.getByText('Selected', { exact: true })).toBeVisible();
+  const orangeBg = await bg();
+  expect(orangeBg).not.toBe(greenBg);
+  expect(orangeBg).toBe(primaryRgb('orange', __dirname));
+  const cookie = (await context.cookies()).find((c) => c.name === 'dl_accent');
+  expect(cookie?.value).toBe('orange');
+  expect(cookie?.httpOnly).toBe(false);
+  expect(cookie?.sameSite).toBe('Lax');
+  await shot('32-accent-orange-settings');
+
+  const raw = await (await page.request.get('/login')).text();
+  expect(raw).toMatch(/<html[^>]*data-accent="orange"/);
+  await page.reload();
+  await expect(html).toHaveAttribute('data-accent', 'orange');
+  expect(await bg()).toBe(primaryRgb('orange', __dirname));
+  await overviewAndPricing('orange');
+
+  await page.goto('/settings');
+  await page.locator('label').filter({ hasText: 'Green' }).click();
+  await expect(html).toHaveAttribute('data-accent', 'green');
+  expect(await bg()).toBe(primaryRgb('green', __dirname));
+  await page.reload();
+  await expect(html).toHaveAttribute('data-accent', 'green');
   expectNoConsoleErrors();
 });

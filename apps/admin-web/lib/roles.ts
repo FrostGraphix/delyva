@@ -22,6 +22,7 @@ export const SECTION_ROLES = {
   pricing: ['ops', 'super_admin'],
   flags: ['super_admin'],
   audit: ['support', 'ops', 'finance', 'super_admin'],
+  settings: ['support', 'ops', 'finance', 'super_admin'],
 } as const satisfies Record<string, readonly ConsoleRole[]>;
 
 /** A console section key. */

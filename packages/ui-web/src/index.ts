@@ -12,3 +12,6 @@ export * from './stat-card.js';
 export * from './modal.js';
 export * from './toast.js';
 export * from './checkbox.js';
+export * from './accent.js';
+export * from './accent-picker.js';
+export * from './accent-switcher.js';

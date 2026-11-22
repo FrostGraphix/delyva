@@ -17,7 +17,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 const VARIANT: Record<ButtonVariant, string> = {
   ink: 'bg-button-ink text-on-button-ink',
   brand: 'bg-primary text-on-primary',
-  soft: 'bg-lime-100 text-ink-900',
+  soft: 'bg-accent-100 text-ink-900',
   ghost: 'bg-transparent text-text',
   danger: 'bg-danger text-on-button-ink',
 };

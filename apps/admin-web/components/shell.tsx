@@ -2,6 +2,7 @@
 import {
   ChartBarIcon,
   FlagIcon,
+  GearIcon,
   MapTrifoldIcon,
   MopedIcon,
   ScrollIcon,
@@ -36,6 +37,7 @@ const NAV: readonly NavItem[] = [
   { href: '/pricing', label: 'nav.pricing', section: 'pricing', Icon: TagIcon },
   { href: '/flags', label: 'nav.flags', section: 'flags', Icon: FlagIcon },
   { href: '/audit', label: 'nav.audit', section: 'audit', Icon: ScrollIcon },
+  { href: '/settings', label: 'nav.settings', section: 'settings', Icon: GearIcon },
 ];
 
 function NavLink({

@@ -657,6 +657,7 @@ Next.js 16 portal that works as a tablet kitchen screen and desktop console. See
 - **Pages:** `/login`, `/onboarding` (wizard over `/v1/vendor-applications/me/*`, signed uploads via the BFF, CSV import with line-numbered errors, bank name-mismatch confirm, test-order checklist, submit) and `/onboarding/status`, `/orders` (kanban board + loud alert), `/orders/[id]`, `/menu`, `/hours`, `/earnings` (TanStack Table), `/settings`.
 - **UX contract:** every page has skeleton loading, empty, error+retry, offline banner and toast feedback; a11y labels/focus; strings from `lib/i18n` keys; light/dark/system via tokens (no raw hex). Shared components added to `packages/ui-web` (feedback, form controls, dialog, toast) and icons to `packages/icons`.
 - **Tests:** Vitest + Testing Library (`pnpm --filter @delyva/vendor-web test`); Playwright E2E in `tests/e2e/vendor/` (`pnpm test:e2e:vendor`) against the real API (DB `delyva_vendorweb_e2e`, Redis db 5, prefix `vendorweb-e2e`).
+- **Accent theme:** Settings → Appearance picks `green`/`orange` (`data-accent` on `<html>`, server-rendered from the `dl_accent` cookie; ADR 0840). The admin console has the same picker at `/settings`.
 - **Config:** `DELYVA_API_URL`, `NEXT_PUBLIC_REALTIME_URL`, `NEXT_PUBLIC_AUTO_REJECT_SECONDS`, `VENDOR_WEB_ALLOWED_ORIGINS`.
 
 ### Known technical debt (vendor web)

@@ -2,6 +2,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import { CUSTOMER_PHONE, FRESH_PHONE, OWNER_PHONE, VENDOR_ID } from './env';
+import { primaryRgb } from '../accent';
 import { customerToken, loginViaUi, placeWalletOrder, publicVendor } from './helpers';
 
 const SHOTS = join(import.meta.dirname, 'screenshots');
@@ -240,4 +241,65 @@ test('fresh vendor completes the onboarding wizard to submission', async ({ page
     'http 400 POST /api/v1/vendor-applications/me/menu-import',
     'http 422 PUT /api/v1/vendor-applications/me/bank-account',
   ]);
+});
+
+test('accent picker: Orange re-themes the portal, persists across reload, screenshots in both accents', async ({
+  page,
+  context,
+}) => {
+  const errors = watchConsole(page);
+  await loginViaUi(page, OWNER_PHONE, /\/orders$/);
+  const html = page.locator('html');
+  await expect(html).toHaveAttribute('data-accent', 'green');
+  const orderBoardAndMenu = async (accent: 'green' | 'orange'): Promise<void> => {
+    await page.goto('/orders');
+    await expect(page.getByRole('heading', { name: 'Orders board' })).toBeVisible();
+    await shot(page, `30-accent-${accent}-orders-board`);
+    await page.goto('/menu');
+    await expect(page.getByRole('heading', { name: 'Menu', exact: true })).toBeVisible();
+    await shot(page, `31-accent-${accent}-menu`);
+  };
+
+  await orderBoardAndMenu('green');
+  await page.goto('/settings');
+  await expect(page.getByRole('heading', { name: 'Appearance' })).toBeVisible();
+  const systemTheme = page.getByRole('button', { name: 'System' });
+  await expect(systemTheme).toHaveAttribute('aria-pressed', 'true');
+  const greenBg = await systemTheme.evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(greenBg).toBe(primaryRgb('green', import.meta.dirname));
+  await expect(page.getByRole('radio', { name: /Green/ })).toBeChecked();
+
+  await test.step('switch to Orange', async () => {
+    await page.locator('label').filter({ hasText: 'Orange' }).click();
+    await expect(html).toHaveAttribute('data-accent', 'orange');
+    await expect(page.getByRole('radio', { name: /Orange/ })).toBeChecked();
+    await expect(page.getByText('Selected', { exact: true })).toBeVisible();
+    const orangeBg = await systemTheme.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(orangeBg).not.toBe(greenBg);
+    expect(orangeBg).toBe(primaryRgb('orange', import.meta.dirname));
+    const cookie = (await context.cookies()).find((c) => c.name === 'dl_accent');
+    expect(cookie?.value).toBe('orange');
+    expect(cookie?.httpOnly).toBe(false);
+    expect(cookie?.sameSite).toBe('Lax');
+    await shot(page, '32-accent-orange-settings');
+  });
+
+  await test.step('persists across reload and is server-rendered (no flash)', async () => {
+    const raw = await (await page.request.get('/login')).text();
+    expect(raw).toMatch(/<html[^>]*data-accent="orange"/);
+    await page.reload();
+    await expect(html).toHaveAttribute('data-accent', 'orange');
+    expect(await systemTheme.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(primaryRgb('orange', import.meta.dirname));
+    await orderBoardAndMenu('orange');
+  });
+
+  await test.step('switch back to Green', async () => {
+    await page.goto('/settings');
+    await page.locator('label').filter({ hasText: 'Green' }).click();
+    await expect(html).toHaveAttribute('data-accent', 'green');
+    expect(await systemTheme.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(primaryRgb('green', import.meta.dirname));
+    await page.reload();
+    await expect(html).toHaveAttribute('data-accent', 'green');
+  });
+  expect(errors).toEqual([]);
 });

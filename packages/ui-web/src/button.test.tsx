@@ -23,7 +23,7 @@ describe('Button (web)', () => {
 
   it('maps every variant to token classes', () => {
     expect(buttonClassName('danger', 'sm')).toContain('bg-danger');
-    expect(buttonClassName('soft')).toContain('bg-lime-100');
+    expect(buttonClassName('soft')).toContain('bg-accent-100');
     expect(buttonClassName('ghost')).toContain('bg-transparent');
   });
 });

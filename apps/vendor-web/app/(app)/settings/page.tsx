@@ -1,7 +1,7 @@
 'use client';
 
 import { SignOutIcon, SpeakerIcon } from '@delyva/icons/web';
-import { Button, Switch } from '@delyva/ui-web';
+import { AccentSwitcher, Button, Switch } from '@delyva/ui-web';
 import { type ReactNode, useEffect, useState } from 'react';
 import { signOut } from '../../../components/app-shell';
 import { playChime, unlockSound } from '../../../lib/client/alert-sound';
@@ -68,6 +68,16 @@ export default function SettingsPage(): ReactNode {
           ))}
         </div>
       </fieldset>
+      <section aria-labelledby="appearance-title" className="flex flex-col gap-3">
+        <h2 id="appearance-title" className="font-heading text-h2 font-extrabold">
+          {t('settings.appearance')}
+        </h2>
+        <AccentSwitcher
+          legend={t('settings.accent')}
+          selectedLabel={t('settings.accent.selected')}
+          labels={{ green: t('settings.accent.green'), orange: t('settings.accent.orange') }}
+        />
+      </section>
       <Button
         variant="soft"
         onClick={() => {
