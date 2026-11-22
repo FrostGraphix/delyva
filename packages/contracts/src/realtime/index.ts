@@ -58,6 +58,14 @@ export interface RiderLocationBroadcast {
   readonly ts: number;
 }
 
+/** POST /v1/realtime/tickets response: a 60 s single-use Socket.IO handshake ticket (ADR 0820). */
+export const RealtimeTicketSchema = z.strictObject({
+  ticket: z.string().min(32).max(128),
+  expiresInSeconds: z.number().int().positive(),
+});
+/** Socket handshake ticket. */
+export type RealtimeTicket = z.infer<typeof RealtimeTicketSchema>;
+
 /** Order status broadcast to an order room (`order:status`). */
 export interface OrderStatusBroadcast {
   readonly orderId: string;

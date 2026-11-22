@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { type DynamicModule, Module } from '@nestjs/common';
 import type { Redis } from 'ioredis';
 import { ACCESS_TOKEN_VERIFIER, AuthGuard } from '../../shared/auth/auth.guard.js';
@@ -8,6 +9,9 @@ import { REDIS } from '../../shared/redis/redis.js';
 import { IdentityModule } from '../identity/identity.module.js';
 import { RealtimeGateway } from './api/realtime.gateway.js';
 import { RiderLocationsController } from './api/rider-locations.controller.js';
+import { SocketTicketsController } from './api/socket-tickets.controller.js';
+import { SocketTickets } from './application/socket-tickets.js';
+import { RedisSocketTicketStore } from './infrastructure/redis-ticket.store.js';
 import { DefaultLiveTrackingService, LIVE_TRACKING } from './application/live-tracking.service.js';
 import { ORDER_ROOM_AUTHORIZER, type OrderRoomAuthorizer } from './application/ports.js';
 import { DenyByDefaultOrderRoomAuthorizer } from './infrastructure/order-room.authorizers.js';
@@ -24,7 +28,7 @@ import { SocketRoomBroadcaster } from './infrastructure/socket-io.js';
  */
 @Module({
   imports: [IdentityModule],
-  controllers: [RiderLocationsController],
+  controllers: [RiderLocationsController, SocketTicketsController],
   providers: [
     {
       provide: ACCESS_TOKEN_VERIFIER,
@@ -49,6 +53,12 @@ import { SocketRoomBroadcaster } from './infrastructure/socket-io.js';
       provide: RedisLocationRateLimiter,
       inject: [REDIS],
       useFactory: (r: Redis) => new RedisLocationRateLimiter(r),
+    },
+    {
+      provide: SocketTickets,
+      inject: [REDIS],
+      useFactory: (r: Redis) =>
+        new SocketTickets(new RedisSocketTicketStore(r), () => randomBytes(32).toString('hex')),
     },
     {
       provide: LIVE_TRACKING,

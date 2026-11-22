@@ -564,7 +564,7 @@ See ADR 0500. Module `apps/api/src/modules/ordering` (api / application / domain
 - **Checkout:** see ADR 0500 §3. Pricing zone code = lower-cased city of the geo zone (fixes the catalog/pricing zone DEBT).
 - **Money:** capture split at DELIVERED (vendor = items − commission, rider = delivery share, platform = commission + service + small-order + rest of delivery, tax = VAT, promo = discount); refunds before capture = hold release to the wallet.
 - **Ports for other contexts:** `OrderFulfilmentPort` under `ORDER_FULFILMENT_PORT` (dispatch); `OrderRoomAccess` registered as realtime's `ORDER_ROOM_AUTHORIZER`. New public services consumed: `CatalogService` (catalog), `GeoService.zonesAt/addressOf` (geo), `TransactionalRedeemPromo` (pricing).
-- **Endpoints:** `GET /v1/carts`, `GET /v1/carts/{cartId}`, `POST /v1/carts/lines`, `PATCH|DELETE /v1/carts/{cartId}/lines/{lineId}`, `DELETE /v1/carts/{cartId}`, `POST /v1/orders`, `GET /v1/orders`, `GET /v1/orders/{id}`, `POST /v1/orders/{id}/cancel`, `POST /v1/orders/{id}/reorder`, `GET /v1/vendors/{vendorId}/orders?status=`, `POST /v1/vendor-orders/{id}/accept|reject|preparing|ready`, `GET /v1/admin/orders`, `POST /v1/admin/orders/{id}/cancel`. All writes take `Idempotency-Key`.
+- **Endpoints:** `GET /v1/carts`, `GET /v1/carts/{cartId}`, `POST /v1/carts/lines`, `PATCH|DELETE /v1/carts/{cartId}/lines/{lineId}`, `DELETE /v1/carts/{cartId}`, `POST /v1/orders`, `GET /v1/orders`, `GET /v1/orders/{id}`, `POST /v1/orders/{id}/cancel`, `POST /v1/orders/{id}/reorder`, `GET /v1/vendors/{vendorId}/orders?status=`, `GET /v1/vendor-orders/{id}` (vendor-audience detail, members only; additive, added with the vendor portal), `POST /v1/vendor-orders/{id}/accept|reject|preparing|ready`, `GET /v1/admin/orders`, `POST /v1/admin/orders/{id}/cancel`. All writes take `Idempotency-Key`.
 - **Jobs:** BullMQ queue `ordering-auto-reject` (delayed, `jobId = orderId`) and the payments-event outbox consumer run in the API process when `ORDERING_JOBS_ENABLED=true`.
 - **Env:** `ORDERING_AUTO_REJECT_SECONDS` (300), `ORDERING_VENDOR_COMMISSION_BPS` (0), `ORDERING_RIDER_DELIVERY_SHARE_BPS` (8000), `ORDERING_JOBS_ENABLED` (true).
 
@@ -628,6 +628,22 @@ See ADR 0600. Module `apps/api/src/modules/dispatch` (api / application / domain
 - **Secrets.** Refresh token + device id in `expo-secure-store` (Keychain/Keystore); access token in memory only; preferences/guest cart in AsyncStorage (no tokens, no PII beyond first name).
 - **E2E.** `tests/e2e/customer` (Playwright) builds the web target and runs it against the real API on port 3320 with its own database `delyva_custapp_e2e` and Redis db 7 (fake payment provider, dev OTP read from Redis).
 - **DEBT** is tracked in code as `DEBT(...)` markers: MMKV, Places autocomplete, search endpoint (Meilisearch), rider summary in `Order`, masked call/chat, PostHog, push token registration without an EAS project id, web tokens in memory only, API CORS.
+## Vendor web (`apps/vendor-web`)
+
+Next.js 16 portal that works as a tablet kitchen screen and desktop console. See ADR 0820.
+
+- **Auth/BFF:** phone + OTP; tokens only in httpOnly Secure SameSite=Lax cookies set by Next route handlers; same-origin `/api/v1/*` allowlisted proxy with server-side refresh; double-submit CSRF + origin checks. Realtime via single-use 60 s socket tickets (`POST /v1/realtime/tickets`); vendor bootstrap via `GET /v1/me/vendors` (both additive API endpoints).
+- **Pages:** `/login`, `/onboarding` (wizard over `/v1/vendor-applications/me/*`, signed uploads via the BFF, CSV import with line-numbered errors, bank name-mismatch confirm, test-order checklist, submit) and `/onboarding/status`, `/orders` (kanban board + loud alert), `/orders/[id]`, `/menu`, `/hours`, `/earnings` (TanStack Table), `/settings`.
+- **UX contract:** every page has skeleton loading, empty, error+retry, offline banner and toast feedback; a11y labels/focus; strings from `lib/i18n` keys; light/dark/system via tokens (no raw hex). Shared components added to `packages/ui-web` (feedback, form controls, dialog, toast) and icons to `packages/icons`.
+- **Tests:** Vitest + Testing Library (`pnpm --filter @delyva/vendor-web test`); Playwright E2E in `tests/e2e/vendor/` (`pnpm test:e2e:vendor`) against the real API (DB `delyva_vendorweb_e2e`, Redis db 5, prefix `vendorweb-e2e`).
+- **Config:** `DELYVA_API_URL`, `NEXT_PUBLIC_REALTIME_URL`, `NEXT_PUBLIC_AUTO_REJECT_SECONDS`, `VENDOR_WEB_ALLOWED_ORIGINS`.
+
+### Known technical debt (vendor web)
+
+- DEBT(payments): no vendor payout/balance read endpoint; earnings shows gross delivered value only.
+- DEBT(catalog): no busy-mode endpoint (disabled placeholder), no category CRUD, no member-scoped menu read (non-live vendors cannot manage menus via the public read).
+- DEBT(realtime): no vendor-wide order room; new orders are polled every 5 s.
+- DEBT(web): CSP allows `'unsafe-inline'` scripts; refresh-rotation dedupe is per process; single locale (English).
 ## Admin web (Phase 1, 2026-11-22)
 
 See ADR 0830. App `apps/admin-web` (Next.js 16 App Router, Tailwind on design tokens, TanStack Query + Table v9). New shared UI in `packages/ui-web` (Card, Skeleton, Badge, Alert, EmptyState, TextField/TextAreaField/SelectField, Checkbox, StatCard, Modal, ToastViewport) and icons in `packages/icons` (chart-bar, map-trifold, storefront, moped, tag, flag, list-checks, sign-out, arrow-clockwise, wifi-slash, warning, shield-check, scroll). SDK gained `listSurgeRules`, `createSurgeRule`, `updateSurgeRule` (additive).

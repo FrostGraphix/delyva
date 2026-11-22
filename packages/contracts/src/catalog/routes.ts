@@ -6,6 +6,7 @@ import {
   DiscoverVendorsQuerySchema,
   DiscoverVendorsResponseSchema,
   MenuItemSchema,
+  MyVendorListSchema,
   ModifierGroupSchema,
   ModifierOptionSchema,
   OpeningHoursEntrySchema,
@@ -26,6 +27,15 @@ export type OpeningHoursResponse = z.infer<typeof OpeningHoursResponseSchema>;
 
 /** Catalog routes (discovery + vendor menu management). Spread into the OpenAPI route registry. */
 export const CATALOG_ROUTES = {
+  listMyVendors: {
+    method: 'get',
+    path: '/v1/me/vendors',
+    operationId: 'listMyVendors',
+    summary: 'Vendors the caller owns or staffs (vendor portal bootstrap)',
+    auth: true,
+    success: { status: 200, schema: MyVendorListSchema },
+    errors: [401, 403],
+  },
   discoverVendors: {
     method: 'get',
     path: '/v1/vendors',

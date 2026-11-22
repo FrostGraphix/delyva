@@ -230,6 +230,12 @@ export class VendorOrderActionsController {
   /** @param actions vendor actions */
   constructor(private readonly actions: VendorOrderActions) {}
 
+  /** GET /v1/vendor-orders/{id} */
+  @Get()
+  one(@Principal() p: AuthPrincipal, @Param('id', uuid) id: string): Promise<Order> {
+    return this.actions.get(p.userId, id);
+  }
+
   /** POST …/accept */
   @Post('accept')
   @HttpCode(200)

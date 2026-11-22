@@ -44,6 +44,12 @@ export class VendorOrderActions {
   /** @param deps collaborators */
   constructor(private readonly deps: OrderCommandDeps) {}
 
+  /** One order of a vendor the caller belongs to, rendered for the vendor audience (foreign → 404). */
+  async get(userId: string, orderId: string): Promise<Order> {
+    const order = await vendorOrder(this.deps, userId, orderId);
+    return renderOrder(this.deps, order, 'vendor');
+  }
+
   /** PLACED → VENDOR_ACCEPTED with prep time; emits the event dispatch consumes. */
   async accept(userId: string, orderId: string, input: AcceptOrder): Promise<Order> {
     await vendorOrder(this.deps, userId, orderId);

@@ -140,6 +140,15 @@ export const ORDERING_ROUTES = {
     errors: [400, 401, 403],
     auth: true,
   },
+  getVendorOrder: {
+    method: 'get',
+    path: '/v1/vendor-orders/{id}',
+    operationId: 'getVendorOrder',
+    summary: 'One order of your vendor: items, totals, timeline and pickup code (vendor members only)',
+    success: { status: 200, schema: OrderSchema },
+    errors: [401, 403, 404],
+    auth: true,
+  },
   acceptVendorOrder: {
     method: 'post',
     path: '/v1/vendor-orders/{id}/accept',
