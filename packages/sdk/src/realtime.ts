@@ -1,5 +1,6 @@
 import {
   type ClientToServerEvents,
+  type DispatchOffer,
   type OrderStatusBroadcast,
   type RiderLocationBroadcast,
   type RiderLocationInput,
@@ -74,6 +75,12 @@ export class RealtimeClient {
   onOrderStatus(listener: (p: OrderStatusBroadcast) => void): () => void {
     this.socket.on(SOCKET_EVENTS.orderStatus, listener);
     return () => this.socket.off(SOCKET_EVENTS.orderStatus, listener);
+  }
+
+  /** Subscribes to job offers sent to this rider (`dispatch:offer`); returns an unsubscribe function. */
+  onDispatchOffer(listener: (offer: DispatchOffer) => void): () => void {
+    this.socket.on(SOCKET_EVENTS.dispatchOffer, listener);
+    return () => this.socket.off(SOCKET_EVENTS.dispatchOffer, listener);
   }
 
   /** Closes the connection. */

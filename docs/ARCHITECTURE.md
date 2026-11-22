@@ -617,6 +617,27 @@ See ADR 0600. Module `apps/api/src/modules/dispatch` (api / application / domain
 - DEBT(dispatch): device location trusted for offline replays (mock-location detection pending); straight-line ETA; no writer yet for plate/hub/rating (onboarding, ratings); no batching.
 - DEBT(dispatch): outbox consumer polls the shared table (as notifications); manual override has no admin audit-log entry (reason on trip row + event only).
 
+## Rider app (Phase 1, 2026-11-22)
+
+`apps/rider-mobile` (Expo Router, TypeScript strict) consumes the API only through `packages/sdk` (new `onDispatchOffer` socket helper) and `packages/contracts`. UI comes from additive components in `packages/ui-native` and icons in `packages/icons`.
+
+- **Flows:** phone + OTP; KYC onboarding (personal, identity, vehicle, guarantor, bank name-resolve, training quiz) with progress saved per step; review, pending and approved status; home with online/offline shift and battery level; live dispatch offers (20 s countdown, accept/decline); trip stages (head to store, pickup code, at store, picked up, to customer, delivery OTP, summary); earnings; profile; report issue; offline banner.
+- **Offline tolerance:** trip actions (picked up, arrived, delivered) are queued locally with idempotency keys and replayed on reconnect. The server prefers the live position over a device fix unless the action is a recent replay (`chooseFix`).
+- **Location:** foreground reporting every 4.5 s on a trip, 30 s idle; a fresh fix is attached to each trip action.
+- **Maps hand-off:** native Maps URL on device; on web `window.open` (expo-linking would navigate the current tab).
+- **E2E:** `tests/e2e/rider` (Playwright against the Expo web build, real API, Postgres db `delyva_riderapp_e2e`, Redis db 10). Run `pnpm e2e:rider`; see `tests/e2e/rider/README.md`.
+
+### Known technical debt (rider app)
+
+- DEBT(rider-app): busy-zone hint is not shown — no demand signal in the contract — add a zone heat endpoint.
+- DEBT(rider-app): offer earnings are missing from the dispatch offer contract — rider cannot see the payout before accepting — add `earningsMinor` to the offer.
+- DEBT(rider-app): balance and cash-out are not available — `balanceMinor` is null (see dispatch debt) — wire payouts when PaymentsService exposes rider_payable.
+- DEBT(rider-app): SOS is a placeholder card — no emergency contact flow — add ops alert and masked call.
+- DEBT(rider-app): location is foreground only — background needs expo-task-manager and a dev build — add with the EAS dev client.
+- DEBT(rider-app): AsyncStorage is used instead of MMKV (needs a dev build) — migrate with the dev client.
+- DEBT(rider-app): on web, tokens live in sessionStorage — web is for E2E only, not shipped — keep native on expo-secure-store.
+- DEBT(rider-app): English only — i18n keys are in place — add Pidgin, Yoruba, Hausa and Igbo catalogues.
+
 ## Customer app (Phase 1, 2026-11-21)
 
 `apps/customer-mobile` — Expo SDK 58 (managed), Expo Router, TanStack Query + Zustand, all server calls through `@delyva/sdk`. ADR: `adr/0800-customer-app-state-and-navigation.md`.

@@ -22,6 +22,9 @@ tests/e2e/vendor/screenshots/
 tests/e2e/vendor/test-results/
 .data/
 
+tests/e2e/rider/screenshots/
+tests/e2e/rider/test-results/
+apps/rider-mobile/dist-web*/
 tests/e2e/admin/screenshots/
 tests/e2e/admin/test-results/
 .demo-*.log

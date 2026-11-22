@@ -1,36 +1,33 @@
-import { themeColors, tokens } from '@delyva/design-tokens';
-import { CheckCircleIcon } from '@delyva/icons/native';
-import { Button } from '@delyva/ui-native';
+import { RiderSkeleton, RiderStateMessage } from '@delyva/ui-native';
+import { Redirect } from 'expo-router';
 import type { ReactElement } from 'react';
-import { Text, useColorScheme, View } from 'react-native';
+import { API_URL } from '../src/config';
+import { t } from '../src/i18n';
+import { isRider, useSession } from '../src/session/session-store';
+import { Screen } from '../src/ui/screen';
 
-/** First screen scaffold: tokens, a design-system button and a native icon. */
-export default function HomeScreen(): ReactElement {
-  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
-  const colors = themeColors(scheme);
-  // DEBT(i18n): hard-coded English copy — i18n setup lands with onboarding — move to message catalogues.
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'flex-end',
-        padding: tokens.space[4],
-        gap: tokens.space[6],
-      }}
-    >
-      <CheckCircleIcon size={32} color={colors.accentText} accessibilityLabel="Delyva Rider" />
-      <Text
-        accessibilityRole="header"
-        style={{
-          color: colors.text,
-          fontSize: tokens.type.h1.size,
-          lineHeight: tokens.type.h1.line,
-          fontWeight: '800',
-        }}
-      >
-        You are offline
-      </Text>
-      <Button label="Go online" variant="brand" size="lg" onPress={() => undefined} />
-    </View>
-  );
+/** Entry gate: sign-in, onboarding, or the rider home depending on the session. */
+export default function Gate(): ReactElement {
+  const status = useSession((s) => s.status);
+  const rider = useSession((s) => isRider(s.roles));
+  if (API_URL === '') {
+    return (
+      <Screen>
+        <RiderStateMessage
+          tone="danger"
+          title={t('common.errorTitle')}
+          body={t('common.configMissing')}
+        />
+      </Screen>
+    );
+  }
+  if (status === 'loading') {
+    return (
+      <Screen>
+        <RiderSkeleton label={t('common.loading')} />
+      </Screen>
+    );
+  }
+  if (status === 'signedOut') return <Redirect href="/sign-in" />;
+  return <Redirect href={rider ? '/home' : '/onboarding'} />;
 }
