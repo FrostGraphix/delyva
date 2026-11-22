@@ -18,3 +18,6 @@ dist-web/
 tests/e2e/customer/screenshots/
 tests/e2e/customer/test-results/
 tests/e2e/customer/playwright-report/
+
+tests/e2e/admin/screenshots/
+tests/e2e/admin/test-results/

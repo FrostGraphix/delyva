@@ -39,6 +39,12 @@ import {
   type CreatePromo,
   type FeeRule,
   type FeeRuleList,
+  type CreateSurgeRule,
+  type SurgeRule,
+  type SurgeRuleList,
+  SurgeRuleListSchema,
+  SurgeRuleSchema,
+  type UpdateSurgeRule,
   FeeRuleListSchema,
   FeeRuleSchema,
   type Promo,
@@ -269,6 +275,21 @@ export class DelyvaClient {
   /** PATCH /v1/admin/fee-rules/{id} */
   updateFeeRule(id: string, body: UpdateFeeRule): Promise<FeeRule> {
     return this.send('PATCH', withId(ROUTES.updateFeeRule.path, id), body, FeeRuleSchema);
+  }
+
+  /** GET /v1/admin/surge-rules */
+  listSurgeRules(): Promise<SurgeRuleList> {
+    return this.send('GET', ROUTES.listSurgeRules.path, undefined, SurgeRuleListSchema);
+  }
+
+  /** POST /v1/admin/surge-rules */
+  createSurgeRule(body: CreateSurgeRule, idempotencyKey?: string): Promise<SurgeRule> {
+    return this.post(ROUTES.createSurgeRule.path, body, SurgeRuleSchema, this.idem(idempotencyKey));
+  }
+
+  /** PATCH /v1/admin/surge-rules/{id} */
+  updateSurgeRule(id: string, body: UpdateSurgeRule): Promise<SurgeRule> {
+    return this.send('PATCH', withId(ROUTES.updateSurgeRule.path, id), body, SurgeRuleSchema);
   }
 
   /** GET /v1/admin/promos */
