@@ -24,7 +24,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const form = await req.formData().catch(() => null);
   const file = form?.get('file');
   const purpose = UploadPurposeSchema.safeParse(form?.get('purpose'));
-  const type = UploadContentTypeSchema.safeParse(file instanceof File ? file.type : null);
+  const type = UploadContentTypeSchema.safeParse(file instanceof File ? declaredType(file) : null);
   if (!(file instanceof File) || !purpose.success || !type.success) {
     return problem(400, 'validation_failed', 'Choose a PDF, JPG, PNG, WebP or CSV file.');
   }
@@ -67,4 +67,9 @@ async function declare(
     });
   }
   return UploadTicketSchema.parse(await res.json());
+}
+
+/** Windows browsers report CSV files as an Excel MIME type; trust the extension for CSV only. */
+function declaredType(file: File): string {
+  return file.name.toLowerCase().endsWith('.csv') ? 'text/csv' : file.type;
 }

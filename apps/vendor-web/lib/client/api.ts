@@ -56,7 +56,12 @@ export async function uploadFile(file: File, purpose: string): Promise<string> {
   const form = new FormData();
   form.set('purpose', purpose);
   form.set('file', file);
-  const res = await csrfFetch('/api/uploads', { method: 'POST', body: form });
+  let res = await csrfFetch('/api/uploads', { method: 'POST', body: form });
+  if (res.status === 401) {
+    // The upload route does not rotate tokens; a proxied GET refreshes the session first.
+    await csrfFetch('/api/v1/vendor-applications/me');
+    res = await csrfFetch('/api/uploads', { method: 'POST', body: form });
+  }
   return (await parse<{ uploadId: string }>(res)).uploadId;
 }
 
